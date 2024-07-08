@@ -1,0 +1,37 @@
+<form id="filter-form" action="" method="{{ method }}" class="form-inline">
+
+  {% if csrf %}
+    {{ form.hidden_tag() }}
+  {% endif %}
+
+  {% for field in form.fields() %}
+
+      <div class="mb-3 mr-sm-3">
+        <label>
+          {{ field.label }}&nbsp;&nbsp;&nbsp;
+          <span class="fas fa-info-circle"
+                data-toggle="collapse"
+                data-target="#help-{{ field.short_name }}"></span>
+        </label>
+        {{ field() }}
+      </div>
+
+  {% endfor %}
+
+  {{ form.submit() }}
+
+</form>
+
+<div id="filter-help">
+
+{% for field in form.fields() %}
+
+  <div id="help-{{ field.short_name }}"
+       class="collapse"
+       data-parent="#filter-help">
+    <span class="fas fa-info-circle"></span> {{ field.description }}
+  </div>
+
+{% endfor %}
+
+</div>

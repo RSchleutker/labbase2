@@ -1,0 +1,39 @@
+{% macro table(entities) %}
+
+  <table class="table table-results">
+    <caption>Result table of filtered antibodies.</caption>
+    <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Label</th>
+      <th scope="col">Clone</th>
+      <th scope="col">Host</th>
+      <th scope="col">Clonality</th>
+      <th scope="col">Antigen</th>
+      <th scope="col">Conjugate</th>
+      <th scope="col">Location</th>
+    </tr>
+    </thead>
+    <tbody id="table-results-body">
+
+    {% for antibody in entities %}
+      <tr onclick="request_details('{{ url_for(".details", id=antibody.id) }}')">
+        <td class="id">{{ antibody.id }}</td>
+        <td>{{ antibody.label }}</td>
+        <td>{% if antibody.clone %}{{ antibody.clone }}{% endif %}</td>
+        <td>{% if antibody.host %}{{ antibody.host }}{% endif %}</td>
+        <td>{% if antibody.specification %}
+          {{ antibody.specification }}
+        {% endif %}</td>
+        <td>{{ antibody.antigen }}</td>
+        <td>{% if antibody.conjugate %}
+          {{ antibody.conjugate }}
+        {% endif %}</td>
+        <td>{% if antibody.location %}{{ antibody.location }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+
+{% endmacro %}

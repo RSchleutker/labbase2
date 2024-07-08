@@ -1,0 +1,104 @@
+{% from 'dilutions/form.html' import dilutions_add_form %}
+
+
+{% macro pane_details(dilution, form) %}
+
+  <li>
+    {% if dilution.date %}
+    <span class="date"><b>{{ dilution.date.isoformat() }}</b> ({{ dilution.user.username }})</span>
+    {% else %}
+    <span class="date"><b>No date</b> ({{ dilution.user.username }})</span>
+    {% endif %}
+  <span class="float-right">
+    <b>{{ dilution.dilution }}</b>
+    &nbsp;
+    {% if dilution.user_id == current_user.id %}
+    <a class="text-primary"
+         data-toggle="modal"
+         data-target="#modal-edit-dilution-{{ dilution.id }}">
+        <i class="fa-solid fa-pen"></i>
+      </a>
+      &nbsp;
+      <a class="text-danger"
+         onclick="delete_entity('{{ url_for("antibodies.dilutions.delete", id=dilution.id, antibody_id=dilution.antibody_id) }}')">
+        <i class="fa-solid fa-trash"></i>
+      </a>
+    {% endif %}
+  </span>
+
+  <hr style="margin: 3px 0px;">
+
+    <p class="info" style="font-size: unset;">
+      {{ dilution.reference }}
+    </p>
+  </li>
+
+  {{ dilutions_add_form(form(None, obj=dilution), "antibodies.dilutions.edit", "PUT", dilution.id, dilution.antibody_id) }}
+
+{% endmacro %}
+
+
+{% macro dilutions_pane(status, pane_id, antibody, form) %}
+  <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+    <div class="text-right">
+    <button
+        type="button"
+        class="btn btn-success btn-sm"
+        data-toggle="modal"
+        data-target="#modal-edit-dilution--1">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+    <br>
+
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#immunostaining">Immunostainings</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#western-blot">Western blots</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#immunoprecipitation">Immunoprecipitations</a>
+      </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div class="tab-pane container active" id="immunostaining">
+        <ul class="ul-complex-attribute">
+          {% for dilution in antibody.dilutions %}
+            {% if dilution.application == "immunostaining" %}
+              {{ pane_details(dilution, form) }}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="tab-pane container fade" id="western-blot">
+        <ul class="ul-complex-attribute">
+          {% for dilution in antibody.dilutions %}
+            {% if dilution.application == "western blot" %}
+              {{ pane_details(dilution, form) }}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="tab-pane container fade" id="immunoprecipitation">
+        <ul class="ul-complex-attribute">
+          {% for dilution in antibody.dilutions %}
+            {% if dilution.application == "immunoprecipitation" %}
+              {{ pane_details(dilution, form) }}
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  <br>
+
+  {{ dilutions_add_form(form(), "antibodies.dilutions.add", "POST", -1, antibody.id) }}
+
+  </div>
+{% endmacro %}

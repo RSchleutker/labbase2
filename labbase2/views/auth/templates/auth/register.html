@@ -1,0 +1,102 @@
+{% extends "base-site-authenticated.html" %}
+
+
+{% block content %}
+
+    <div class="container">
+
+        <h1>Register new user</h1>
+
+        <div class="row">
+
+            <div class="col-4">
+
+                <div>
+
+                    <div class="row">
+                        <div class="col-12">
+
+                            <form action="" method="post" class="content-form">
+                                {{ form.hidden_tag() }}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Username
+                                        </label>
+                                        {{ form.username() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Email address
+                                        </label>
+                                        {{ form.email() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Roles
+                                        </label>
+                                        {{ form.roles() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Password
+                                        </label>
+                                        {{ form.password() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Repeat password
+                                        </label>
+                                        {{ form.password2() }}
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-group">
+                                    {{ form.submit() }}
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-8">
+
+                <strong>Username</strong>
+
+                <p>{{ form.username.description }}</p>
+
+                <strong>Email address</strong>
+
+                <p>{{ form.email.description }}</p>
+
+                <strong>Roles</strong>
+
+                <p>{{ form.roles.description }}</p>
+
+                <strong>Password</strong>
+
+                <p>{{ form.password.description }}</p>
+
+                <strong>Repeat password</strong>
+
+                <p>{{ form.password2.description }}</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

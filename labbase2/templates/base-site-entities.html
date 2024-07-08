@@ -1,0 +1,98 @@
+<!-- EXTENSION DECLARATION -->
+{% extends "base-site-authenticated.html" %}
+
+{% from "macros/pagination.html" import render_pagination %}
+{% from "macros/pagination.html" import results_pagination %}
+{% import 'macros/forms.html' as forms %}
+{#{% from "base/upload-import-file-form.html" import upload_import_file_form %}#}
+
+
+{% set args = dict(request.args) %}
+{% set _ = args.pop("page", 1) %}
+
+
+{% block content %}
+
+  <div id="filters">
+      {% block filters %}
+        {{ filter_form.render()|safe }}
+      {% endblock %}
+
+      {% block toolbar %}{% endblock %}
+  </div>
+
+    <div id="horizontal-flex-container">
+
+      <div id="content">
+        {% block main %}
+          {{ render_pagination(entities) }}
+          {{ results_pagination(entities) }}
+          {{ table(entities.items) }}
+          {{ render_pagination(entities) }}
+        {% endblock %}
+      </div>
+
+      <div id="sidebar-right">
+        {% block sidebar_right %}{% endblock %}
+      </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+  {{ super() }}
+
+    <!--
+    Highlights the table row that a user clicked on.
+    -->
+    <script>
+    $(document).ready(function () {
+      $("#table-results-body tr").click(function () {
+        $("#table-results-body tr").removeClass("active");
+        $(this).addClass("active");
+      });
+    });
+  </script>
+
+  <!-- Request details about a ressource from the sever and display it in the
+  right sidebar. The script is typically invoked by clicking on a table row. -->
+  <script type="text/javascript">
+    function request_details(url) {
+      let request = $.ajax({url: url, method: "GET"});
+      request.always(function (data) {$("#sidebar-right").html(data);});
+    }
+  </script>
+
+  <!-- Deletes an entity entirely from the database. -->
+  <script type="text/javascript">
+    function delete_entity(url) {
+        if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
+            let request = $.ajax({url: url, method: "DELETE"});
+            request.always(function (data) {$("#sidebar-right").html(data);});
+        }
+    }
+  </script>
+
+  <script type="text/javascript">
+    function batch_action(url) {
+        if (confirm('Are you sure?')) {
+            let request = $.ajax({url: url, method: "PUT"});
+            request.always(function (data) {
+                $("#modal-messages-body").html(data);
+                $("#modal-messages").modal()
+            });
+        }
+    }
+  </script>
+
+  <script type="text/javascript">
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+  </script>
+
+{% endblock %}

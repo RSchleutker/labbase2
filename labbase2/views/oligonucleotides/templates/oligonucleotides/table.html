@@ -1,0 +1,73 @@
+{% from "oligonucleotides/macros/plot.html" import plot_profile %}
+
+
+{% macro table(entities) %}
+
+    <table class="table table-results">
+        <caption>Results table for filtered primers.</caption>
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Ordered on</th>
+            <th scope="col">Ordered by</th>
+            <th scope="col">Storage place</th>
+            <th scope="col">Length</th>
+            <th scope="col">Sequence</th>
+        </tr>
+        </thead>
+        <tbody id="table-results-body">
+
+        {% for oligonucleotide in entities %}
+            <tr id="oligonucleotide-row-{{ oligonucleotide.id }}" onclick="request_details('{{ url_for(".details", id_=oligonucleotide.id) }}')">
+                <td class="id">{{ oligonucleotide.id }}</td>
+                <td>{{ oligonucleotide.label }}</td>
+                <td>{{ oligonucleotide.order_date | format_date }}</td>
+                <td>{{ oligonucleotide.owner.username }}</td>
+                <td>{{ oligonucleotide.storage_place }}</td>
+                <td>{{ oligonucleotide|length }}</td>
+                <td class="sequence">
+                    {{ oligonucleotide.formatted_seq(max_len=45)|safe }}
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}
+
+
+{% macro table_hits(entities, ref, length) %}
+
+    <table class="table table-results">
+        <caption>Results table for matching primers.</caption>
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Storage place</th>
+            <th scope="col">Length</th>
+            <th scope="col">Continous match</th>
+            <th scope="col">Best match</th>
+            <th scope="col">Profile</th>
+        </tr>
+        </thead>
+        <tbody id="table-results-body">
+
+        {% for oligonucleotide, result in entities %}
+            <tr onclick="request_details('{{ url_for(".details", id_=oligonucleotide.id) }}')">
+                <td class="id">{{ oligonucleotide.id }}</td>
+                <td>{{ oligonucleotide.label }}</td>
+                <td>{{ oligonucleotide.storage_place }}</td>
+                <td>{{ oligonucleotide|length }}</td>
+                <td>{{ result.length }}</td>
+                <td>{{ result.lcs }}</td>
+                <td>{{ plot_profile(oligonucleotide.id, result.to_jsarray(), (result.profile | length)) }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}

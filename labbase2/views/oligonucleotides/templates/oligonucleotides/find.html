@@ -1,0 +1,20 @@
+{% extends "base-site-entities.html" %}
+
+{% from "oligonucleotides/table.html" import table_hits %}
+
+
+{%  block scripts_head %}
+
+  {{ super() }}
+
+  <script src="https://cdn.plot.ly/plotly-2.8.3.min.js"></script>
+
+{% endblock %}
+
+
+
+{% block main %}
+
+  {{ table_hits(entities, ref, length) }}
+
+{% endblock %}

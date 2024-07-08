@@ -1,0 +1,567 @@
+/*
+Author: Raphael Schleutker
+ */
+
+/* IMPORTS */
+//noinspection CssUnknownTarget
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+/* FONT VARIABLES */
+$font-stack               : 'Poppins', sans-serif;
+$font-size                : .9em;
+$font-primary-color       : #73879C;
+$font-secondary-color     : #ECF0F1;
+$font-discarded-color     : #BFBFBF;
+
+/* BACKGROUND VARIABLES */
+$background-color         : #F9F9FA;
+$sidebar-background-color : #2A3F54;
+$navbar-background-color  : #1C3144;
+
+/* ADDITIONAL COLORS */
+$border-color             : #D9DEE4;
+
+/* NAVBAR */
+$navbar-height            : 55px;
+
+/* SIDEBAR */
+$sidebar-width            : 200px;
+$details-width            : 550px;
+$details-font-size        : .6em;
+
+/* BUTTONS */
+$btn-dark-background      : #172D44;
+
+
+/* BASIC STYLE OF THE WEBSITE */
+
+html, body {
+  height : 100%;
+  width  : 100%;
+}
+
+body {
+  background  : $background-color;
+  color       : $font-primary-color;
+  font-family : $font-stack;
+  font-size   : $font-size;
+}
+
+.container {
+  padding-top : 15px;
+}
+
+
+/* GENERAL ELEMENTS */
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  margin-bottom : 1rem;
+  font-weight   : 400;
+  line-height   : 1.2;
+}
+
+.h1, h1 {
+  font-size : 1.75rem;
+}
+
+.h2, h2 {
+  font-size : 1.6rem;
+}
+
+.h3, h3 {
+  font-size : 1.45rem;
+}
+
+.h4, h4 {
+  font-size : 1.3rem;
+}
+
+.h5, h5 {
+  font-size : 1.15rem;
+}
+
+.h6, h6 {
+  font-size : 1rem;
+}
+
+p {
+  font-weight : 300;
+  line-height : 1.7em;
+  text-align  : justify;
+
+  &.centered {
+    text-align : center;
+  }
+
+  &.extra-margin {
+    margin-top    : .5rem;
+    margin-bottom : 2rem;
+  }
+}
+
+b, strong {
+  font-weight : 600;
+}
+
+.nav-tabs {
+  font-size: .75rem;
+}
+
+
+/* BUTTONS */
+
+.btn-dark {
+  color            : #FFF;
+  background-color : $btn-dark-background;
+  border-color     : $btn-dark-background;
+}
+
+.btn-dark:hover {
+  background-color : #122335;
+  border-color     : #122335;
+}
+
+
+/* FORMS */
+
+.form-control {
+  font-size : .8rem;
+}
+
+.input-group-text {
+  min-width: 100px;
+  font-size : .8rem;
+}
+
+.form-control::placeholder {
+  opacity : .5;
+}
+
+.content-form {
+  .form-control {
+    margin-bottom : 12px;
+  }
+}
+
+
+/* TABLES */
+
+.table, thead, th, td {
+  border-color : $border-color;
+}
+
+.table {
+  position  : relative;
+  color     : unset;
+  font-size : .8em;
+
+  td {
+    vertical-align : middle;
+  }
+}
+
+
+.table-results {
+  tbody tr:hover {
+    background   : $background-color;
+    cursor       : pointer;
+    border-width : 1px 0;
+  }
+
+  th {
+    font-size   : 1.1em;
+    font-weight : 500;
+  }
+
+  tr {
+    background   : #FFF;
+    border-style : solid;
+    border-color : $border-color;
+    border-width : 1px 1px 0 1px;
+
+    &.discarded {
+      color : $font-discarded-color;
+    }
+
+    &.active {
+      background-color : $background-color;
+      border-width     : 1px 0;
+      font-weight      : 500;
+    }
+
+    &:last-child {
+      border-width : 1px;
+
+      &.active {
+        border-width : 1px 0;
+      }
+    }
+  }
+}
+
+.table-details {
+  font-size: .9em;
+
+  thead {
+    font-weight: bold;
+  }
+  tr {
+    height     : unset;
+    background : unset;
+  }
+
+  td {
+    padding-top    : 5px;
+    padding-bottom : 5px;
+  }
+}
+
+
+/* FLASH MESSAGES */
+
+.flash {
+  position    : fixed;
+  bottom      : 50px;
+  margin-left : 20px;
+  right       : 20px;
+  z-index     : 1001;
+}
+
+
+/* SIDEBAR */
+
+#sidebar {
+  background-color : $sidebar-background-color;
+  color            : $font-secondary-color;
+  width            : $sidebar-width;
+  position         : fixed;
+  top              : 0;
+  left             : 0;
+  height           : 100vh;
+  padding          : 15px;
+  z-index          : 999;
+  overflow-y       : auto;
+  transition       : 0.5s;
+
+  a {
+    color : $font-secondary-color;
+  }
+
+  hr {
+    border-color : $btn-dark-background;
+  }
+
+  .close-button {
+    position  : absolute;
+    top       : 0;
+    right     : 15px;
+    font-size : x-large;
+  }
+
+  .search {
+    margin-top : 50px;
+  }
+}
+
+
+/* NAVBAR */
+
+#navbar {
+  position   : fixed;
+  top        : 0;
+  right      : 0;
+  left       : 0;
+  background : $navbar-background-color;
+  color      : $font-secondary-color;
+  height     : $navbar-height;
+  padding    : 0 10px;
+  z-index    : 1001;
+  transition : 0.5s;
+
+  .nav-link, .navbar-light, .navbar-brand {
+    color : $font-secondary-color;
+  }
+
+  .dropdown-item.disabled, .dropdown-item:disabled {
+    color : #ABB7C1;
+  }
+}
+
+.dropdown-menu {
+  color            : $font-secondary-color;
+  border-radius    : 0;
+  border-width     : 0;
+  background-color : #0F6674;
+}
+
+.dropdown-item {
+  color   : $font-secondary-color;
+  padding : .5rem 1.5rem;
+
+  &.active, &:active, &:hover {
+    color            : $font-secondary-color;
+    background-color : #0B505B;
+  }
+}
+
+
+/* MAIN */
+
+#vertical-flex-container {
+  position       : absolute;
+  top            : $navbar-height;
+  left           : 0;
+  right          : 0;
+  display        : flex;
+  flex-direction : column;
+  height         : calc(100vh - #{$navbar-height});
+  width          : 100%;
+}
+
+
+#filters {
+  vertical-align : middle;
+  padding        : 40px;
+
+  .form-inline {
+    justify-content : center;
+    align-items     : last baseline;
+
+    label {
+      -ms-flex-align  : unset;
+      align-items     : unset;
+      -ms-flex-pack   : unset;
+      justify-content : unset;
+      margin-bottom   : .25em;
+      font-weight     : 500;
+    }
+  }
+
+  #filter-help {
+    color     : #9DABB9;
+    font-size : smaller;
+
+    div {
+      transition : 0s;
+      text-align : center;
+    }
+  }
+
+  svg:hover {
+    cursor : pointer;
+    color  : #495562;
+  }
+}
+
+
+#horizontal-flex-container {
+  display        : flex;
+  flex-direction : row;
+  width          : 100%;
+  flex-grow      : 1;
+  overflow-y     : hidden;
+}
+
+
+#content {
+  overflow : auto;
+  scrollbar-width: none;
+  padding  : 0 10px;
+  height   : 100%;
+  width    : 100%;
+  /* -ms-overflow-style : none; /* IE and Edge */
+  /* scrollbar-width    : none; /* Firefox */
+
+  /*&::-webkit-scrollbar {
+    display : none;
+  }*/
+}
+
+
+#sidebar-left, #sidebar-right {
+  flex-shrink        : 0;
+  padding            : 0 10px 10px 10px;
+  overflow-y         : auto;
+  height             : 100%;
+  -ms-overflow-style : none; /* IE and Edge */
+  scrollbar-width    : none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display : none;
+  }
+
+  p {
+    margin-bottom : 6px;
+  }
+
+  ul {
+    margin-top : 10px;
+
+    &.list-group > li {
+      padding : 10px;
+    }
+  }
+
+  .list-group {
+    margin-bottom : 1em;
+  }
+
+  .list-group-mine {
+    background   : unset;
+    border-color : $border-color;
+  }
+
+  .ul-complex-attribute {
+    list-style-type : none;
+    position        : relative;
+    margin          : 0 5px;
+    padding         : 0 10px;
+
+    hr {
+      margin : 3px 0;
+    }
+
+    li {
+      margin-bottom : 15px;
+    }
+  }
+
+  li.empty {
+    color : $font-discarded-color;
+  }
+
+  strong {
+    font-size   : 1.1em;
+    font-weight : 400;
+  }
+
+  .entity-attribute {
+    font-size  : .9em;
+    text-align : center;
+    margin-top : 5px;
+  }
+
+  .primer-sequence {
+    word-wrap: anywhere;
+  }
+
+  .h1, h1 {
+    font-size : 1.4rem;
+  }
+
+  .h2, h2 {
+    font-size     : 1.3rem;
+    margin-bottom : 1em;
+  }
+
+  .h3, h3 {
+    font-size : 1.2rem;
+  }
+
+  .h4, h4 {
+    font-size : 1.1rem;
+  }
+
+  .h5, h5 {
+    font-size : 1.05rem;
+  }
+
+  .h6, h6 {
+    font-size : 1rem;
+  }
+
+  .tab-content {
+    font-size  : .9em;
+    background : #FFF;
+    border     : 1px solid $border-color;
+    border-top : 1px solid #FFF;
+  }
+
+  .tab-top-link {
+    padding    : 5px;
+    text-align : center;
+  }
+}
+
+.sidebar-header {
+  background : $background-color;
+  position   : sticky;
+  top        : 0;
+  z-index    : 999;
+}
+
+#sidebar-left {
+  width : $sidebar-width;
+}
+
+#sidebar-right {
+  width : $details-width;
+
+  .btn-sm {
+    font-size: .75rem;
+  }
+}
+
+.ul-additional-options {
+  padding         : 0;
+  list-style-type : none;
+
+  > li {
+    padding : 4px 0;
+  }
+}
+
+
+/* GENOTYPE DISPLAY */
+
+.chromosome, .allele-1, .allele-2 {
+  padding : 0 5px;
+}
+
+.chromosome {
+  display        : inline-block;
+  text-align     : center;
+  vertical-align : middle;
+}
+
+.allele-2 {
+  border-top : 1px solid;
+  display    : block;
+}
+
+
+/* ADDITIONAL */
+.soft-wrap {
+  word-break : break-all;
+}
+
+.lower-seq {
+  background : #FDCDCD;
+}
+
+.card-login {
+  margin-top    : 200px;
+  margin-bottom : auto;
+  width         : 450px;
+  box-shadow    : 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+  0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.remember {
+  margin-bottom : 15px;
+}
+
+.remember input {
+  width        : 20px;
+  height       : 20px;
+  margin-left  : 15px;
+  margin-right : 5px;
+}
+
+.found-primers {
+  background    : #F9F9F9;
+  padding       : 10px;
+  border-radius : 5px;
+  border        : 1px solid #CCC;
+  font-family   : monospace;
+}

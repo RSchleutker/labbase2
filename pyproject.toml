@@ -1,0 +1,18 @@
+[project]
+name = "labbase2"
+version="0.0.1"
+description="A database application to manage lab ressources."
+dependencies = [
+    "flask",
+    "flask-login",
+    "flask-sqlalchemy",
+    "flask-wtf",
+    "pillow",
+    "biopython",
+    "email-validator",
+    "rq"
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"

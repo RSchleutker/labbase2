@@ -1,0 +1,141 @@
+{% from 'comments/pane.html' import comment_pane with context %}
+{% from 'files/pane.html' import files_pane with context %}
+{% from 'requests/pane.html' import request_pane with context %}
+{% from 'batches/pane.html' import batch_pane with context %}
+{% from "dilutions/pane.html" import dilutions_pane with context %}
+{% from "antibodies/form.html" import antibody_add_form %}
+{% from "dilutions/form.html" import dilutions_add_form %}
+{% from "files/form.html" import file_upload_form %}
+
+
+<ul class="nav nav-tabs">
+
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-comments">
+      Comments
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
+  </li>
+
+</ul>
+
+<div class="tab-content">
+
+  <div class="tab-pane container active" id="tab-info">
+
+    <h1 style="display: inline-block">{{ antibody.label }}</h1>
+
+    <span class="float-right">
+      <a class="text-primary"
+         data-toggle="modal"
+         data-target="#modal-edit-antibody-{{ antibody.id }}">
+        <i class="fa-solid fa-pen"></i>
+      </a>
+    </span>
+
+    <table class="table table-details">
+      <tbody>
+        <tr>
+          <td>Database ID</td>
+          <td>{{ antibody.id }}</td>
+        </tr>
+        <tr>
+          <td>Label</td>
+          <td>{{ antibody.label }}</td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td>{{ antibody.location }}</td>
+        </tr>
+        <tr>
+          <td>Clone</td>
+          <td>{{ antibody.clone }}</td>
+        </tr>
+        <tr>
+          <td>Host</td>
+          <td>{{ antibody.host }}</td>
+        </tr>
+        <tr>
+          <td>Antigen</td>
+          <td>{{ antibody.antigen }}</td>
+        </tr>
+        <tr>
+          <td>Clonality</td>
+          <td>{{ antibody.specification }}</td>
+        </tr>
+        <tr>
+          <td>Conjugate</td>
+          <td>{{ antibody.conjugate }}</td>
+        </tr>
+        <tr>
+          <td>Source</td>
+          <td>{{ antibody.source }}</td>
+        </tr>
+        <tr>
+          <td>Storage</td>
+          <td>{{ antibody.storage_temp }}°C</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  {{ dilutions_pane(
+    status='fade',
+    pane_id='tab-dilutions',
+    antibody=antibody,
+    form=dilution_form
+  ) }}
+
+  {{ batch_pane(
+    status='fade',
+    pane_id='tab-batches',
+    consumable=antibody,
+    form=batch_form
+  ) }}
+
+  {{ files_pane(
+    status='fade',
+    pane_id='tab-files',
+    entity=antibody,
+    form=file_form
+  ) }}
+
+  {{ comment_pane(
+    status='fade',
+    pane_id='tab-comments',
+    entity=antibody,
+    form=comment_form
+  ) }}
+
+  {{ request_pane(
+    status='fade',
+    pane_id='tab-requests',
+    entity=antibody,
+    form=request_form
+  ) }}
+
+</div>
+
+<br>
+
+{{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}

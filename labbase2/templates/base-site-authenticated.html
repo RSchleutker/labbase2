@@ -1,0 +1,102 @@
+<!-- EXTENSION DECLARATION AND IMPORTS -->
+{% extends "base-site.html" %}
+
+{% import 'macros/navbar.html' as nav with context %}
+
+
+<!-- START SITE BLOCK -->
+{% block body %}
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
+
+        <a class="navbar-brand" href="">{{ title }}</a>
+        <button class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="nav navbar-nav ml-auto">
+{#                <li class="nav-item dropdown">#}
+{#                    {{ nav.dropdown('flystocks-dropdown', 'Fly Stocks') }}#}
+{#                    <div class="dropdown-menu">#}
+{#                        {{ nav.dropdown_link('flystocks.index', 'Fly Stocks') }}#}
+{#                    </div>#}
+{#                </li>#}
+{#                <li class="nav-item dropdown">#}
+{#                    {{ nav.dropdown('antibodies-dropdown', 'Antibodies') }}#}
+{#                    <div class="dropdown-menu">#}
+{#                        {{ nav.dropdown_link('antibodies.index', 'Antibodies') }}#}
+{#                        <div class="dropdown-divider"></div>#}
+{#                        {{ nav.dropdown_link('batches.index', 'Batches', consumable_type="antibody") }}#}
+{#                    </div>#}
+{#                </li>#}
+{#                <li class="nav-item dropdown">#}
+{#                    {{ nav.dropdown('chemicals-dropdown', 'Chemicals') }}#}
+{#                    <div class="dropdown-menu">#}
+{#                        {{ nav.dropdown_link('chemicals.index', 'Chemicals') }}#}
+{#                        <div class="dropdown-divider"></div>#}
+{#                        {{ nav.dropdown_link('batches.index', 'Batches', consumable_type="chemical") }}#}
+{#                        {{ nav.dropdown_link('chemicals.solutions.index', 'Stock Solutions') }}#}
+                        {#            {{ nav.dropdown_link('ghs_classes_main', 'GHS Classes') }}#}
+{#                    </div>#}
+{#                </li>#}
+                {#        <li class="nav-item dropdown">#}
+                {#          {{ nav.dropdown('chemicals-dropdown', 'Enzymes') }}#}
+                {#          <div class="dropdown-menu">#}
+                {#            {{ nav.dropdown_link('restriction_enzymes_main', 'Restriction Enzymes') }}#}
+                {#            {{ nav.dropdown_link('polymerases_main', 'Polymerases') }}#}
+                {#          </div>#}
+                {#        </li>#}
+{#                <li class="nav-item dropdown">#}
+{#                    {{ nav.dropdown('plasmids-dropdown', 'Plasmids') }}#}
+{#                    <div class="dropdown-menu">#}
+{#                        {{ nav.dropdown_link('plasmids.index', 'Plasmids') }}#}
+{#                        {{ nav.dropdown_link('plasmids.bacteria.index', 'Glycerol Stocks') }}#}
+{#                    </div>#}
+{#                </li>#}
+                <li class="nav-item dropdown">
+                    {{ nav.dropdown('oligonucleotides-dropdown', 'Oligonucleotides') }}
+                    <div class="dropdown-menu">
+                        {{ nav.dropdown_link('oligonucleotides.index', 'Oligonucleotides') }}
+                        {{ nav.dropdown_link('oligonucleotides.find', 'Find primers') }}
+                    </div>
+                </li>
+                {{ nav.link('base.index', '<span class="fas fa-home"></span>&nbsp;Home') }}
+                <li class="nav-item dropdown">
+                    {{ nav.dropdown('users-dropdown', '<span class="fas fa-users"></span>&nbsp;Users') }}
+                    <div class="dropdown-menu">
+{#                        {{ nav.dropdown_link('user.users_main', '<span class="fas fa-users"></span>&nbsp;Users') }}#}
+                        {{ nav.dropdown_link('auth.register', '<span class="fas fa-user-plus"></span>&nbsp;Register user') }}
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    {{ nav.dropdown('user-dropdown', ' <span class="fas fa-user"></span>&nbsp;' + current_user.username) }}
+                    <div class="dropdown-menu">
+{#                        {{ nav.dropdown_link('user.index', '<span class="fas fa-cog"></span>&nbsp;Profile') }}#}
+{#                        {{ nav.dropdown_link('user.change_password', '<span class="fa-solid fa-key"></span>&nbsp;Change password') }}#}
+                        {{ nav.dropdown_link('imports.index', 'My imports') }}
+                        <div class="dropdown-divider"></div>
+                        {{ nav.dropdown_link('auth.logout', '<span class="fas fa-sign-out-alt"></span>&nbsp;Logout') }}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="vertical-flex-container">
+
+        {% block content %}
+
+
+        {% endblock %}
+
+    </div>
+
+{% endblock %}

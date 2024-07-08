@@ -1,0 +1,20 @@
+<table class="table">
+  <thead>
+  <tr>
+    {% for column in columns %}
+      <th scope="col">{{ column }}</th>
+    {% endfor %}
+  </tr>
+  </thead>
+  <tbody id="table-results-body">
+
+  {% for primer in entities %}
+    <tr>
+      {% for column in columns %}
+      <td>{{ primer[column] }}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+
+  </tbody>
+</table>

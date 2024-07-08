@@ -1,0 +1,74 @@
+{% extends "base-site-authenticated.html" %}
+
+{% import 'macros/forms.html' as forms %}
+
+
+{% macro import_card(job) %}
+
+    {% set div_id = "card-import-" ~ job.id %}
+
+    <div class="card">
+    <div class="card-body">
+
+        <div id="{{ div_id}}" class="d-flex align-items-center mb-0">
+            <div class="flex-shrink-0">
+                <h5 class="mb-1">{{ job.entity_type | capitalize }}</h5>
+                <p class="mb-0">Generated on {{ job.timestamp | format_datetime }}</p>
+            </div>
+            <div class="flex-fill align-self-stretch border-left border-right ml-4 pl-4 mr-4 pr-4">
+                <p class="mb-0">Uploaded file: <em>{{ job.file.original_filename }}</em></p>
+                <p class="mb-0">Last edited on {{ job.timestamp_edited | format_datetime }}</p>
+            </div>
+            <div class="flex-shrink-0">
+                <a href="{{ url_for(".edit", id_=job.id) }}"
+                   type="button"
+                   class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                <a class="btn btn-danger btn-sm"
+                   type="button"
+                   style="color: white;"
+                   onclick="delete_import('{{ url_for(".delete", id_=job.id) }}', '#{{ div_id}}')">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+        </div>
+
+    </div>
+  </div>
+
+{% endmacro %}
+
+
+{% block content %}
+
+  <div class="container">
+
+  <h2 class="mb-4 mt-2">Imports waiting for review</h2>
+
+  {% for job in jobs %}
+
+      {{ import_card(job) }}
+      <br>
+
+  {% endfor %}
+
+  </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    {{ super() }}
+
+    <script type="text/javascript">
+        function delete_import(url, card) {
+            if (confirm("Are you sure? This will delete the import. This action cannot be undone!")) {
+                let request = $.ajax({url: url, method: "DELETE"});
+                request.always(function (data) {$(card).html(data);});
+            }
+        }
+    </script>
+
+{% endblock %}

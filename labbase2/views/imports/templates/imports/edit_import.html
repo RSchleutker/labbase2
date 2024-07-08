@@ -1,0 +1,39 @@
+{% extends "base-site-authenticated.html" %}
+
+{% import 'macros/table_from_pandas.html' as table_from_pd %}
+{% import 'macros/forms.html' as forms %}
+
+
+{% block content %}
+
+    <div class="container">
+
+    <h2>Uploaded data</h2>
+
+    <p>
+    Below you see the first five rows of the uploaded data. This is the starting point for the import.
+    Please choose a column mapping further below and update to see how these rows will be imported.
+    </p>
+
+        {{ table_from_pd.table_from_pandas(table.head()) }}
+
+    <h2>Map columns to database</h2>
+
+    <form method="post">
+        {{ form.hidden_tag() }}
+        {% for field in form.mapping.entries %}
+        <div class="row">
+        <div class="col-12">
+            {{ forms.field(field, field.label) }}
+        </div>
+        </div>
+        {% endfor %}
+        <div class="form-group">
+            {{ form.submit() }}
+        </div>
+    </form>
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% macro field(field, label) %}
+
+  <div class="input-group form-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text">{{ label|safe }}</span>
+    </div>
+    {{ field() }}
+  </div>
+
+{% endmacro %}
+
+
+{% macro field_no_label(field) %}
+
+  <div class="input-group form-group">
+    {{ field() }}
+  </div>
+
+{% endmacro %}
+
+
+{% macro script_send_form(form, form_name, method, message_field) %}
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $("#{{ form_name }}").submit(function (event) {
+      event.preventDefault();
+      $("#{{ message_field }}").html('<span class="spinner-border" role="status"></span>');
+      let $form = $(this), url = $form.attr("action");
+
+      let form = $('#{{ form_name }}')
+      let update = $.ajax({url: url, method: "{{ method }}", data: form.serialize()});
+
+      update.always(function( data ) {$("#{{ message_field }}").html( data );});
+    });
+  });
+  </script>
+
+{% endmacro %}

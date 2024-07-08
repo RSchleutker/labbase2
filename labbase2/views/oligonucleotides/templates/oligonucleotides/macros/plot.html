@@ -1,0 +1,40 @@
+{% macro plot_profile(id, data, length) %}
+
+  <div id="profile-{{ id }}" style="width:400px; height:45px;"></div>
+
+  <script>
+    canvas = document.getElementById('profile-{{ id }}');
+    var trace1 = {
+      y: {{ data }},
+      mode: "lines",
+      line: {color: 'rgb(115, 135, 156)', width: 1}
+    }
+    var layout = {
+      margin: { t: 0, r: 0, b: 0, l: 0 },
+      'showLegend': false,
+      'xaxis': {
+        'showgrid': false,
+        'zeroline': false,
+        'visible': false,
+        'fixedrange': false
+      },
+      'yaxis': {
+        'showgrid': false,
+        'zeroline': false,
+        'visible': false,
+        'fixedrange': true
+      },
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(0,0,0,0)'
+    };
+
+    Plotly.newPlot(
+      canvas,
+      [trace1],
+      layout,
+      {staticPlot: false, displayModeBar: false}
+    );
+  </script>
+
+
+{% endmacro %}
