@@ -2,9 +2,9 @@ import datetime
 
 from .forms import EditDilution
 
-from app.models import db
-from app.models import Dilution
-from app.forms.utils import err2message
+from labbase2.models import db
+from labbase2.models import Dilution
+from labbase2.forms.utils import err2message
 
 from flask import Blueprint
 from flask_login import current_user
@@ -28,8 +28,7 @@ def add(antibody_id: int):
     if (form := EditDilution()).validate():
         dilution = Dilution(
             antibody_id=antibody_id,
-            user_id=current_user.id,
-            date=datetime.date.today()
+            user_id=current_user.id
         )
         form.populate_obj(dilution)
 
@@ -46,12 +45,12 @@ def add(antibody_id: int):
         return err2message(form.errors), 400
 
 
-@bp.route("/<int:antibody_id>/dilution/<int:id>", methods=["PUT"])
+@bp.route("/<int:antibody_id>/dilution/<int:id_>", methods=["PUT"])
 @login_required
-def edit(antibody_id: int, id: int):
+def edit(antibody_id: int, id_: int):
     if (form := EditDilution()).validate():
-        if not (dilution := Dilution.query.get(id)):
-            return f"No dilution with ID {id}!", 404
+        if not (dilution := Dilution.query.get(id_)):
+            return f"No dilution with ID {id_}!", 404
         elif dilution.user_id != current_user.id:
             return "Dilution can only be edited by source user!", 401
         else:
@@ -68,11 +67,11 @@ def edit(antibody_id: int, id: int):
         return err2message(form.errors), 400
 
 
-@bp.route("<int:antibody_id>/dilution/<int:id>", methods=["DELETE"])
+@bp.route("<int:antibody_id>/dilution/<int:id_>", methods=["DELETE"])
 @login_required
-def delete(antibody_id: int, id: int):
-    if not (dilution := Dilution.query.get(id)):
-        return f"No dilution with ID {id}!", 404
+def delete(antibody_id: int, id_: int):
+    if not (dilution := Dilution.query.get(id_)):
+        return f"No dilution with ID {id_}!", 404
     if dilution.antibody_id != antibody_id:
         return f"Dilution belongs to another antibody!", 400
     elif dilution.user_id != current_user.id:
@@ -86,4 +85,4 @@ def delete(antibody_id: int, id: int):
             print(err)
             return str(err), 400
         else:
-            return f"Successfully deleted dilution {id}!", 200
+            return f"Successfully deleted dilution {id_}!", 200

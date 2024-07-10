@@ -56,7 +56,7 @@ class Request(db.Model, Importer):
         server_default=func.today(),
         info={"importable": True}
     )
-    sent = db.Column(
+    timestamp_sent = db.Column(
         db.Date,
         info={"importable": True}
     )

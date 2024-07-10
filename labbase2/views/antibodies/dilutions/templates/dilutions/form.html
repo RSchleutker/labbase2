@@ -1,4 +1,4 @@
-{% import '_macros/forms.html' as forms %}
+{% import "macros/forms.html" as forms %}
 
 
 {% macro dilutions_add_form(form, endpoint, method, id, antibody_id) %}
@@ -6,7 +6,7 @@
   {% if id == -1 %}
     {% set action = url_for(endpoint, antibody_id=antibody_id) %}
   {% else %}
-    {% set action = url_for(endpoint, id=id, antibody_id=antibody_id) %}
+    {% set action = url_for(endpoint, id_=id, antibody_id=antibody_id) %}
   {% endif %}
 
   <div id="modal-edit-dilution-{{ id }}"
@@ -42,7 +42,7 @@
                   </div>
                   <div class="row">
                     <div class="col-12">
-                      {{ forms.field(form.reference, 'Reference') }}
+                      {{ forms.field_no_label(form.reference) }}
                     </div>
                   </div>
                   <div class="form-group">

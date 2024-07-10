@@ -1,10 +1,11 @@
-from app.forms.forms import EditForm
-from app.forms.utils import RENDER_KW
-from app.forms.filters import strip_input
+from labbase2.forms.forms import EditForm
+from labbase2.forms.utils import RENDER_KW
+from labbase2.forms.filters import strip_input
 
 from wtforms.fields import StringField
 from wtforms.fields import SelectField
 from wtforms.fields import IntegerField
+from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 
@@ -49,10 +50,11 @@ class EditDilution(EditForm):
         render_kw=RENDER_KW | {"id": "edit-form-dilution-dilution",
                                "placeholder": "Dilution"}
     )
-    reference = StringField(
+    reference = TextAreaField(
         label="Reference",
-        validators=[DataRequired(), Length(max=512)],
+        validators=[DataRequired(), Length(max=2048)],
         filters=[strip_input],
         render_kw=RENDER_KW | {"id": "edit-form-dilution-reference",
-                               "placeholder": "Reference"}
+                               "placeholder": "Reference",
+                               "rows": 8}
     )

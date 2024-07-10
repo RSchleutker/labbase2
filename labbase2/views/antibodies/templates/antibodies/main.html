@@ -1,4 +1,4 @@
-{% extends "base_site_entities.html" %}
+{% extends "base-site-entities.html" %}
 
 {% from "antibodies/form.html" import antibody_add_form %}
 {% from "antibodies/table.html" import table %}
@@ -21,8 +21,8 @@
     <div class="p-2">
       <div class="btn-group btn-group-sm">
         <button type="button" class="btn btn-warning disabled"><i class="fa-solid fa-download"></i></button>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format="csv", **args) }}">CSV</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format="json", **args) }}">JSON</a>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="csv", **args) }}">CSV</a>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="json", **args) }}">JSON</a>
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@
 {% endblock %}
 
 
-{% block javascripts_end %}
+{% block scripts %}
 
   {{ super() }}
 

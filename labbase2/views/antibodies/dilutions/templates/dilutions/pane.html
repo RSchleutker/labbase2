@@ -3,35 +3,37 @@
 
 {% macro pane_details(dilution, form) %}
 
-  <li>
-    {% if dilution.date %}
-    <span class="date"><b>{{ dilution.date.isoformat() }}</b> ({{ dilution.user.username }})</span>
-    {% else %}
-    <span class="date"><b>No date</b> ({{ dilution.user.username }})</span>
-    {% endif %}
-  <span class="float-right">
-    <b>{{ dilution.dilution }}</b>
-    &nbsp;
-    {% if dilution.user_id == current_user.id %}
-    <a class="text-primary"
-         data-toggle="modal"
-         data-target="#modal-edit-dilution-{{ dilution.id }}">
-        <i class="fa-solid fa-pen"></i>
-      </a>
-      &nbsp;
-      <a class="text-danger"
-         onclick="delete_entity('{{ url_for("antibodies.dilutions.delete", id=dilution.id, antibody_id=dilution.antibody_id) }}')">
-        <i class="fa-solid fa-trash"></i>
-      </a>
-    {% endif %}
-  </span>
+  <div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-start align-items-start mb-2">
+            <div class="flex-grow-1">
+                <h5 class="mb-1">{{ dilution.application | capitalize }}</h5>
+                <p class="text-muted">{{ dilution.timestamp | format_datetime }} by {{ dilution.user.username }}</p>
+            </div>
+            <span class="flex-shrink-0">
+                {% if dilution.user_id == current_user.id %}
+                    <a class="text-primary ml-2 mr-2"
+                       data-toggle="modal"
+                       data-target="#modal-edit-dilution-{{ dilution.id }}">
+                          <i class="fa-solid fa-pen"></i>
+                      </a>
+                    <a class="text-danger"
+                       onclick="delete_entity('{{ url_for("dilutions.delete", antibody_id=dilution.antibody_id, id_=dilution.id) }}')">
+                          <i class="fa-solid fa-trash"></i>
+                      </a>
+                {% endif %}
+            </span>
+        </div>
 
-  <hr style="margin: 3px 0px;">
-
-    <p class="info" style="font-size: unset;">
-      {{ dilution.reference }}
-    </p>
-  </li>
+        <h6 class="mb-2">{{ dilution.dilution }}</h6>
+        <p>{{ dilution.reference }}</p>
+        {% if dilution.timestamp_edited %}
+            <p class="text-muted mb-0">
+                <em>(This dilution was updated on {{ dilution.timestamp_edited | format_datetime }})</em>
+            </p>
+        {% endif %}
+    </div>
+  </div>
 
   {{ dilutions_add_form(form(None, obj=dilution), "antibodies.dilutions.edit", "PUT", dilution.id, dilution.antibody_id) }}
 
@@ -41,17 +43,18 @@
 {% macro dilutions_pane(status, pane_id, antibody, form) %}
   <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-    <div class="text-right">
-    <button
-        type="button"
-        class="btn btn-success btn-sm"
-        data-toggle="modal"
-        data-target="#modal-edit-dilution--1">
-      <i class="fa-solid fa-plus"></i>
-    </button>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="flex-grow-1 mb-0">Dilutions</h2>
+      <span class="flex-shrink-0">
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            data-toggle="modal"
+            data-target="#modal-edit-dilution--1">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </span>
   </div>
-
-    <br>
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
@@ -68,31 +71,25 @@
     <!-- Tab panes -->
     <div class="tab-content">
       <div class="tab-pane container active" id="immunostaining">
-        <ul class="ul-complex-attribute">
           {% for dilution in antibody.dilutions %}
             {% if dilution.application == "immunostaining" %}
               {{ pane_details(dilution, form) }}
             {% endif %}
           {% endfor %}
-        </ul>
       </div>
       <div class="tab-pane container fade" id="western-blot">
-        <ul class="ul-complex-attribute">
           {% for dilution in antibody.dilutions %}
             {% if dilution.application == "western blot" %}
               {{ pane_details(dilution, form) }}
             {% endif %}
           {% endfor %}
-        </ul>
       </div>
       <div class="tab-pane container fade" id="immunoprecipitation">
-        <ul class="ul-complex-attribute">
           {% for dilution in antibody.dilutions %}
             {% if dilution.application == "immunoprecipitation" %}
               {{ pane_details(dilution, form) }}
             {% endif %}
           {% endfor %}
-        </ul>
       </div>
     </div>
 

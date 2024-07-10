@@ -3,7 +3,7 @@
 
 {% macro pane_details(comment, form) %}
 
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-body">
         <div class="d-flex flex-start align-items-center mb-3">
             <img class="rounded-circle shadow-1-strong mr-3" src="{{ url_for("static", filename="images/avatar-f.webp") }}" alt="avatar" width="60" height="60">
@@ -54,21 +54,21 @@
 {% macro comment_pane(status, pane_id, entity, form) %}
   <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-  <h2 class="mb-4" style="display: inline-block">Comments</h2>
-
-    <div class="float-right">
-    <button
-        type="button"
-        class="btn btn-success btn-sm"
-        data-toggle="modal"
-        data-target="#modal-edit-comment--1">
-      <i class="fa-solid fa-plus"></i>
-    </button>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="flex-grow-1 mb-0">Comments</h2>
+      <span class="flex-shrink-0">
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            data-toggle="modal"
+            data-target="#modal-edit-comment--1">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </span>
   </div>
 
   {% for comment in entity.comments %}
     {{ pane_details(comment, form) }}
-      <br>
   {% endfor %}
 
   {{ comments_add_form(form(), "comments.add", "POST", -1, entity.id) }}

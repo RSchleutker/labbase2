@@ -47,6 +47,7 @@ class Comment(db.Model, Importer, Export):
     )
     timestamp = db.Column(
         db.DateTime,
+        nullable=False,
         server_default=func.now(timezone=True),
         info={"importable": True}
     )

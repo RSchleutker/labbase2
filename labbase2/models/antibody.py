@@ -2,6 +2,8 @@ from labbase2.models import db
 from labbase2.models.mixins import Export
 from labbase2.models.consumable import Consumable
 
+from sqlalchemy import func
+
 
 __all__ = ["Antibody", "Dilution"]
 
@@ -49,7 +51,7 @@ class Antibody(Consumable):
         "Dilution",
         backref="antibody",
         lazy=True,
-        order_by="Dilution.application, Dilution.date.desc(), Dilution.id",
+        order_by="Dilution.application, Dilution.timestamp.desc(), Dilution.id",
         cascade="all, delete-orphan"
     )
 
@@ -99,5 +101,19 @@ class Dilution(db.Model, Export):
     )
     application = db.Column(db.String(64), nullable=False)
     dilution = db.Column(db.String(32), nullable=False)
-    reference = db.Column(db.String(512))
-    date = db.Column(db.Date, nullable=False)
+    reference = db.Column(
+        db.String(2048),
+        nullable=False,
+        info={"importable": True}
+    )
+    timestamp = db.Column(
+        db.DateTime,
+        server_default=func.now(timezone=True),
+        info={"importable": True}
+    )
+    timestamp_edited = db.Column(
+        db.DateTime(timezone=True),
+        nullable=True,
+        onupdate=func.now(timezone=True),
+        info={"importable": True}
+    )

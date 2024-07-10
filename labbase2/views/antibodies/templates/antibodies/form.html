@@ -1,11 +1,11 @@
-{% import '_macros/forms.html' as forms %}
+{% import 'macros/forms.html' as forms %}
 
 {% macro antibody_add_form(form, endpoint, method, id) %}
 
   {% if id == -1 %}
     {% set action = url_for(endpoint) %}
   {% else %}
-    {% set action = url_for(endpoint, id=id) %}
+    {% set action = url_for(endpoint, id_=id) %}
   {% endif %}
 
   <div id="modal-edit-antibody-{{ id }}" class="modal fade" role="dialog">

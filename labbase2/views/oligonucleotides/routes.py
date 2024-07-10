@@ -97,7 +97,7 @@ def add():
                 f"Successfully added oligonucleotide '{oligonucleotide.label}'!"), 201
 
     else:
-        return err2message(form.errors), 400
+        return err2message(form.errors)
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -115,13 +115,13 @@ def edit(id_: int):
         try:
             db.session.commit()
         except Exception as err:
-            return Message.ERROR(str(err)), 400
+            return Message.ERROR(str(err))
         else:
             return Message.SUCCESS(
                 f"Successfully edited oligonucleotide {oligonucleotide.label}!"), 200
 
     else:
-        return err2message(form.errors), 400
+        return err2message(form.errors)
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])

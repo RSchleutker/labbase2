@@ -1,10 +1,10 @@
-from app.forms.forms import FilterForm
-from app.forms.forms import EditEntityForm
-from app.forms.utils import RENDER_KW
-from app.forms.filters import strip_input
-from app.forms.filters import make_lower
+from labbase2.forms.forms import FilterForm
+from labbase2.forms.forms import EditEntityForm
+from labbase2.forms.utils import RENDER_KW
+from labbase2.forms.filters import strip_input
+from labbase2.forms.filters import make_lower
 
-from app.models import Antibody
+from labbase2.models import Antibody
 
 from wtforms.fields import Field
 from wtforms.fields import StringField
