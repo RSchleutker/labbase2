@@ -1,0 +1,92 @@
+{% from 'batches/form.html' import batch_add_form %}
+
+
+{% macro pane_details(batch, form) %}
+
+    <div class="card mb-3">
+        {% if batch.is_empty %}
+            <div class="card-body opacity-40">
+        {% else %}
+            <div class="card-body">
+        {% endif %}
+            <div class="d-flex align-items-start mb-2">
+                <div class="flex-fill">
+                    <h5 class="mb-1">{{ batch.supplier }} {{ batch.article_number }}</h5>
+                    <p>Ordered on {{ batch.order_date | format_date }}</p>
+                </div>
+                <span class="flex-shrink-0">
+                    <a class="text-primary mr-2"
+                         data-toggle="modal"
+                         data-target="#modal-edit-batch-{{ batch.id }}">
+                        <i class="fa-solid fa-pen"></i>
+                      </a>
+                      {% if (not batch.in_use) and (batch.emptied_date is none) %}
+                          <a class="text-info mr-2"
+                             onclick="batch_action('{{ url_for("batches.in_use", id_=batch.id) }}')">
+                            <i class="fa-solid fa-box-open"></i>
+                          </a>
+                          {% endif %}
+                          {% if batch.in_use and batch.emptied_date is none %}
+                          <a class="text-danger mr-2"
+                             onclick="batch_action('{{ url_for("batches.emptied", id_=batch.id) }}')">
+                            <i class="fa-solid fa-battery-empty"></i>
+                          </a>
+                          {% endif %}
+                      <a class="text-danger"
+                         onclick="delete_entity('{{ url_for(".delete", id_=batch.id) }}')">
+                      <i class="fa-solid fa-trash"></i>
+                      </a>
+                </span>
+            </div>
+
+            <div class="d-flex align-items-stretch">
+                <div class="flex-fill pr-2 border-right">
+                    <p class="mb-0 text-center">Storage place</p>
+                    <p class="text-info font-weight-bold text-center">{{ batch.storage_place }}</p>
+                </div>
+                <div class="flex-fill pl-2 pr-2 border-right">
+                    <p class="mb-0 text-center">Lot number</p>
+                    <p class="font-weight-bold text-center">{{ batch.lot }}</p>
+                </div>
+                <div class="flex-fill pl-2 pr-2 border-right">
+                    <p class="mb-0 text-center">Amount</p>
+                    <p class="font-weight-bold text-center">{{ batch.amount }}</p>
+                </div>
+                <div class="flex-fill pl-2">
+                    <p class="mb-0 text-center">Price</p>
+                    <p class="font-weight-bold text-center">{{ batch.price }}€</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+  {{ batch_add_form(form(None, obj=batch), "batches.edit", "PUT", batch.id, batch.consumable_id) }}
+
+{% endmacro %}
+
+
+{% macro batch_pane(status, pane_id, consumable, form) %}
+  <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="flex-grow-1 mb-0">Batches</h2>
+      <span class="flex-shrink-0">
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            data-toggle="modal"
+            data-target="#modal-edit-batch--1">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </span>
+  </div>
+
+      {% for batch in consumable.batches %}
+        {{ pane_details(batch, form) }}
+      {% endfor %}
+
+    {{ batch_add_form(form(), "batches.add", "POST", -1, consumable.id) }}
+
+  </div>
+{% endmacro %}

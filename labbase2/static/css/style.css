@@ -78,6 +78,10 @@ b, strong {
   font-size: 0.75rem;
 }
 
+.opacity-40 {
+  opacity: 0.4;
+}
+
 /* BUTTONS */
 .btn-dark {
   color: #FFF;

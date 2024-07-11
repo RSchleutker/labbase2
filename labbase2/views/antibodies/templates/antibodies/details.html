@@ -1,10 +1,10 @@
 {% from "comments/pane.html" import comment_pane with context %}
 {% from "files/pane.html" import files_pane with context %}
 {% from 'requests/pane.html' import request_pane with context %}
-{#{% from 'batches/pane.html' import batch_pane with context %}#}
+{% from 'batches/pane.html' import batch_pane with context %}
 {% from "dilutions/pane.html" import dilutions_pane with context %}
 {% from "antibodies/form.html" import antibody_add_form %}
-{#{% from "dilutions/form.html" import dilutions_add_form %}#}
+{% from "dilutions/form.html" import dilutions_add_form %}
 {% from "files/form.html" import file_upload_form %}
 
 
@@ -18,9 +18,9 @@
     <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
   </li>
 
-  {#  <li class="nav-item">
+  <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
-  </li>#}
+  </li>
 
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
@@ -113,12 +113,12 @@
     form=dilution_form
   ) }}
 
-{#  {{ batch_pane(#}
-{#    status='fade',#}
-{#    pane_id='tab-batches',#}
-{#    consumable=antibody,#}
-{#    form=batch_form#}
-{#  ) }}#}
+  {{ batch_pane(
+    status='fade',
+    pane_id='tab-batches',
+    consumable=antibody,
+    form=batch_form
+  ) }}
 
   {{ files_pane(
     status='fade',

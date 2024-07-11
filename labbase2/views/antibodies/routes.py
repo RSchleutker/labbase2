@@ -7,7 +7,7 @@ from labbase2.forms.utils import err2message
 
 from labbase2.utils.message import Message
 from labbase2.views.requests.forms import EditRequest
-# from batches.forms import EditBatch
+from labbase2.views.batches.forms import EditBatch
 from labbase2.utils.role_required import role_required
 from labbase2.models import db
 from labbase2.models import Antibody
@@ -75,7 +75,7 @@ def details(id_: int):
         comment_form=EditComment,
         request_form=EditRequest,
         file_form=UploadFile,
-        # batch_form=EditBatch,
+        batch_form=EditBatch,
         dilution_form=EditDilution
     )
 

@@ -1,0 +1,42 @@
+{% macro table(entities) %}
+
+  <table class="table table-results">
+    <caption>Results table for filtered batches.</caption>
+    <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Type</th>
+      <th scope="col">Consumable</th>
+      <th scope="col">Supplier</th>
+      <th scope="col">Lot</th>
+      <th scope="col">Ordered</th>
+      <th scope="col">Emptied</th>
+      <th scope="col">In use</th>
+      <th scope="col">Storage</th>
+    </tr>
+    </thead>
+
+    <tbody id="table-results-body">
+    {% for batch, type, label in entities %}
+      <tr {% if batch.empty %}class="discarded"{% endif %}
+          onclick="request_details('{{ url_for(".details", id_=batch.id, format_="long") }}')">
+        <td class="id">{{ batch.id }}</td>
+        <td>{{ type.capitalize() }}</td>
+        <td>{{ label }}</td>
+        <td>{{ batch.supplier }}</td>
+        <td>{{ batch.lot }}</td>
+        <td>{{ batch.ordered }}</td>
+        <td>
+          {% if batch.emptied_date is not none %}
+            {{ batch.emptied_date }}
+          {% endif %}
+        </td>
+        <td>{% if batch.in_use %}Yes{% else %}No{% endif %}</td>
+        <td>{{ batch.restricted_location }}</td>
+      </tr>
+    {% endfor %}
+
+    </tbody>
+  </table>
+
+{% endmacro %}

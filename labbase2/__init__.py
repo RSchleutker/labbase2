@@ -47,6 +47,7 @@ def create_app(config_filename):
     from labbase2.views import comments
     from labbase2.views import files
     from labbase2.views import requests
+    from labbase2.views import batches
     from labbase2.views import antibodies
     from labbase2.views.antibodies import dilutions
     from labbase2.views import oligonucleotides
@@ -57,6 +58,7 @@ def create_app(config_filename):
     app.register_blueprint(comments.bp)
     app.register_blueprint(files.bp)
     app.register_blueprint(requests.bp)
+    app.register_blueprint(batches.bp)
     app.register_blueprint(antibodies.bp)
     app.register_blueprint(dilutions.bp)
     app.register_blueprint(oligonucleotides.bp)
