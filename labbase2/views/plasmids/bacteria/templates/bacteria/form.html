@@ -1,0 +1,80 @@
+{% import 'macros/forms.html' as forms %}
+
+{% macro bacteria_add_form(form, endpoint, method, id, plasmid_id) %}
+
+  {% if id == -1 %}
+    {% set action = url_for(endpoint, plasmid_id=plasmid_id) %}
+  {% else %}
+    {% set action = url_for(endpoint, id_=id) %}
+  {% endif %}
+
+<div id="modal-edit-bacterium-{{ id }}"
+     class="modal fade"
+     role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Glycerol Stock</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;
+        </button>
+      </div>
+      <div class="modal-body" id="modal-edit-bacterium-{{ id }}-body">
+
+        <div>
+
+          <div class="row">
+            <div class="col-12">
+
+              <form action="{{ action }}"
+                    method="get"
+                    id="form-edit-bacterium-{{ id }}">
+                {{ form.hidden_tag() }}
+                <div class="row">
+                  <div class="col-6">
+                    {{ forms.field(form.transformation_date, 'Transformation date') }}
+                  </div>
+                  <div class="col-6">
+                    {{ forms.field(form.disposal_date, 'Disposal date') }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-6">
+                    {{ forms.field(form.strain, 'Strain') }}
+                  </div>
+                  <div class="col-6">
+                    {{ forms.field(form.storage_place, '<i class="fa fa-map-marker-alt"></i>') }}
+                  </div>
+                </div>
+                <div class="form-group">
+                  {{ form.submit() }}
+                </div>
+              </form>
+
+              <div id="form-edit-bacterium-{{ id }}-messages">
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    {{ forms.script_send_form(
+      form,
+      'form-edit-bacterium-' + id|string,
+      method,
+      'form-edit-bacterium-' + id|string + '-messages'
+      ) }}
+
+{% endmacro %}

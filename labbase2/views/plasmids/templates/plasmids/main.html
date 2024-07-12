@@ -1,0 +1,46 @@
+<!-- EXTENSION DECLARATION -->
+{% extends "base-site-entities.html" %}
+
+{% from "plasmids/form.html" import plasmid_add_form %}
+{% from "plasmids/table.html" import table %}
+
+
+{% block toolbar %}
+
+  <div class="d-flex flex-row justify-content-center">
+    <div class="p-2">
+       <div class="btn-group btn-group-sm">
+         <button type="button" class="btn btn-success disabled"><i class="fa-solid fa-upload"></i></button>
+         <button type="button"
+                 class="btn btn-success"
+                 data-toggle="modal"
+                 data-target="#modal-edit-plasmid--1">
+           FORM
+         </button>
+       </div>
+    </div>
+    <div class="p-2">
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-warning disabled"><i class="fa-solid fa-download"></i></button>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="csv",
+        **args) }}">CSV</a>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="json",
+        **args) }}">JSON</a>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="fasta",
+        **args) }}">FASTA</a>
+        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="zip",
+        **args) }}">MAPS</a>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+  {{ super() }}
+
+  {{ plasmid_add_form(add_form, ".add", "POST", -1) }}
+
+{% endblock %}

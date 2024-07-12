@@ -49,7 +49,7 @@ def create_app(config_filename):
     from labbase2.views import requests
     from labbase2.views import batches
     from labbase2.views import antibodies
-    from labbase2.views.antibodies import dilutions
+    from labbase2.views import plasmids
     from labbase2.views import oligonucleotides
 
     app.register_blueprint(base.bp)
@@ -60,7 +60,7 @@ def create_app(config_filename):
     app.register_blueprint(requests.bp)
     app.register_blueprint(batches.bp)
     app.register_blueprint(antibodies.bp)
-    app.register_blueprint(dilutions.bp)
+    app.register_blueprint(plasmids.bp)
     app.register_blueprint(oligonucleotides.bp)
 
     from labbase2.utils.template_filters import format_date
