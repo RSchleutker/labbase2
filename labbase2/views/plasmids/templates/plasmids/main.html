@@ -3,6 +3,7 @@
 
 {% from "plasmids/form.html" import plasmid_add_form %}
 {% from "plasmids/table.html" import table %}
+{% from "macros/import-modal.html" import import_modal %}
 
 
 {% block toolbar %}
@@ -16,6 +17,12 @@
                  data-toggle="modal"
                  data-target="#modal-edit-plasmid--1">
            FORM
+         </button>
+         <button type="button"
+                 class="btn btn-success"
+                 data-toggle="modal"
+                 data-target="#modal-import-file">
+           FILE
          </button>
        </div>
     </div>
@@ -33,6 +40,8 @@
       </div>
     </div>
   </div>
+
+  {{ import_modal(import_file_form, "plasmid") }}
 
 {% endblock %}
 

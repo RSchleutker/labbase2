@@ -7,6 +7,8 @@ from labbase2.forms.utils import err2message
 from labbase2.utils.message import Message
 from labbase2.utils.role_required import role_required
 from labbase2.models import db
+from labbase2.models import Antibody
+from labbase2.models import Plasmid
 from labbase2.models import Oligonucleotide
 from labbase2.models import File
 from labbase2.models import ImportJob
@@ -32,6 +34,7 @@ from Bio.Seq import Seq
 
 import pandas as pd
 from pathlib import Path
+from functools import partial
 
 
 __all__ = ["bp"]
@@ -55,61 +58,112 @@ def index():
     )
 
 
-@bp.route("/upload/<string:type_>", methods=["GET", "POST"])
+@bp.route("/upload/<string:type_>", methods=["POST"])
 @login_required
 def upload(type_: str):
     form = UploadFile()
 
-    if form.validate_on_submit():
-        data = form.file.data
-        file = File(user_id=current_user.id, original_filename=secure_filename(data.filename))
-
-        # A database ID is assigned to the file now. Use that to create filename to store file.
-        try:
-            db.session.add(file)
-            db.session.flush()
-        except Exception as error:
-            flash(Message.ERROR(error))
-        else:
-            file.set_filename()
-
-        # Next, try to save the file to disk.
-        try:
-            data.save(file.path)
-        except Exception as error:
-            db.session.rollback()
-            flash(Message.ERROR(error))
+    match type_.lower():
+        case "antibody":
+            entity_cls = Antibody
+        case "oligonucleotide":
+            entity_cls = Oligonucleotide
+        case "plasmid":
+            entity_cls = Plasmid
+        case _:
+            flash(f"Unknown type {type}", "danger")
             return redirect(request.referrer)
 
-        # Lastly, commit changes to database. Don't know if this requires a try-except block
-        # since at this point the flush was already successful. But better be safe than sorry.
-        try:
-            db.session.commit()
-        except Exception as error:
-            file.path.unlink(missing_ok=True)
-            db.session.rollback()
-            return redirect(request.referrer)
+    if not form.validate():
+        return redirect(request.referrer)
 
-        # Now create the ImportJob.
-        import_job = ImportJob(
-            user_id=current_user.id,
-            file_id=file.id,
-            entity_type="oligonucleotide"
-        )
+    data = form.file.data
+    file = File(user_id=current_user.id, original_filename=secure_filename(data.filename))
 
-        for field in Oligonucleotide.importable_fields():
-            import_job.mappings.append(ColumnMapping(mapped_field=field))
+    # A database ID is assigned to the file now. Use that to create filename to store file.
+    try:
+        db.session.add(file)
+        db.session.flush()
+    except Exception as error:
+        flash(Message.ERROR(error))
+    else:
+        file.set_filename()
 
-        db.session.add(import_job)
+    # Next, try to save the file to disk.
+    try:
+        data.save(file.path)
+    except Exception as error:
+        db.session.rollback()
+        flash(Message.ERROR(error))
+        return redirect(request.referrer)
+
+    # Lastly, commit changes to database. Don't know if this requires a try-except block
+    # since at this point the flush was already successful. But better be safe than sorry.
+    try:
         db.session.commit()
+    except Exception as error:
+        flash(f"An error occurred during file upload! {error}", "danger")
+        file.path.unlink(missing_ok=True)
+        db.session.rollback()
+        return redirect(request.referrer)
 
-    return redirect(url_for("imports.index"))
+    # Try to read the file.
+    match file.path.suffix:
+        case ".csv":
+            read_fnc = pd.read_csv
+        case ".xls" | ".xlsx":
+            read_fnc = partial(pd.read_excel, engine="openpyxl")
+        case _:
+            flash("Unknown file type!", "danger")
+            return redirect(request.referrer)
+
+    try:
+        read_fnc(file.path)
+    except pd.errors.ParserError:
+        flash("File could not be parsed properly!", "danger")
+        db.session.delete(file)
+        db.session.commit()
+        return redirect(request.referrer)
+    except pd.errors.EmptyDataError:
+        flash("File is empty or has improper header!", "danger")
+        db.session.delete(file)
+        db.session.commit()
+        return redirect(request.referrer)
+    except Exception as error:
+        flash(f"An unknown error occurred during file parsing! {error}", "danger")
+        db.session.delete(file)
+        db.session.commit()
+        return redirect(request.referrer)
+
+    # Now create the ImportJob.
+    import_job = ImportJob(
+        user_id=current_user.id,
+        file_id=file.id,
+        entity_type=type_
+    )
+
+    for field in entity_cls.importable_fields():
+        column_mapping = ColumnMapping(mapped_field=field)
+        import_job.mappings.append(column_mapping)
+
+    db.session.add(import_job)
+    db.session.commit()
+
+    return redirect(url_for("imports.edit", id_=import_job.id))
 
 
 @bp.route("/edit/<int:id_>", methods=["GET", "POST"])
 @login_required
 def edit(id_: int):
     import_job = ImportJob.query.get(id_)
+
+    if import_job is None:
+        flash(f"No import with ID {id_}!", "danger")
+        return redirect(url_for(".index"))
+    if import_job.user_id != current_user.id:
+        flash(f"You are not authorized to work on this import!", "danger")
+        return redirect(url_for(".index"))
+
     file = import_job.file
 
     match file.path.suffix:
@@ -117,6 +171,9 @@ def edit(id_: int):
             table = pd.read_csv(file.path)
         case ".xls" | ".xlsx":
             table = pd.read_excel(file.path, engine="openpyxl")
+        case _:
+            flash("Unknown file type!", "danger")
+            return redirect(url_for(".index"))
 
     fields = [mapping.mapped_field for mapping in import_job.mappings]
     defaults = [mapping.input_column for mapping in import_job.mappings]
@@ -147,8 +204,15 @@ def execute(id_: int):
         return redirect(url_for(".index"))
 
     match job.entity_type:
+        case "antibody":
+            entity_cls = Antibody
         case "oligonucleotide":
-            cls = Oligonucleotide
+            entity_cls = Oligonucleotide
+        case "plasmid":
+            entity_cls = Plasmid
+        case _:
+            flash(f"Unknown entity type {job.entity_type}!", "danger")
+            return redirect(request.referrer)
 
     mappings = ColumnMapping.query.filter(
         ColumnMapping.job_id == job.id,
@@ -161,37 +225,43 @@ def execute(id_: int):
 
     match file.path.suffix:
         case ".csv":
-            table = pd.read_csv(file.path)
+            read_fnc = pd.read_csv
         case ".xls" | ".xlsx":
-            table = pd.read_excel(file.path, engine="openpyxl")
+            read_fnc = partial(pd.read_excel, engine="openpyxl")
+        case _:
+            flash("Unknown file type!", "danger")
+            return redirect(request.referrer)
+
+    table = read_fnc(file.path)
 
     table = table[colmns]
     table.columns = fields
 
-    imported_entities = []
-
     for row in table.itertuples(index=False):
         row = row._asdict()
+
         for key, value in row.items():
             if pd.isnull(value):
                 row[key] = None
-
             if isinstance(value, str):
                 row[key] = value.strip()
 
         origin = f"Created from file {file.original_filename} by {current_user.username}."
-        entity = cls(origin=origin, **row)
-        imported_entities.append(entity)
+        entity = entity_cls(origin=origin, **row)
 
-    try:
-        db.session.add_all(imported_entities)
-        db.session.commit()
-    except Exception as error:
-        print(error)
-        db.session.rollback()
-    else:
-        db.session.delete(job)
-        db.session.commit()
+        try:
+            db.session.add(entity)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            continue
+        except Exception as error:
+            print(error)
+            db.session.rollback()
+            return redirect(url_for(".index"))
+
+    db.session.delete(job)
+    db.session.commit()
 
     return redirect(url_for(".index"))
 
@@ -201,15 +271,16 @@ def execute(id_: int):
 def delete(id_: int):
     if not (job := ImportJob.query.get(id_)):
         return Message.ERROR(f"No import with ID {id_}!")
-    elif job.user_id != current_user.id:
+
+    if job.user_id != current_user.id:
         return Message.ERROR("Only owner can delete import!")
+
+    try:
+        db.session.delete(job)
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback()
+        return Message.ERROR(str(err))
     else:
-        try:
-            db.session.delete(job)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return Message.ERROR(str(err))
-        else:
-            return Message.SUCCESS(f"Successfully deleted import {id_}!")
+        return Message.SUCCESS(f"Successfully deleted import {id_}!")
 

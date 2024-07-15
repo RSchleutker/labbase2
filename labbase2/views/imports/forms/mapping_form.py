@@ -47,7 +47,7 @@ class MappingForm(FlaskForm):
         validate_choice=False
     ))
     submit = SubmitField(
-        label="Submit",
+        label="Update mapping",
         render_kw=RENDER_KW_BTN | {"id": "form-submit"}
     )
 

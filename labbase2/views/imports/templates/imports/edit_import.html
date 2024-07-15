@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    <div class="container">
+    <div class="container pb-5">
 
     <h2>Uploaded data</h2>
 
@@ -17,21 +17,50 @@
 
         {{ table_from_pd.table_from_pandas(table.head()) }}
 
-    <h2>Map columns to database</h2>
+    <h2 class="mt-4">Map columns to database</h2>
 
-    <form method="post">
-        {{ form.hidden_tag() }}
+    <p>
+      Below, you find all fields present in the database. Please select from the dropdown menu
+      the column in the uploaded file that should be mapped to the respective field.
+    </p>
+
+
+    <form method="post" class="form-inline">
+
+      {{ form.hidden_tag() }}
+
         {% for field in form.mapping.entries %}
-        <div class="row">
-        <div class="col-12">
-            {{ forms.field(field, field.label) }}
-        </div>
-        </div>
+          <div class="mb-3 ml-3 mr-3">
+            <label class="mb-2 justify-content-start">{{ field.label }}</label>
+            {{ field(class="form-control") }}
+          </div>
         {% endfor %}
-        <div class="form-group">
+        <div>
             {{ form.submit() }}
         </div>
     </form>
+
+
+    <h2 class="mt-4">Import data to database</h2>
+
+    <p>
+    Once you have selected the correct column mapping (and saved it by clicking on 'Update
+      mapping'), you can try to import the rows of your file to the database.
+    </p>
+
+    <a href="{{ url_for("imports.execute", id_=job.id) }}"
+       type="button"
+       class="btn btn-success">
+      Import to database
+    </a>
+
+    {% for error in errors %}
+
+      <span class="alert alert-danger">
+        {{ error }}
+      </span>
+
+    {% endfor %}
 
     </div>
 

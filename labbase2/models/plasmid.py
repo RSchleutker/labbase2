@@ -4,6 +4,7 @@ from labbase2.models.mixins import Sequence
 from labbase2.models.mixins import Filter
 from labbase2.models import BaseEntity
 from labbase2.models import db
+from labbase2.models.fields import CustomDate
 
 from flask import send_file
 from flask_login import current_user
@@ -73,11 +74,11 @@ class Plasmid(BaseEntity, Sequence):
     """
 
     id = db.Column(db.Integer, db.ForeignKey("base_entity.id"), primary_key=True)
-    insert = db.Column(db.String(128), nullable=False)
-    vector = db.Column(db.String(256))
-    cloning_date = db.Column(db.Date)
-    description = db.Column(db.String(1024))
-    reference = db.Column(db.String(512))
+    insert = db.Column(db.String(128), nullable=False, info={"importable": True})
+    vector = db.Column(db.String(256), info={"importable": True})
+    cloning_date = db.Column(CustomDate, info={"importable": True})
+    description = db.Column(db.String(1024), info={"importable": True})
+    reference = db.Column(db.String(512), info={"importable": True})
 
     # One-to-many relationships.
     preparations = db.relationship(
@@ -90,8 +91,7 @@ class Plasmid(BaseEntity, Sequence):
         "GlycerolStock",
         backref="plasmid",
         lazy=True,
-        order_by="GlycerolStock.disposal_date, "
-                 "GlycerolStock.transformation_date.desc()"
+        order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()"
     )
 
     __mapper_args__ = {"polymorphic_identity": "plasmid"}
@@ -209,7 +209,7 @@ class Preparation(db.Model):
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"))
+    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     preparation_date = db.Column(db.Date)
     method = db.Column(db.String(64))
@@ -263,7 +263,7 @@ class GlycerolStock(db.Model, Filter):
     __tablename__: str = "glycerol_stock"
 
     id = db.Column(db.Integer, primary_key=True)
-    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"))
+    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     strain = db.Column(db.String(64), nullable=False)
     transformation_date = db.Column(db.Date, nullable=False)

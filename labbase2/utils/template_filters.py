@@ -21,5 +21,5 @@ def format_datetime(x: datetime) -> str:
 
     tz = getattr(current_user, "tz", "Europe/Berlin")
 
-    return x.astimezone(ZoneInfo(tz)).strftime("%b %d, %Y %-I:%M %p")
+    return x.astimezone(ZoneInfo(tz)).strftime("%b %d, %Y %I:%M %p")
 

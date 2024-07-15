@@ -3,6 +3,7 @@ import string
 from labbase2.models.mixins import Sequence
 from labbase2.models import BaseEntity
 from labbase2.models import db
+from labbase2.models.fields import SequenceString
 
 from sqlalchemy import asc
 from sqlalchemy import desc
@@ -20,20 +21,6 @@ import re
 
 
 __all__ = ["Oligonucleotide"]
-
-
-class SequenceString(TypeDecorator):
-
-    impl = db.String
-
-    def process_bind_param(self, value, dialect):
-        if value is None:
-            return None
-
-        return "".join(value.split())
-
-    def copy(self, **kw):
-        return SequenceString(self.impl.length)
 
 
 # Map finding jobs to the oligonucleotide in a many-to-many relationship.

@@ -1,0 +1,42 @@
+{% import "macros/forms.html" as forms %}
+
+
+{% macro import_modal(form, entity_type) %}
+
+  <div id="modal-import-file" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Import from file</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;
+          </button>
+        </div>
+        <div class="modal-body" id="modal-import-file-body">
+
+            <form action="{{ url_for("imports.upload", type_=entity_type) }}"
+            method="POST"
+            enctype=multipart/form-data
+            id="form-edit-file-{{ id }}">
+          {{ form.hidden_tag() }}
+          <div class="row">
+              <div class="col-4">
+                  {{ forms.field(form.file, 'File') }}
+              </div>
+              <div class="col-8">
+                  {{ form.submit() }}
+              </div>
+          </div>
+      </form>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endmacro %}

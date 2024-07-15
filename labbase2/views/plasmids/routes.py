@@ -75,8 +75,6 @@ bp.register_blueprint(preparations.bp)
 @bp.route("/", methods=["GET"])
 @login_required
 def index():
-    print(db.session.new)
-
     page = request.args.get("page", 1, type=int)
     form = FilterPlasmids(request.args)
 
@@ -93,6 +91,7 @@ def index():
     return render_template(
         "plasmids/main.html",
         filter_form=form,
+        import_file_form=UploadFile(),
         add_form=EditPlasmid(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         title="Plasmids"
