@@ -85,5 +85,6 @@ class EditEntityForm(EditForm):
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-label"}
+        render_kw=RENDER_KW | {"id": "edit-form-label",
+                               "placeholder": "Name"}
     )

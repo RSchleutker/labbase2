@@ -17,6 +17,7 @@ $font-discarded-color     : #BFBFBF;
 $background-color         : #F9F9FA;
 $sidebar-background-color : #2A3F54;
 $navbar-background-color  : #1C3144;
+$emph-background-color    : rgba(0,0,0,.03);
 
 /* ADDITIONAL COLORS */
 $border-color             : #D9DEE4;
@@ -49,6 +50,10 @@ body {
 
 .container {
   padding-top : 15px;
+}
+
+.modal-header, .modal-footer {
+  background-color: $emph-background-color;
 }
 
 

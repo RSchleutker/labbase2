@@ -110,8 +110,9 @@ def add():
         try:
             db.session.add(plasmid)
             db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err)), 400
+        except Exception as error:
+            print(error)
+            return Message.ERROR(str(error)), 400
         else:
             return Message.SUCCESS(f"Successfully added plasmid!"), 201
 
@@ -124,21 +125,23 @@ def add():
 @role_required(roles=["editor", "viewer"])
 def edit(id_: int):
     if (form := EditPlasmid()).validate():
-        if not (plasmid := Plasmid.query.get(id_)):
-            return Message.ERROR(f"No plasmid with ID {id_}!"), 404
-        elif plasmid.owner_id != current_user.id:
-            return Message.ERROR("Plasmid can only be edited by owner!"), 403
-        else:
+        plasmid = Plasmid.query.get(id_)
+        if plasmid is None:
+            return Message.ERROR(f"No plasmid with ID {id_}!")
+
+        if plasmid.owner_id != current_user.id:
+            return Message.ERROR("Plasmid can only be edited by owner!")
+
             form.populate_obj(plasmid)
 
-            try:
-                db.session.commit()
-            except Exception as err:
-                return Message.ERROR(str(err)), 400
-            else:
-                return Message.SUCCESS(f"Successfully edited plasmid!"), 200
-    else:
-        return err2message(form.errors), 400
+        try:
+            db.session.commit()
+        except Exception as err:
+            return Message.ERROR(str(err)), 400
+        else:
+            return Message.SUCCESS(f"Successfully edited plasmid!"), 200
+
+    return err2message(form.errors), 400
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])

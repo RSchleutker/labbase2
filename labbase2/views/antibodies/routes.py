@@ -71,7 +71,7 @@ def details(id_: int):
     return render_template(
         "antibodies/details.html",
         antibody=antibody,
-        form=EditAntibody(None, obj=antibody),
+        form=EditAntibody(formdata=None, obj=antibody),
         comment_form=EditComment,
         request_form=EditRequest,
         file_form=UploadFile,

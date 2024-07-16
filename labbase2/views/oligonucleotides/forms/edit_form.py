@@ -28,13 +28,16 @@ class EditOligonucleotide(EditEntityForm):
         "Order date",
         default=date.today,
         validators=[Optional()],
-        render_kw=RENDER_KW | {"id": "edit-form-order-date", "type": "date"}
+        render_kw=RENDER_KW | {"id": "edit-form-order-date",
+                               "type": "date",
+                               "placeholder": "Primer name, e.g. oRS-1"}
     )
     owner_id = SelectField(
         "Owner", validators=[DataRequired()],
         validate_choice=False,
         default=lambda: current_user.id,
-        coerce=int
+        coerce=int,
+        render_kw=RENDER_KW | {"size": 1}
     )
     sequence = StringField(
         "Sequence",

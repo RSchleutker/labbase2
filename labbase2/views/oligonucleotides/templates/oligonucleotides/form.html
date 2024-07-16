@@ -1,82 +1,67 @@
 {% import 'macros/forms.html' as forms %}
+{% import 'macros/modal.html' as modal %}
+
 
 {% macro primer_add_form(form, endpoint, method, id) %}
 
-  {% if id == -1 %}
-    {% set action = url_for(endpoint) %}
-  {% else %}
-    {% set action = url_for(endpoint, id_=id) %}
-  {% endif %}
+    {% if id == -1 %}
+        {% set action = url_for(endpoint) %}
+        {% set title = 'Add Primer' %}
+    {% else %}
+        {% set action = url_for(endpoint, id_=id) %}
+        {% set title = 'Edit Primer' %}
+    {% endif %}
 
-  <div id="modal-edit-primer-{{ id }}" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Edit Primer</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;
-          </button>
-        </div>
-        <div class="modal-body" id="modal-edit-primer-{{ id }}-body">
-          <div>
-            <div class="row">
-              <div class="col-12">
+    {% set modal_id = 'modal-edit-primer-' ~ id %}
+    {% set form_id = 'form-edit-primer-' ~ id %}
 
-                <form
-                    action="{{ action }}"
-                    method="post"
-                    id="form-edit-primer-{{ id }}">
-                  {{ form.hidden_tag() }}
-                  <div class="row">
-                    <div class="col-6">
-                      {{ forms.field(form.label, 'Label') }}
-                    </div>
-                    <div class="col-6">
-                      {{ forms.field(form.order_date, 'Order date') }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-7">
-                      {{ forms.field(form.sequence, 'Sequence') }}
-                    </div>
-                  <div class="col-5">
-                      {{ forms.field(form.owner_id, 'Owner') }}
-                  </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      {{ forms.field(form.storage_place, 'Location') }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      {{ forms.field_no_label(form.description) }}
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    {{ form.submit() }}
-                  </div>
-                </form>
+    {% call modal.modal(id=modal_id, title=title) %}
 
-                <div id="form-edit-primer-{{ id }}-messages">
-                </div>
-              </div>
+        <form action="{{ action }}" method="get" id="{{ form_id }}">
+
+            {{ form.hidden_tag() }}
+
+            <div class="form-group row">
+                {{ forms.field_row(form.label, 'Name') }}
             </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  {{ forms.script_send_form(
-      form,
-      'form-edit-primer-' + id|string,
-      method,
-      'form-edit-primer-' + id|string + '-messages'
-      ) }}
+            <div class="form-group row">
+                {{ forms.field_row(form.order_date, 'Order Date') }}
+            </div>
+
+            <div class="form-group row">
+                {{ forms.field_row(form.sequence, 'Sequence') }}
+            </div>
+
+            <div class="form-group row">
+                {{ forms.field_row(form.storage_place, 'Storage place') }}
+            </div>
+
+            <div class="form-group row">
+                {{ forms.field_row(form.owner_id, 'Owner') }}
+            </div>
+
+            <div class="form-group row">
+                {{ forms.field_row(form.description, 'Description') }}
+            </div>
+
+            <div class="form-group row">
+                <div class="col-sm-10">
+                    {{ form.submit() }}
+                </div>
+            </div>
+
+        </form>
+
+        <div id="{{ form_id }}-messages"></div>
+
+        {{ forms.script_send_form(
+            form=form,
+            form_name=form_id,
+            method=method,
+            message_field=form_id ~ '-messages'
+         ) }}
+
+    {% endcall %}
 
 {% endmacro %}

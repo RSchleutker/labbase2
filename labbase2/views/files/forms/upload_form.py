@@ -24,7 +24,8 @@ class UploadFile(EditForm):
     file = FileField(
         "Select File",
         validators=[DataRequired()],
-        render_kw=RENDER_KW_FILE | {"id": "edit-form-upload-filepath"}
+        render_kw=RENDER_KW_FILE | {"id": "edit-form-upload-filepath",
+                                    "type": "file"}
     )
     note = TextAreaField(
         "Note",
