@@ -171,10 +171,12 @@ b, strong {
 
 
 .table-results {
+
+  border-radius: 5px;
+
   tbody tr:hover {
     background   : $background-color;
     cursor       : pointer;
-    border-width : 1px 0;
   }
 
   th {
@@ -194,16 +196,11 @@ b, strong {
 
     &.active {
       background-color : $background-color;
-      border-width     : 1px 0;
       font-weight      : 500;
     }
 
     &:last-child {
       border-width : 1px;
-
-      &.active {
-        border-width : 1px 0;
-      }
     }
   }
 }
@@ -481,9 +478,6 @@ b, strong {
 
   .tab-content {
     font-size  : .9em;
-    background : #FFF;
-    border     : 1px solid $border-color;
-    border-top : 1px solid #FFF;
   }
 
   .tab-top-link {

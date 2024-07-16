@@ -10,43 +10,51 @@
 {% from "files/form.html" import file_edit_form %}
 
 
-<ul class="nav nav-tabs">
+<div class="card">
 
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
-  </li>
+    <div class="card-header">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-preps">Preps</a>
-  </li>
+        <h1 class="mb-4">{{ plasmid.label }}</h1>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-comments">
-      Comments
-    </a>
-  </li>
+        <ul class="nav nav-tabs card-header-tabs">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-bacteria">Stocks</a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
+            </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-preps">Preps</a>
+            </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-comments">
+                    Comments
+                </a>
+            </li>
 
-</ul>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-bacteria">Stocks</a>
+            </li>
 
-<div class="tab-content">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+            </li>
 
-  <div class="tab-pane container active" id="tab-info">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
+            </li>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="flex-grow-1 mb-0">{{ plasmid.label }}</h2>
-          <span class="flex-shrink-0">
+        </ul>
+
+    </div>
+
+    <div class="tab-content">
+
+        <div class="tab-pane container active" id="tab-info">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="flex-grow-1 mb-0">Details</h2>
+                <span class="flex-shrink-0">
               <a class="text-primary mr-2"
                  data-toggle="modal"
                  data-target="#modal-edit-plasmid-{{ plasmid.id }}">
@@ -57,113 +65,111 @@
               <i class="fa-solid fa-trash"></i>
               </a>
           </span>
-      </div>
+            </div>
 
-    <h3>Details</h3>
+            <table class="table table-details">
+                <tbody>
+                <tr>
+                    <td>Database ID</td>
+                    <td>{{ plasmid.id }}</td>
+                </tr>
+                <tr>
+                    <td>Label</td>
+                    <td>{{ plasmid.label }}</td>
+                </tr>
+                <tr>
+                    <td>Owner</td>
+                    <td>{{ plasmid.owner.username }}</td>
+                </tr>
+                <tr>
+                    <td>Cloning date</td>
+                    <td>{{ plasmid.cloning_date }}</td>
+                </tr>
+                <tr>
+                    <td>Insert</td>
+                    <td>{{ plasmid.insert }}</td>
+                </tr>
+                <tr>
+                    <td>Vector</td>
+                    <td>{{ plasmid.vector }}</td>
+                </tr>
+                <tr>
+                    <td>Storage place</td>
+                    <td>{{ plasmid.storage_place }}</td>
+                </tr>
+                <tr>
+                    <td>Glycerol stock(s)</td>
+                    <td>{% if plasmid.stocks %}Yes ({{ plasmid.stocks|length }}){% else %}No{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>Length</td>
+                    <td>{{ plasmid|length }}</td>
+                </tr>
+                <tr>
+                    <td>Current plasmid file</td>
+                    <td>
+                        {% if plasmid.file %}
+                            <a href="{{ url_for('files.download', id_=plasmid.file.id) }}">
+                                {{ plasmid.file.original_filename }} <i class="fa-solid fa-file-arrow-down"></i>
+                            </a>
+                        {% else %}
+                            No Genebank file uploaded.
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Reference</td>
+                    <td>{{ plasmid.reference }}</td>
+                </tr>
+                </tbody>
+            </table>
 
-    <table class="table table-details">
-      <tbody>
-        <tr>
-          <td>Database ID</td>
-          <td>{{ plasmid.id }}</td>
-        </tr>
-        <tr>
-          <td>Label</td>
-          <td>{{ plasmid.label }}</td>
-        </tr>
-        <tr>
-          <td>Owner</td>
-          <td>{{ plasmid.owner.username }}</td>
-        </tr>
-        <tr>
-          <td>Cloning date</td>
-          <td>{{ plasmid.cloning_date }}</td>
-        </tr>
-        <tr>
-          <td>Insert</td>
-          <td>{{ plasmid.insert }}</td>
-        </tr>
-        <tr>
-          <td>Vector</td>
-          <td>{{ plasmid.vector }}</td>
-        </tr>
-        <tr>
-          <td>Storage place</td>
-          <td>{{ plasmid.storage_place }}</td>
-        </tr>
-        <tr>
-          <td>Glycerol stock(s)</td>
-          <td>{% if plasmid.stocks %}Yes ({{ plasmid.stocks|length }}){% else %}No{% endif %}</td>
-        </tr>
-        <tr>
-          <td>Length</td>
-          <td>{{ plasmid|length }}</td>
-        </tr>
-        <tr>
-          <td>Current plasmid file</td>
-          <td>
-            {% if plasmid.file %}
-              <a href="{{ url_for('files.download', id_=plasmid.file.id) }}">
-                {{ plasmid.file.original_filename }} <i class="fa-solid fa-file-arrow-down"></i>
-              </a>
-            {% else %}
-              No Genebank file uploaded.
+            {% if plasmid.description %}
+                <h3 class="mt-4">Description</h3>
+                <p class="text-justify">
+                    {{ plasmid.description }}
+                </p>
             {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <td>Reference</td>
-          <td>{{ plasmid.reference }}</td>
-        </tr>
-      </tbody>
-    </table>
 
-    {% if plasmid.description %}
-      <h3 class="mt-4">Description</h3>
-      <p class="text-justify">
-          {{ plasmid.description }}
-      </p>
-    {% endif %}
+        </div>
 
-  </div>
-
-  {{ preparations_pane(
+        {{ preparations_pane(
     status='fade',
     pane_id='tab-preps',
     plasmid=plasmid,
     form=preparation_form
   ) }}
 
-  {{ files_pane(
+        {{ files_pane(
     status='fade',
     pane_id='tab-files',
     entity=plasmid,
     form=file_form
   ) }}
 
-  {{ comment_pane(
+        {{ comment_pane(
     status='fade',
     pane_id='tab-comments',
     entity=plasmid,
     form=comment_form
   ) }}
 
-  {{ bacteria_pane(
+        {{ bacteria_pane(
     status='fade',
     pane_id='tab-bacteria',
     plasmid=plasmid,
     form=bacteria_form
   ) }}
 
-  {{ request_pane(
+        {{ request_pane(
     status='fade',
     pane_id='tab-requests',
     entity=plasmid,
     form=request_form
   ) }}
 
+    </div>
+
+    {{ plasmid_add_form(form, ".edit", "PUT", plasmid.id) }}
+
 </div>
-
-<br>
-
-{{ plasmid_add_form(form, ".edit", "PUT", plasmid.id) }}

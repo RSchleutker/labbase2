@@ -130,10 +130,12 @@ b, strong {
   vertical-align: middle;
 }
 
+.table-results {
+  border-radius: 5px;
+}
 .table-results tbody tr:hover {
   background: #F9F9FA;
   cursor: pointer;
-  border-width: 1px 0;
 }
 .table-results th {
   font-size: 1.1em;
@@ -150,14 +152,10 @@ b, strong {
 }
 .table-results tr.active {
   background-color: #F9F9FA;
-  border-width: 1px 0;
   font-weight: 500;
 }
 .table-results tr:last-child {
   border-width: 1px;
-}
-.table-results tr:last-child.active {
-  border-width: 1px 0;
 }
 
 .table-details {
@@ -387,9 +385,6 @@ b, strong {
 }
 #sidebar-left .tab-content, #sidebar-right .tab-content {
   font-size: 0.9em;
-  background: #FFF;
-  border: 1px solid #D9DEE4;
-  border-top: 1px solid #FFF;
 }
 #sidebar-left .tab-top-link, #sidebar-right .tab-top-link {
   padding: 5px;

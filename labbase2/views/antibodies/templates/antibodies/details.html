@@ -8,43 +8,51 @@
 {% from "files/form.html" import file_upload_form %}
 
 
-<ul class="nav nav-tabs">
+<div class="card">
 
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
-  </li>
+    <div class="card-header">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
-  </li>
+        <h1 class="mb-4">{{ antibody.label }}</h1>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
-  </li>
+        <ul class="nav nav-tabs card-header-tabs">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
+            </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-comments">
-      Comments
-    </a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
+            </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
-  </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
+            </li>
 
-</ul>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+            </li>
 
-<div class="tab-content">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-comments">
+                    Comments
+                </a>
+            </li>
 
-  <div class="tab-pane container active" id="tab-info">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
+            </li>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="flex-grow-1 mb-0">{{ antibody.label }}</h2>
-          <span class="flex-shrink-0">
+        </ul>
+
+    </div>
+
+    <div class="tab-content">
+
+        <div class="tab-pane container active" id="tab-info">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="flex-grow-1 mb-0">Details</h2>
+                <span class="flex-shrink-0">
               <a class="text-primary mr-2"
                  data-toggle="modal"
                  data-target="#modal-edit-antibody-{{ antibody.id }}">
@@ -55,94 +63,92 @@
               <i class="fa-solid fa-trash"></i>
               </a>
           </span>
-      </div>
+            </div>
 
-      <h3>Details</h3>
+            <table class="table table-details">
+                <tbody>
+                <tr>
+                    <td>Database ID</td>
+                    <td>{{ antibody.id }}</td>
+                </tr>
+                <tr>
+                    <td>Label</td>
+                    <td>{{ antibody.label }}</td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>{{ antibody.location }}</td>
+                </tr>
+                <tr>
+                    <td>Clone</td>
+                    <td>{{ antibody.clone }}</td>
+                </tr>
+                <tr>
+                    <td>Host</td>
+                    <td>{{ antibody.host }}</td>
+                </tr>
+                <tr>
+                    <td>Antigen</td>
+                    <td>{{ antibody.antigen }}</td>
+                </tr>
+                <tr>
+                    <td>Clonality</td>
+                    <td>{{ antibody.specification }}</td>
+                </tr>
+                <tr>
+                    <td>Conjugate</td>
+                    <td>{{ antibody.conjugate }}</td>
+                </tr>
+                <tr>
+                    <td>Source</td>
+                    <td>{{ antibody.source }}</td>
+                </tr>
+                <tr>
+                    <td>Storage</td>
+                    <td>{{ antibody.storage_temp }}°C</td>
+                </tr>
+                </tbody>
+            </table>
 
-    <table class="table table-details">
-      <tbody>
-        <tr>
-          <td>Database ID</td>
-          <td>{{ antibody.id }}</td>
-        </tr>
-        <tr>
-          <td>Label</td>
-          <td>{{ antibody.label }}</td>
-        </tr>
-        <tr>
-          <td>Location</td>
-          <td>{{ antibody.location }}</td>
-        </tr>
-        <tr>
-          <td>Clone</td>
-          <td>{{ antibody.clone }}</td>
-        </tr>
-        <tr>
-          <td>Host</td>
-          <td>{{ antibody.host }}</td>
-        </tr>
-        <tr>
-          <td>Antigen</td>
-          <td>{{ antibody.antigen }}</td>
-        </tr>
-        <tr>
-          <td>Clonality</td>
-          <td>{{ antibody.specification }}</td>
-        </tr>
-        <tr>
-          <td>Conjugate</td>
-          <td>{{ antibody.conjugate }}</td>
-        </tr>
-        <tr>
-          <td>Source</td>
-          <td>{{ antibody.source }}</td>
-        </tr>
-        <tr>
-          <td>Storage</td>
-          <td>{{ antibody.storage_temp }}°C</td>
-        </tr>
-      </tbody>
-    </table>
+        </div>
 
-  </div>
-
-  {{ dilutions_pane(
+        {{ dilutions_pane(
     status='fade',
     pane_id='tab-dilutions',
     antibody=antibody,
     form=dilution_form
   ) }}
 
-  {{ batch_pane(
+        {{ batch_pane(
     status='fade',
     pane_id='tab-batches',
     consumable=antibody,
     form=batch_form
   ) }}
 
-  {{ files_pane(
+        {{ files_pane(
     status='fade',
     pane_id='tab-files',
     entity=antibody,
     form=file_form
   ) }}
 
-  {{ comment_pane(
+        {{ comment_pane(
     status='fade',
     pane_id='tab-comments',
     entity=antibody,
     form=comment_form
   ) }}
 
-  {{ request_pane(
+        {{ request_pane(
     status='fade',
     pane_id='tab-requests',
     entity=antibody,
     form=request_form
   ) }}
 
+    </div>
+
+    {{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}
+
 </div>
-
-<br>
-
-{{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}

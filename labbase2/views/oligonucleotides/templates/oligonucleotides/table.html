@@ -4,33 +4,39 @@
 {% macro table(entities) %}
 
     <table class="table table-results">
+
         <caption>Results table for filtered primers.</caption>
+
         <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Label</th>
-            <th scope="col">Ordered on</th>
-            <th scope="col">Ordered by</th>
-            <th scope="col">Storage place</th>
-            <th scope="col">Length</th>
-            <th scope="col">Sequence</th>
-        </tr>
+
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Label</th>
+                <th scope="col">Ordered on</th>
+                <th scope="col">Ordered by</th>
+                <th scope="col">Storage place</th>
+                <th scope="col">Length</th>
+                <th scope="col">Sequence</th>
+            </tr>
+
         </thead>
         <tbody id="table-results-body">
 
-        {% for oligonucleotide in entities %}
-            <tr id="oligonucleotide-row-{{ oligonucleotide.id }}" onclick="request_details('{{ url_for(".details", id_=oligonucleotide.id) }}')">
-                <td class="id">{{ oligonucleotide.id }}</td>
-                <td>{{ oligonucleotide.label }}</td>
-                <td>{{ oligonucleotide.order_date | format_date }}</td>
-                <td>{{ oligonucleotide.owner.username }}</td>
-                <td>{{ oligonucleotide.storage_place }}</td>
-                <td>{{ oligonucleotide|length }}</td>
-                <td class="sequence">
-                    {{ oligonucleotide.formatted_seq(max_len=45)|safe }}
-                </td>
-            </tr>
-        {% endfor %}
+            {% for oligonucleotide in entities %}
+                <tr id="oligonucleotide-row-{{ oligonucleotide.id }}"
+                    onclick="request_details('{{ url_for(".details", id_=oligonucleotide.id) }}')"
+                    class="rounded-bottom">
+                    <td class="id">{{ oligonucleotide.id }}</td>
+                    <td>{{ oligonucleotide.label }}</td>
+                    <td>{{ oligonucleotide.order_date | format_date }}</td>
+                    <td>{{ oligonucleotide.owner.username }}</td>
+                    <td>{{ oligonucleotide.storage_place }}</td>
+                    <td>{{ oligonucleotide|length }}</td>
+                    <td class="sequence">
+                        {{ oligonucleotide.formatted_seq(max_len=45)|safe }}
+                    </td>
+                </tr>
+            {% endfor %}
 
         </tbody>
     </table>
