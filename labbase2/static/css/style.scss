@@ -272,20 +272,17 @@ b, strong {
 
 /* NAVBAR */
 
-#navbar {
-  position   : fixed;
-  top        : 0;
-  right      : 0;
-  left       : 0;
+.navbar {
   background : $navbar-background-color;
   color      : $font-secondary-color;
-  height     : $navbar-height;
-  padding    : 0 10px;
-  z-index    : 1001;
-  transition : 0.5s;
 
   .nav-link, .navbar-light, .navbar-brand {
     color : $font-secondary-color;
+
+    &.active, &:active {
+      color : $font-secondary-color;
+      font-weight: bolder;
+    }
   }
 
   .dropdown-item.disabled, .dropdown-item:disabled {
@@ -295,14 +292,11 @@ b, strong {
 
 .dropdown-menu {
   color            : $font-secondary-color;
-  border-radius    : 0;
-  border-width     : 0;
   background-color : #0F6674;
 }
 
 .dropdown-item {
   color   : $font-secondary-color;
-  padding : .5rem 1.5rem;
 
   &.active, &:active, &:hover {
     color            : $font-secondary-color;
