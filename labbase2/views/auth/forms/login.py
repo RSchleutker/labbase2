@@ -30,8 +30,7 @@ class LoginForm(FlaskForm):
         "User",
         validators=[DataRequired()],
         filters=[strip_input, make_lower],
-        render_kw=RENDER_KW | {"id": "login-form-email",
-                               "placeholder": "Username or e-mail address"},
+        render_kw=RENDER_KW | {"placeholder": "Username or e-mail address"},
         description="""
         Enter your username or e-mail address.
         """
@@ -39,8 +38,7 @@ class LoginForm(FlaskForm):
     password = PasswordField(
         "Password",
         validators=[DataRequired()],
-        render_kw=RENDER_KW | {"id": "login-form-password",
-                               "placeholder": "Password"},
+        render_kw=RENDER_KW | {"placeholder": "Password"},
         description="""
         Enter your password.
         """
@@ -54,6 +52,5 @@ class LoginForm(FlaskForm):
     )
     submit = SubmitField(
         "Sign In",
-        render_kw=RENDER_KW | {"id": "login-form-submit",
-                               "class": "btn btn-primary btn-block btn-sm"}
+        render_kw={"id": "login-form-submit"}
     )
