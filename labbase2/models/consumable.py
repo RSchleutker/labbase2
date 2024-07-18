@@ -145,9 +145,10 @@ class Consumable(BaseEntity, Export):
     id = db.Column(
         db.Integer,
         db.ForeignKey("base_entity.id"),
-        primary_key=True
+        primary_key=True,
+        info={"importable": False}
     )
-    storage_info = db.Column(db.String(64))
+    storage_info = db.Column(db.String(64), info={"importable": True})
 
     # One-to-many relationships.
     batches = db.relationship(

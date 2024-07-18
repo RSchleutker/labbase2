@@ -43,15 +43,21 @@ class Chemical(Consumable):
 
     __tablename__: str = "chemical"
 
-    id = db.Column(db.Integer, db.ForeignKey("consumable.id"), primary_key=True)
-    cas_number = db.Column(db.String(16))
-    pubchem_cid = db.Column(db.Integer)
+    id = db.Column(
+        db.Integer,
+        db.ForeignKey("consumable.id"),
+        primary_key=True,
+        info={"importable": False}
+    )
+    cas_number = db.Column(db.String(16), info={"importable": True})
+    pubchem_cid = db.Column(db.Integer, info={"importable": True})
     responsible_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
-        nullable=False
+        nullable=False,
+        info={"importable": True}
     )
-    molecular_weight = db.Column(db.Float)
+    molecular_weight = db.Column(db.Float, info={"importable": True})
 
     # One-to-many relationships.
     stocks = db.relationship("StockSolution", backref="chemical", lazy=True)

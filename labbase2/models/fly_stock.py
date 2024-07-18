@@ -99,26 +99,71 @@ class FlyStock(BaseEntity):
     id = db.Column(
         db.Integer,
         db.ForeignKey("base_entity.id"),
-        primary_key=True
+        primary_key=True,
+        info={"importable": False}
     )
-    chromosome_xa = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_xb = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_y = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_2a = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_2b = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_3a = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_3b = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_4a = db.Column(db.String(512), nullable=False, default="+")
-    chromosome_4b = db.Column(db.String(512), nullable=False, default="+")
-    short_genotype = db.Column(db.String(2048))
-    filemaker_genotype = db.Column(db.String(2048))
-    location = db.Column(db.String(64))
-    created_date = db.Column(db.Date)
-    source = db.Column(db.String(512))
-    doc = db.Column(db.String(512))
-    reference = db.Column(db.String(512))
-    discarded_date = db.Column(db.Date)
-    complements = db.Column(db.String(1024))
+    chromosome_xa = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_xb = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_y = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_2a = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_2b = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_3a = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_3b = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_4a = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    chromosome_4b = db.Column(
+        db.String(512),
+        nullable=False,
+        default="+",
+        info={"importable": True}
+    )
+    short_genotype = db.Column(db.String(2048), info={"importable": True})
+    filemaker_genotype = db.Column(db.String(2048), info={"importable": True})
+    location = db.Column(db.String(64), info={"importable": True})
+    created_date = db.Column(db.Date, info={"importable": True})
+    source = db.Column(db.String(512), info={"importable": True})
+    doc = db.Column(db.String(512), info={"importable": True})
+    reference = db.Column(db.String(512), info={"importable": True})
+    discarded_date = db.Column(db.Date, info={"importable": True})
 
     # One-to-many relationships.
     modifications = db.relationship(
