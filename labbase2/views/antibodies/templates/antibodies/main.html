@@ -2,6 +2,7 @@
 
 {% from "antibodies/form.html" import antibody_add_form %}
 {% from "antibodies/table.html" import table %}
+{% from "macros/import-modal.html" import import_modal %}
 
 
 {% block toolbar %}
@@ -16,6 +17,12 @@
                  data-target="#modal-edit-antibody--1">
            FORM
          </button>
+         <button type="button"
+                 class="btn btn-success"
+                 data-toggle="modal"
+                 data-target="#modal-import-file">
+           FILE
+         </button>
        </div>
     </div>
     <div class="p-2">
@@ -26,6 +33,8 @@
       </div>
     </div>
   </div>
+
+  {{ import_modal(import_file_form, "antibody") }}
 
 {% endblock %}
 

@@ -38,13 +38,13 @@ class Antibody(Consumable):
     __tablename__: str = "antibody"
 
     id = db.Column(db.Integer, db.ForeignKey("consumable.id"), primary_key=True)
-    clone = db.Column(db.String(32))
-    host = db.Column(db.String(64), nullable=False)
-    antigen = db.Column(db.String(256), nullable=False)
-    specification = db.Column(db.String(64))
-    storage_temp = db.Column(db.Integer)
-    source = db.Column(db.String(64))
-    conjugate = db.Column(db.String(64))
+    clone = db.Column(db.String(32), info={"importable": True})
+    host = db.Column(db.String(64), nullable=False, info={"importable": True})
+    antigen = db.Column(db.String(256), nullable=False, info={"importable": True})
+    specification = db.Column(db.String(64), info={"importable": True})
+    storage_temp = db.Column(db.Integer, info={"importable": True})
+    source = db.Column(db.String(64), info={"importable": True})
+    conjugate = db.Column(db.String(64), info={"importable": True})
 
     # One-to-many relationships.
     dilutions = db.relationship(
