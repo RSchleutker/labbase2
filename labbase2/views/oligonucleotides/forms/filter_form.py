@@ -57,16 +57,6 @@ class FilterOligonucleotide(FilterForm):
             <strong>AND</strong> 'sequencing'.
             """
     )
-    order_by = SelectField(
-        label="Order by",
-        choices=[("label", "Label"),
-                 ("id", "ID"),
-                 ("order_date", "Order date"),
-                 ("length", "Length")],
-        default="label",
-        render_kw=RENDER_KW | {"id": "filter-form-order-by", "size": 1},
-        description="The column by which the results shall be ordered."
-    )
     download_fasta = SubmitField(
         label="Export to FASTA",
         render_kw=RENDER_KW_BTN | {"id": "filter-form-download-fasta"}
@@ -74,11 +64,14 @@ class FilterOligonucleotide(FilterForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = User.query\
-            .with_entities(User.id, User.username)\
-            .order_by(User.username)\
+        user = User.query \
+            .with_entities(User.id, User.username) \
+            .order_by(User.username) \
             .all()
         self.owner_id.choices += user
+        self.order_by.choices += [("label", "Label"),
+                                  ("order_date", "Order date"),
+                                  ("length", "Length")]
 
     def fields(self) -> list[Field]:
         return [self.id, self.label, self.owner_id, self.sequence,

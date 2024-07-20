@@ -1,4 +1,4 @@
-<form id="filter-form" action="" method="{{ method }}" class="form-inline d-inline-flex align-items-end">
+<form id="filter-form" action="" method="{{ method }}">
 
   {% if csrf %}
     {{ form.hidden_tag() }}
@@ -6,15 +6,21 @@
 
   {% for field in form.fields() %}
 
-      <div class="mb-3 mx-2">
-        <label>
-          {{ field.label }}&nbsp;&nbsp;&nbsp;
-          <span class="fas fa-info-circle"
-                data-toggle="collapse"
-                data-target="#help-{{ field.short_name }}"></span>
-        </label>
-        {{ field() }}
-      </div>
+      {% if field.type == 'BooleanField' %}
+
+          <div class="form-check form-switch mb-3 mx-2">
+              {{ field(class_='form-check-input', type='checkbox', role='switch') }}
+              <label class="form-check-label">{{ field.label }}</label>
+          </div>
+
+      {% else %}
+
+          <div class="mb-3 mx-2">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field() }}
+          </div>
+
+      {% endif %}
 
   {% endfor %}
 

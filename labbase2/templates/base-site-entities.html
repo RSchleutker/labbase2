@@ -11,30 +11,47 @@
 {% set _ = args.pop("page", 1) %}
 
 
+{% block navbar_right %}
+
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-filters" aria-controls="offcanvasExample">
+        <i class="fa-solid fa-filter"></i>
+    </button>
+
+{% endblock %}
+
+
 {% block content %}
 
-  <div id="filters">
-      {% block filters %}
-        {{ filter_form.render()|safe }}
-      {% endblock %}
-
-      {% block toolbar %}{% endblock %}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-filters" aria-labelledby="offcanvas-filters">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Filter</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
+  <div class="offcanvas-body">
+
+      {{ filter_form.render()|safe }}
+
+  </div>
+</div>
 
     <div id="horizontal-flex-container">
 
-      <div id="content">
-        {% block main %}
-          {{ render_pagination(entities) }}
-          {{ results_pagination(entities) }}
-          {{ table(entities.items) }}
-          {{ render_pagination(entities) }}
-        {% endblock %}
-      </div>
+        <div id="content">
 
-      <div id="sidebar-right">
-        {% block sidebar_right %}{% endblock %}
-      </div>
+            {% block main %}
+
+                {{ results_pagination(entities) }}
+                {{ render_pagination(entities) }}
+                {{ table(entities.items) }}
+                {{ render_pagination(entities) }}
+
+            {% endblock %}
+
+        </div>
+
+        <div id="sidebar-right">
+            {% block sidebar_right %}{% endblock %}
+        </div>
 
     </div>
 
@@ -43,56 +60,56 @@
 
 {% block scripts %}
 
-  {{ super() }}
+    {{ super() }}
 
     <!--
     Highlights the table row that a user clicked on.
     -->
     <script>
-    $(document).ready(function () {
-      $("#table-results-body tr").click(function () {
-        $("#table-results-body tr").removeClass("active");
-        $(this).addClass("active");
-      });
-    });
-  </script>
+        $(document).ready(function () {
+            $("#table-results-body tr").click(function () {
+                $("#table-results-body tr").removeClass("active");
+                $(this).addClass("active");
+            });
+        });
+    </script>
 
-  <!-- Request details about a ressource from the sever and display it in the
-  right sidebar. The script is typically invoked by clicking on a table row. -->
-  <script type="text/javascript">
-    function request_details(url) {
-      let request = $.ajax({url: url, method: "GET"});
-      request.always(function (data) {$("#sidebar-right").html(data);});
-    }
-  </script>
-
-  <!-- Deletes an entity entirely from the database. -->
-  <script type="text/javascript">
-    function delete_entity(url) {
-        if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
-            let request = $.ajax({url: url, method: "DELETE"});
+    <!-- Request details about a ressource from the sever and display it in the
+    right sidebar. The script is typically invoked by clicking on a table row. -->
+    <script type="text/javascript">
+        function request_details(url) {
+            let request = $.ajax({url: url, method: "GET"});
             request.always(function (data) {$("#sidebar-right").html(data);});
         }
-    }
-  </script>
+    </script>
 
-  <script type="text/javascript">
-    function batch_action(url) {
-        if (confirm('Are you sure?')) {
-            let request = $.ajax({url: url, method: "PUT"});
-            request.always(function (data) {
-                $("#modal-messages-body").html(data);
-                $("#modal-messages").modal()
-            });
+    <!-- Deletes an entity entirely from the database. -->
+    <script type="text/javascript">
+        function delete_entity(url) {
+            if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
+                let request = $.ajax({url: url, method: "DELETE"});
+                request.always(function (data) {$("#sidebar-right").html(data);});
+            }
         }
-    }
-  </script>
+    </script>
 
-  <script type="text/javascript">
-    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
-        event.preventDefault();
-        $(this).ekkoLightbox();
-    });
-  </script>
+    <script type="text/javascript">
+        function batch_action(url) {
+            if (confirm('Are you sure?')) {
+                let request = $.ajax({url: url, method: "PUT"});
+                request.always(function (data) {
+                    $("#modal-messages-body").html(data);
+                    $("#modal-messages").modal()
+                });
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+            event.preventDefault();
+            $(this).ekkoLightbox();
+        });
+    </script>
 
 {% endblock %}

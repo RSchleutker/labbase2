@@ -37,8 +37,8 @@ class FilterForm(BaseForm):
         description="Internal database ID."
     )
     ascending = BooleanField(
-        label="Ascending",
-        render_kw={"class": 'form-check-input', "id": "filter-form-ascending"},
+        label="Sort ascending",
+        render_kw={"class": "form-check-input", "id": "filter-form-ascending"},
         default=True,
         description="Uncheck to sort results in descending order."
     )
@@ -46,7 +46,7 @@ class FilterForm(BaseForm):
         label="Order by",
         choices=[('id', 'ID')],
         default='id',
-        render_kw=RENDER_KW | {"id": "filter-form-order-by", "size": 1},
+        render_kw={"class": "form-select form-select-sm", "size": 1},
         description="The column by which the results shall be ordered."
     )
     download_csv = SubmitField(
