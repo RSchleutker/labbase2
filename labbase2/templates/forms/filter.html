@@ -1,4 +1,4 @@
-<form id="filter-form" action="" method="{{ method }}" class="form-inline">
+<form id="filter-form" action="" method="{{ method }}" class="form-inline d-inline-flex align-items-end">
 
   {% if csrf %}
     {{ form.hidden_tag() }}
@@ -6,7 +6,7 @@
 
   {% for field in form.fields() %}
 
-      <div class="mb-3 mr-sm-3">
+      <div class="mb-3 mx-2">
         <label>
           {{ field.label }}&nbsp;&nbsp;&nbsp;
           <span class="fas fa-info-circle"
