@@ -4,26 +4,45 @@
 {% from "files/form.html" import file_upload_form %}
 
 
-<div class="card">
+<div class="card mt-3 mb-3">
 
     <div class="card-header">
 
         <h1 class="mb-4">{{ oligonucleotide.label }}</h1>
 
-        <ul class="nav nav-tabs card-header-tabs">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist">
 
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-info"
+                        type="button"
+                        role="tab"
+                        aria-selected="true">
+                    Details
+                </button>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-files"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
+                    Files
+                </button>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-comments">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-comments"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
                     Comments
-                </a>
+                </button>
             </li>
 
         </ul>
@@ -33,26 +52,24 @@
     The actual tab panes.
     -->
 
-    <div class="tab-content">
+    <div class="card-body tab-content">
 
         <div class="tab-pane container active" id="tab-info">
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="flex-grow-1 mb-0">Details</h2>
                 <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-toggle="modal"
-                 data-target="#modal-edit-primer-{{ oligonucleotide.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=oligonucleotide.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
+                      <a class="text-primary me-2"
+                         data-bs-toggle="modal"
+                         data-bs-target="#modal-edit-primer-{{ oligonucleotide.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
+                      <a class="text-danger"
+                         onclick="delete_entity('{{ url_for(".delete", id_=oligonucleotide.id) }}')">
+                      <i class="fa-solid fa-trash"></i></a>
+                  </span>
             </div>
 
-            <div class="primer-sequence mb-4">
+            <div class="mb-4 user-select-all text-break font-monospace fs-6">
                 {{ oligonucleotide.formatted_seq()|safe }}
             </div>
 
