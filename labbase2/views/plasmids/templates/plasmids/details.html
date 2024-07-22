@@ -10,38 +10,78 @@
 {% from "files/form.html" import file_edit_form %}
 
 
-<div class="card">
+<div class="card my-3">
 
     <div class="card-header">
 
         <h1 class="mb-4">{{ plasmid.label }}</h1>
 
-        <ul class="nav nav-tabs card-header-tabs">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist">
 
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-info"
+                        type="button"
+                        role="tab"
+                        aria-selected="true">
+                    Details
+                </button>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-preps">Preps</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-preps"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
+                    Preps
+                </button>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-comments">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-comments"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
                     Comments
-                </a>
+                </button>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-bacteria">Stocks</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-bacteria"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
+                    Stocks
+                </button>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-files"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
+                    Files
+                </button>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        data-bs-toggle="tab"
+                        data-bs-target="#tab-requests"
+                        type="button"
+                        role="tab"
+                        aria-selected="false">
+                    Requests
+                </button>
             </li>
 
         </ul>
@@ -53,18 +93,21 @@
         <div class="tab-pane container active" id="tab-info">
 
             <div class="d-flex justify-content-between align-items-center mb-3">
+
                 <h2 class="flex-grow-1 mb-0">Details</h2>
+
                 <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-toggle="modal"
-                 data-target="#modal-edit-plasmid-{{ plasmid.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=plasmid.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
+                    <a class="text-primary mr-2"
+                       data-toggle="modal"
+                       data-target="#modal-edit-plasmid-{{ plasmid.id }}">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <a class="text-danger"
+                       onclick="delete_entity('{{ url_for(".delete", id_=plasmid.id) }}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </span>
+
             </div>
 
             <table class="table table-details">
@@ -134,39 +177,39 @@
         </div>
 
         {{ preparations_pane(
-    status='fade',
-    pane_id='tab-preps',
-    plasmid=plasmid,
-    form=preparation_form
-  ) }}
+            status='fade',
+            pane_id='tab-preps',
+            plasmid=plasmid,
+            form=preparation_form
+          ) }}
 
         {{ files_pane(
-    status='fade',
-    pane_id='tab-files',
-    entity=plasmid,
-    form=file_form
-  ) }}
+            status='fade',
+            pane_id='tab-files',
+            entity=plasmid,
+            form=file_form
+          ) }}
 
         {{ comment_pane(
-    status='fade',
-    pane_id='tab-comments',
-    entity=plasmid,
-    form=comment_form
-  ) }}
+            status='fade',
+            pane_id='tab-comments',
+            entity=plasmid,
+            form=comment_form
+          ) }}
 
         {{ bacteria_pane(
-    status='fade',
-    pane_id='tab-bacteria',
-    plasmid=plasmid,
-    form=bacteria_form
-  ) }}
+            status='fade',
+            pane_id='tab-bacteria',
+            plasmid=plasmid,
+            form=bacteria_form
+          ) }}
 
         {{ request_pane(
-    status='fade',
-    pane_id='tab-requests',
-    entity=plasmid,
-    form=request_form
-  ) }}
+            status='fade',
+            pane_id='tab-requests',
+            entity=plasmid,
+            form=request_form
+          ) }}
 
     </div>
 
