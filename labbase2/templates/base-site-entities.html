@@ -4,6 +4,8 @@
 {% from "macros/pagination.html" import render_pagination %}
 {% from "macros/pagination.html" import results_pagination %}
 {% import 'macros/forms.html' as forms %}
+{% import 'macros/flash.html' as flash %}
+{% import 'macros/toast.html' as toast %}
 {#{% from "base/upload-import-file-form.html" import upload_import_file_form %}#}
 
 
@@ -22,26 +24,69 @@
 
 {% block content %}
 
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-filters" aria-labelledby="offcanvas-filters">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Filter</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-filters" aria-labelledby="offcanvas-filters">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">Filter</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
 
-      {{ filter_form.render()|safe }}
+            {{ filter_form.render()|safe }}
 
-  </div>
-</div>
+        </div>
+    </div>
 
     <div id="horizontal-flex-container">
 
-        <div id="content">
+        <div id="content" class="p-3">
+
+            <h1 class="mt-3 mb-4">{{ title }}</h1>
+
+            {{ flash.flash() }}
 
             {% block main %}
 
-                {{ results_pagination(entities) }}
-                {{ render_pagination(entities) }}
+                <div class="d-flex align-items-start">
+
+                    <span class="rounded border bg-white py-1 px-2 flex-shrink-0 fw-lighter">
+                        {{ results_pagination(entities) }}
+                    </span>
+
+                    <span class="py-1 px-2 mx-2 fw-lighter">
+                        <i class="fa-solid fa-database"></i> <strong>702</strong> in total
+                    </span>
+
+                    <div class="flex-fill"></div>
+
+                    <div class="btn-group me-2" role="group" aria-label="Basic example">
+                        {% block import %}{% endblock %}
+                        <button type="button"
+                                class="btn btn-sm bg-white border border-start-0"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal-import-file">
+                            <i class="fa-solid fa-file-import"></i>
+                        </button>
+                    </div>
+
+                    <div class="dropdown flex-shrink-0 me-2">
+                        <button class="btn btn-sm border bg-white dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <ul class="dropdown-menu fw-lighter">
+                            {% block download %}{% endblock %}
+                        </ul>
+                    </div>
+
+                    <div class="flex-shrink-0">
+                        {{ render_pagination(entities) }}
+                    </div>
+
+                </div>
+
+
                 {{ table(entities.items) }}
                 {{ render_pagination(entities) }}
 

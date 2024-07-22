@@ -5,9 +5,7 @@
 
     <table class="table table-results">
 
-        <caption>Results table for filtered primers.</caption>
-
-        <thead>
+        <thead class="table-light">
 
             <tr>
                 <th scope="col">ID</th>
@@ -32,13 +30,14 @@
                     <td>{{ oligonucleotide.owner.username }}</td>
                     <td>{{ oligonucleotide.storage_place }}</td>
                     <td>{{ oligonucleotide|length }}</td>
-                    <td class="sequence">
+                    <td class="sequence user-select-all font-monospace">
                         {{ oligonucleotide.formatted_seq(max_len=45)|safe }}
                     </td>
                 </tr>
             {% endfor %}
 
         </tbody>
+
     </table>
 
 {% endmacro %}
