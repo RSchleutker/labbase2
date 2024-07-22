@@ -6,10 +6,10 @@
 
     {% if id == -1 %}
         {% set action = url_for(endpoint) %}
-        {% set title = 'Add Primer' %}
+        {% set title = 'Add Oligonucleotide' %}
     {% else %}
         {% set action = url_for(endpoint, id_=id) %}
-        {% set title = 'Edit Primer' %}
+        {% set title = 'Edit Oligonucleotide' %}
     {% endif %}
 
     {% set modal_id = 'modal-edit-primer-' ~ id %}
