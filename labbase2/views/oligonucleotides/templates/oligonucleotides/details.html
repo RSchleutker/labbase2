@@ -52,7 +52,7 @@
     The actual tab panes.
     -->
 
-    <div class="card-body tab-content">
+    <div class="tab-content">
 
         <div class="tab-pane container active" id="tab-info">
 
@@ -75,9 +75,7 @@
 
             </div>
 
-            <div class="mb-4 user-select-all text-break font-monospace fs-6">
-                {{ oligonucleotide.formatted_seq()|safe }}
-            </div>
+            <p class="mb-4 user-select-all text-break font-monospace fs-6">{{ oligonucleotide.formatted_seq()|safe }}</p>
 
             <table class="table table-details">
                 <tbody>

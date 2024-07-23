@@ -281,22 +281,22 @@ b, strong {
     }
   }
 
+  .dropdown-menu {
+    color            : $font-secondary-color;
+    background-color : #0F6674;
+  }
+
+  .dropdown-item {
+    color   : $font-secondary-color;
+
+    &.active, &:active, &:hover {
+      color            : $font-secondary-color;
+      background-color : #0B505B;
+    }
+  }
+
   .dropdown-item.disabled, .dropdown-item:disabled {
     color : #ABB7C1;
-  }
-}
-
-.dropdown-menu {
-  color            : $font-secondary-color;
-  background-color : #0F6674;
-}
-
-.dropdown-item {
-  color   : $font-secondary-color;
-
-  &.active, &:active, &:hover {
-    color            : $font-secondary-color;
-    background-color : #0B505B;
   }
 }
 

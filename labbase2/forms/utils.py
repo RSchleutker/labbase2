@@ -18,7 +18,6 @@ RENDER_KW_BTN: dict = {
 
 RENDER_KW_FILE: dict = {
     **RENDER_KW,
-    'class': 'custom-filepath-input',
     'type': 'file'
 }
 
