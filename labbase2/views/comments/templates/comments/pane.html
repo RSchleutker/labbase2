@@ -4,34 +4,39 @@
 {% macro pane_details(comment, form) %}
 
     <div class="card mb-3">
+
         <div class="card-body">
+
         <div class="d-flex flex-start align-items-center mb-3">
-            <img class="rounded-circle shadow-1-strong mr-3" src="{{ url_for("static", filename="images/avatar-f.webp") }}" alt="avatar" width="60" height="60">
+            <img class="rounded-circle shadow-1-strong me-3"
+                 src="{{ url_for("static", filename="images/avatar-f.webp") }}"
+                 alt="avatar"
+                 width="60" height="60">
             <div>
                 <h5 class="mb-1">{{ comment.user.username }}</h5>
                 <p class="text-muted">{{ comment.timestamp | format_datetime }}</p>
             </div>
         </div>
+
         <div class="d-flex justify-content-between">
             <h6 class="fw-bold mb-2 flex-grow-1" style="display: inline-block">{{ comment.subject }}</h6>
             <span class="flex-shrink-0">
                 <a class="text-info"
-                   data-toggle="collapse"
+                   data-bs-toggle="collapse"
                    href="#card-comment-{{ comment.id }}"
                    aria-expanded="false"
                    aria-controls="card-comment-{{ comment.id }}">
-                    <i class="fa-solid fa-eye-slash"></i>
-                </a>
+                    <i class="fa-solid fa-eye-slash"></i></a>
+
                 {% if comment.user_id == current_user.id %}
-                    <a class="text-primary ml-2 mr-2"
+                    <a class="text-primary ml-2 me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-comment-{{ comment.id }}">
-                          <i class="fa-solid fa-pen"></i>
-                      </a>
+                          <i class="fa-solid fa-pen"></i></a>
+
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("comments.delete", id_=comment.id) }}')">
-                          <i class="fa-solid fa-trash"></i>
-                      </a>
+                          <i class="fa-solid fa-trash"></i></a>
                 {% endif %}
             </span>
         </div>
