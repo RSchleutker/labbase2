@@ -120,7 +120,7 @@ b, strong {
 .table {
   position: relative;
   color: unset;
-  font-size: 0.8em;
+  font-size: 0.85em;
 }
 .table td {
   vertical-align: middle;
@@ -152,6 +152,9 @@ b, strong {
 }
 .table-results tr:last-child {
   border-width: 1px;
+}
+.table-results td, .table-results th {
+  padding: 1rem 0.5rem;
 }
 
 .table-details {
@@ -300,10 +303,6 @@ b, strong {
 #sidebar-left, #sidebar-right {
   flex-shrink: 0;
   padding: 0 10px 10px 10px;
-  overflow-y: auto;
-  height: 100%;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
 }
 #sidebar-left::-webkit-scrollbar, #sidebar-right::-webkit-scrollbar {
   display: none;

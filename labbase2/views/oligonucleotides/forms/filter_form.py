@@ -29,7 +29,7 @@ class FilterOligonucleotide(FilterForm):
         validators=[Optional()],
         choices=[(0, "All")],
         coerce=int,
-        render_kw=RENDER_KW | {"id": "filter-form-owner-id", "size": 1},
+        render_kw={"id": "filter-form-owner-id", "size": 1},
         description="The owner of the primer."
     )
     sequence = StringField(
@@ -71,7 +71,9 @@ class FilterOligonucleotide(FilterForm):
         self.owner_id.choices += user
         self.order_by.choices += [("label", "Label"),
                                   ("order_date", "Order date"),
-                                  ("length", "Length")]
+                                  ("length", "Length"),
+                                  ("sequence", "Sequence"),
+                                  ("timestamp_edited", "Last edited")]
 
     def fields(self) -> list[Field]:
         return [self.id, self.label, self.owner_id, self.sequence,

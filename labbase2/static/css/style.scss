@@ -158,7 +158,7 @@ b, strong {
 .table {
   position  : relative;
   color     : unset;
-  font-size : .8em;
+  font-size : .85em;
 
   td {
     vertical-align : middle;
@@ -198,6 +198,10 @@ b, strong {
     &:last-child {
       border-width : 1px;
     }
+  }
+
+  td, th {
+    padding: 1rem .5rem;
   }
 }
 
@@ -377,10 +381,6 @@ b, strong {
 #sidebar-left, #sidebar-right {
   flex-shrink        : 0;
   padding            : 0 10px 10px 10px;
-  overflow-y         : auto;
-  height             : 100%;
-  -ms-overflow-style : none; /* IE and Edge */
-  scrollbar-width    : none; /* Firefox */
 
   &::-webkit-scrollbar {
     display : none;

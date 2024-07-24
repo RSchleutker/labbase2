@@ -13,6 +13,13 @@
               <label class="form-check-label">{{ field.label }}</label>
           </div>
 
+      {% elif field.type == 'SelectField' %}
+
+          <div class="mb-3 mx-2">
+              <label class="form-label">{{ field.label }}</label>
+              {{ field(class_='form-select form-select-sm') }}
+          </div>
+
       {% else %}
 
           <div class="mb-3 mx-2">

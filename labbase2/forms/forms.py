@@ -46,7 +46,7 @@ class FilterForm(BaseForm):
         label="Order by",
         choices=[('id', 'ID')],
         default='id',
-        render_kw={"class": "form-select form-select-sm", "size": 1},
+        render_kw={"size": 1},
         description="The column by which the results shall be ordered."
     )
     download_csv = SubmitField(
