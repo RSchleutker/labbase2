@@ -15,7 +15,8 @@
 
 {% block navbar_right %}
 
-    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-filters" aria-controls="offcanvasExample">
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvas-filters" aria-controls="offcanvas-filters">
         <i class="fa-solid fa-filter"></i>
     </button>
 
@@ -50,7 +51,15 @@
 
                 <div class="d-flex align-items-start">
 
-                    <div class="rounded border bg-white flex-shrink-0 fw-lighter py-1 px-2">
+                    <button type="button"
+                            class="btn btn-sm bg-white border me-2"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas-filters"
+                            aria-controls="offcanvas-filters">
+                        <i class="fa-solid fa-filter"></i>
+                    </button>
+
+                    <div class="rounded-1 border bg-white flex-shrink-0 fw-lighter py-1 px-2">
 
                         <span class="border-end py-1 px-2">
                             {{ results_pagination(entities) }}
@@ -103,7 +112,7 @@
 
         <div id="sidebar-right" class="flex-shrink-0 overflow-auto" style="height: 100%">
 
-                {% block sidebar_right %}{% endblock %}
+            {% block sidebar_right %}{% endblock %}
 
         </div>
 
