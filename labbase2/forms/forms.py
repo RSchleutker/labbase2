@@ -86,5 +86,6 @@ class EditEntityForm(EditForm):
         validators=[Optional()],
         filters=[strip_input],
         render_kw=RENDER_KW | {"id": "edit-form-label",
-                               "placeholder": "Name"}
+                               "placeholder": "Name"},
+        description="Must be unique among ALL database entries."
     )

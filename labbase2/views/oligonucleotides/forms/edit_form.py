@@ -37,7 +37,8 @@ class EditOligonucleotide(EditEntityForm):
         validate_choice=False,
         default=lambda: current_user.id,
         coerce=int,
-        render_kw=RENDER_KW | {"size": 1}
+        render_kw=RENDER_KW | {"size": 1},
+        description="Be aware that you cannot edit this entry anymore if you select someone else."
     )
     sequence = StringField(
         "Sequence",
@@ -64,7 +65,8 @@ class EditOligonucleotide(EditEntityForm):
         filters=[strip_input],
         render_kw=RENDER_KW | {"id": "edit-form-description",
                                "placeholder": "Description",
-                               "rows": 6}
+                               "rows": 6},
+        description="Give a short description about the purpose of this oligonucleotide."
     )
 
     def __init__(self, *args, **kwargs):

@@ -1,50 +1,59 @@
 <form id="filter-form" action="" method="{{ method }}">
 
-  {% if csrf %}
-    {{ form.hidden_tag() }}
-  {% endif %}
+    {% if csrf %}
+        {{ form.hidden_tag() }}
+    {% endif %}
 
-  {% for field in form.fields() %}
+    {% for field in form.fields() %}
 
-      {% if field.type == 'BooleanField' %}
+        {% if field.type == 'BooleanField' %}
 
-          <div class="form-check form-switch mb-3 mx-2">
-              {{ field(class_='form-check-input', type='checkbox', role='switch') }}
-              <label class="form-check-label">{{ field.label }}</label>
-          </div>
+            <div class="form-check form-switch mb-3 mx-2">
+                {{ field(class_='form-check-input', type='checkbox', role='switch') }}
+                <label class="form-check-label">{{ field.label }}</label>
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
 
-      {% elif field.type == 'SelectField' %}
+        {% elif field.type == 'SelectField' %}
 
-          <div class="mb-3 mx-2">
-              <label class="form-label">{{ field.label }}</label>
-              {{ field(class_='form-select form-select-sm') }}
-          </div>
+            <div class="mb-3 mx-2">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field(class_='form-select form-select-sm') }}
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
 
-      {% else %}
+        {% else %}
 
-          <div class="mb-3 mx-2">
-              <label class="form-label">{{ field.label }}</label>
-              {{ field() }}
-          </div>
+            <div class="mb-3 mx-2">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field() }}
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
 
-      {% endif %}
+        {% endif %}
 
-  {% endfor %}
+    {% endfor %}
 
-  {{ form.submit() }}
+    {{ form.submit() }}
 
 </form>
 
 <div id="filter-help">
 
-{% for field in form.fields() %}
+    {% for field in form.fields() %}
 
-  <div id="help-{{ field.short_name }}"
-       class="collapse"
-       data-parent="#filter-help">
-    <span class="fas fa-info-circle"></span> {{ field.description }}
-  </div>
+        <div id="help-{{ field.short_name }}"
+             class="collapse"
+             data-parent="#filter-help">
+            <span class="fas fa-info-circle"></span> {{ field.description }}
+        </div>
 
-{% endfor %}
+    {% endfor %}
 
 </div>
