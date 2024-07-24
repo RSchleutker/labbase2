@@ -56,17 +56,46 @@
       </span>
   </div>
 
-    <ul class="nav nav-pills">
-      <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#immunostaining">Immunostainings</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#western-blot">Western blots</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#immunoprecipitation">Immunoprecipitations</a>
-      </li>
+    <div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
+
+    <ul class="nav nav-pills m-0" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#immunostaining"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Immunostaining
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#western-blot"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Western blot
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#immunoprecipitation"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Immunoprecipitation
+            </button>
+        </li>
+
     </ul>
+
+</div>
 
     <!-- Tab panes -->
     <div class="tab-content">

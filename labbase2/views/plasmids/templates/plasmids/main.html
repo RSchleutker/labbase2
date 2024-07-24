@@ -1,46 +1,48 @@
 <!-- EXTENSION DECLARATION -->
-{% extends "base-site-entities.html" %}
+{% extends 'base-site-entities.html' %}
 
-{% from "plasmids/form.html" import plasmid_add_form %}
-{% from "plasmids/table.html" import table %}
+{% from 'plasmids/form.html' import plasmid_add_form %}
+{% from 'plasmids/table.html' import table %}
 
 
-{% block toolbar %}
+{% block import %}
 
-  <div class="d-flex flex-row justify-content-center">
-    <div class="p-2">
-       <div class="btn-group btn-group-sm">
-         <button type="button" class="btn btn-success disabled"><i class="fa-solid fa-upload"></i></button>
-         <button type="button"
-                 class="btn btn-success"
-                 data-bs-toggle="modal"
-                 data-bs-target="#modal-edit-plasmid--1">
-           FORM
-         </button>
-       </div>
-    </div>
-    <div class="p-2">
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-warning disabled"><i class="fa-solid fa-download"></i></button>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="csv",
-        **args) }}">CSV</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="json",
-        **args) }}">JSON</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="fasta",
-        **args) }}">FASTA</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="zip",
-        **args) }}">MAPS</a>
-      </div>
-    </div>
-  </div>
+    <button type="button"
+            class="btn btn-sm btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-plasmid--1">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+{% endblock %}
+
+
+{% block download %}
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="csv", **args) }}">
+        <i class="bi bi-filetype-csv me-1"></i> Download CSV file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="json", **args) }}">
+        <i class="bi bi-filetype-json me-1"></i> Down JSON file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+        <i class="bi bi-file-earmark me-1"></i> Download FASTA file
+    </a>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+        <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
+    </a>
 
 {% endblock %}
 
 
 {% block scripts %}
 
-  {{ super() }}
+    {{ super() }}
 
-  {{ plasmid_add_form(add_form, ".add", "POST", -1) }}
+    {{ upload_file_form(import_file_form, url_for("imports.upload", type_="plasmid")) }}
+    {{ plasmid_add_form(add_form, ".add", "POST", -1) }}
 
 {% endblock %}

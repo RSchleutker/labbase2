@@ -1,31 +1,35 @@
 {% macro table(entities) %}
 
-  <table class="table table-results">
-    <caption>Results table for filtered plasmids.</caption>
-    <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Label</th>
-      <th scope="col">Owner</th>
-      <th scope="col">Insert</th>
-      <th scope="col">Vector</th>
-      <th scope="col">Cloning date</th>
-    </tr>
-    </thead>
-    <tbody id="table-results-body">
+    <table class="table table-results">
 
-    {% for plasmid in entities %}
-      <tr onclick="request_details('{{ url_for(".details", id_=plasmid.id) }}')">
-        <td class="id">{{ plasmid.id }}</td>
-        <td>{{ plasmid.label }}</td>
-        <td>{{ plasmid.owner.username }}</td>
-        <td>{{ plasmid.insert }}</td>
-        <td>{{ plasmid.vector }}</td>
-        <td>{{ plasmid.cloning_date }}</td>
-      </tr>
-    {% endfor %}
+        <thead class="table-light">
 
-    </tbody>
-  </table>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Insert</th>
+            <th scope="col">Vector</th>
+            <th scope="col">Cloning date</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for plasmid in entities %}
+            <tr onclick="request_details('{{ url_for(".details", id_=plasmid.id) }}')">
+                <td class="id">{{ plasmid.id }}</td>
+                <td>{{ plasmid.label }}</td>
+                <td>{{ plasmid.owner.username }}</td>
+                <td>{{ plasmid.insert }}</td>
+                <td>{{ plasmid.vector }}</td>
+                <td>{{ plasmid.cloning_date }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+
+    </table>
 
 {% endmacro %}

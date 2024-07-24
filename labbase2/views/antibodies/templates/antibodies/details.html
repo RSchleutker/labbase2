@@ -8,51 +8,89 @@
 {% from "files/form.html" import file_upload_form %}
 
 
-<div class="card">
+<h1 class="mt-3 mb-4">{{ antibody.label }}</h1>
 
-    <div class="card-header">
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
-        <h1 class="mb-4">{{ antibody.label }}</h1>
+    <ul class="nav nav-pills m-0" role="tablist">
 
-        <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
-            </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-dilutions"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Dilutions
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
-            </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-batches"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Batches
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
-            </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-files"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Files
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-            </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-comments"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Comments
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-comments">
-                    Comments
-                </a>
-            </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-requests"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Requests
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
-            </li>
+    </ul>
 
-        </ul>
+</div>
 
-    </div>
+<div class="tab-content bg-white rounded border my-3">
 
-    <div class="tab-content">
+    <div class="tab-pane container active" id="tab-info">
 
-        <div class="tab-pane container active" id="tab-info">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="flex-grow-1 mb-0">Details</h2>
-                <span class="flex-shrink-0">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+            <span class="flex-shrink-0">
               <a class="text-primary mr-2"
                  data-bs-toggle="modal"
                  data-bs-target="#modal-edit-antibody-{{ antibody.id }}">
@@ -63,92 +101,90 @@
               <i class="fa-solid fa-trash"></i>
               </a>
           </span>
-            </div>
-
-            <table class="table table-details">
-                <tbody>
-                <tr>
-                    <td>Database ID</td>
-                    <td>{{ antibody.id }}</td>
-                </tr>
-                <tr>
-                    <td>Label</td>
-                    <td>{{ antibody.label }}</td>
-                </tr>
-                <tr>
-                    <td>Location</td>
-                    <td>{{ antibody.location }}</td>
-                </tr>
-                <tr>
-                    <td>Clone</td>
-                    <td>{{ antibody.clone }}</td>
-                </tr>
-                <tr>
-                    <td>Host</td>
-                    <td>{{ antibody.host }}</td>
-                </tr>
-                <tr>
-                    <td>Antigen</td>
-                    <td>{{ antibody.antigen }}</td>
-                </tr>
-                <tr>
-                    <td>Clonality</td>
-                    <td>{{ antibody.specification }}</td>
-                </tr>
-                <tr>
-                    <td>Conjugate</td>
-                    <td>{{ antibody.conjugate }}</td>
-                </tr>
-                <tr>
-                    <td>Source</td>
-                    <td>{{ antibody.source }}</td>
-                </tr>
-                <tr>
-                    <td>Storage</td>
-                    <td>{{ antibody.storage_temp }}°C</td>
-                </tr>
-                </tbody>
-            </table>
-
         </div>
 
-        {{ dilutions_pane(
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ antibody.id }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ antibody.label }}</td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td>{{ antibody.location }}</td>
+            </tr>
+            <tr>
+                <td>Clone</td>
+                <td>{{ antibody.clone }}</td>
+            </tr>
+            <tr>
+                <td>Host</td>
+                <td>{{ antibody.host }}</td>
+            </tr>
+            <tr>
+                <td>Antigen</td>
+                <td>{{ antibody.antigen }}</td>
+            </tr>
+            <tr>
+                <td>Clonality</td>
+                <td>{{ antibody.specification }}</td>
+            </tr>
+            <tr>
+                <td>Conjugate</td>
+                <td>{{ antibody.conjugate }}</td>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td>{{ antibody.source }}</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>{{ antibody.storage_temp }}°C</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    {{ dilutions_pane(
     status='fade',
     pane_id='tab-dilutions',
     antibody=antibody,
     form=dilution_form
   ) }}
 
-        {{ batch_pane(
+    {{ batch_pane(
     status='fade',
     pane_id='tab-batches',
     consumable=antibody,
     form=batch_form
   ) }}
 
-        {{ files_pane(
+    {{ files_pane(
     status='fade',
     pane_id='tab-files',
     entity=antibody,
     form=file_form
   ) }}
 
-        {{ comment_pane(
+    {{ comment_pane(
     status='fade',
     pane_id='tab-comments',
     entity=antibody,
     form=comment_form
   ) }}
 
-        {{ request_pane(
+    {{ request_pane(
     status='fade',
     pane_id='tab-requests',
     entity=antibody,
     form=request_form
   ) }}
 
-    </div>
-
-    {{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}
-
 </div>
+
+{{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}

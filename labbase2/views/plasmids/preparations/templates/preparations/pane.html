@@ -28,24 +28,24 @@
       <div class="d-flex align-items-stretch">
           <div class="flex-fill pr-2 border-right">
               <p class="mb-0 text-center">Storage place</p>
-              <p class="text-info font-weight-bold text-center">{{ preparation.storage_place }}</p>
+              <p class="text-info fw-bold text-center">{{ preparation.storage_place }}</p>
           </div>
           <div class="flex-fill pl-2 pr-2 border-right">
               <p class="mb-0 text-center">Concentration</p>
-              <p class="font-weight-bold text-center">{{ preparation.concentration }} ng/µl</p>
+              <p class="fw-bold text-center">{{ preparation.concentration }} ng/µl</p>
           </div>
           <div class="flex-fill pl-2 pr-2 border-right">
               <p class="mb-0 text-center">Eluent</p>
-              <p class="font-weight-bold text-center">{{ preparation.eluent }}</p>
+              <p class="fw-bold text-center">{{ preparation.eluent }}</p>
           </div>
           <div class="flex-fill pl-2">
               <p class="mb-0 text-center">Method</p>
-              <p class="font-weight-bold text-center">{{ preparation.method }}</p>
+              <p class="fw-bold text-center">{{ preparation.method }}</p>
           </div>
       </div>
 
     {% if preparation.emptied_date %}
-    <p class="font-weight-bold text-center mt-2 mb-0" style="opacity: unset;">
+    <p class="fw-bold text-center mt-2 mb-0" style="opacity: unset;">
       This preparation has been emptied on {{ preparation.emptied_date }}
     </p>
     {% endif %}

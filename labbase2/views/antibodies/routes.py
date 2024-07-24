@@ -56,8 +56,10 @@ def index():
     return render_template(
         "antibodies/main.html",
         filter_form=form,
+        import_file_form=UploadFile(),
         add_form=EditAntibody(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
+        total=Antibody.query.count(),
         title="Antibodies"
     )
 

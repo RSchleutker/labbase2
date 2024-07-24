@@ -1,31 +1,35 @@
 {% macro table(entities) %}
 
-  <table class="table table-results">
-    <caption>Results table for filtered glycerol stocks.</caption>
-    <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Plasmid</th>
-      <th scope="col">Owner</th>
-      <th scope="col">Strain</th>
-      <th scope="col">Transformation date</th>
-      <th scope="col">Location</th>
-    </tr>
-    </thead>
+    <table class="table table-results">
 
-    <tbody id="table-results-body">
-    {% for bacterium, label in entities %}
-      <tr onclick="request_details('{{ url_for(".details", id_=bacterium.id, format_="long") }}')">
-        <td class="id">{{ bacterium.id }}</td>
-        <td>{{ label }}</td>
-        <td>{{ bacterium.owner.username }}</td>
-        <td>{{ bacterium.strain }}</td>
-        <td>{{ bacterium.transformation_date }}</td>
-        <td>{{ bacterium.storage_place }}</td>
-      </tr>
-    {% endfor %}
+        <thead class="table-light">
 
-    </tbody>
-  </table>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Plasmid</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Strain</th>
+            <th scope="col">Transformation date</th>
+            <th scope="col">Location</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for bacterium, label in entities %}
+            <tr onclick="request_details('{{ url_for(".details", id_=bacterium.id, format_="long") }}')">
+                <td class="id">{{ bacterium.id }}</td>
+                <td>{{ label }}</td>
+                <td>{{ bacterium.owner.username }}</td>
+                <td>{{ bacterium.strain }}</td>
+                <td>{{ bacterium.transformation_date }}</td>
+                <td>{{ bacterium.storage_place }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+
+    </table>
 
 {% endmacro %}

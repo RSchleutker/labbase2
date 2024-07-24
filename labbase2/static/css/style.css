@@ -78,7 +78,7 @@ b, strong {
   font-weight: 600;
 }
 
-.nav-tabs {
+.nav-tabs, .nav-pills {
   font-size: 0.75rem;
 }
 
@@ -303,6 +303,7 @@ b, strong {
 #sidebar-left, #sidebar-right {
   flex-shrink: 0;
   padding: 0 10px 10px 10px;
+  scrollbar-width: none;
 }
 #sidebar-left::-webkit-scrollbar, #sidebar-right::-webkit-scrollbar {
   display: none;
