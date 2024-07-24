@@ -1,3 +1,4 @@
+{% from 'antibodies/pane.html' import pane_details %}
 {% from "comments/pane.html" import comment_pane with context %}
 {% from "files/pane.html" import files_pane with context %}
 {% from 'requests/pane.html' import request_pane with context %}
@@ -86,104 +87,47 @@
 
 <div class="tab-content bg-white rounded border my-3">
 
-    <div class="tab-pane container active" id="tab-info">
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="flex-grow-1 mb-0">Details</h2>
-            <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-bs-toggle="modal"
-                 data-bs-target="#modal-edit-antibody-{{ antibody.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
-        </div>
-
-        <table class="table table-details">
-            <tbody>
-            <tr>
-                <td>Database ID</td>
-                <td>{{ antibody.id }}</td>
-            </tr>
-            <tr>
-                <td>Label</td>
-                <td>{{ antibody.label }}</td>
-            </tr>
-            <tr>
-                <td>Location</td>
-                <td>{{ antibody.location }}</td>
-            </tr>
-            <tr>
-                <td>Clone</td>
-                <td>{{ antibody.clone }}</td>
-            </tr>
-            <tr>
-                <td>Host</td>
-                <td>{{ antibody.host }}</td>
-            </tr>
-            <tr>
-                <td>Antigen</td>
-                <td>{{ antibody.antigen }}</td>
-            </tr>
-            <tr>
-                <td>Clonality</td>
-                <td>{{ antibody.specification }}</td>
-            </tr>
-            <tr>
-                <td>Conjugate</td>
-                <td>{{ antibody.conjugate }}</td>
-            </tr>
-            <tr>
-                <td>Source</td>
-                <td>{{ antibody.source }}</td>
-            </tr>
-            <tr>
-                <td>Storage</td>
-                <td>{{ antibody.storage_temp }}°C</td>
-            </tr>
-            </tbody>
-        </table>
-
-    </div>
+    {{ pane_details(
+        status='active',
+        pane_id='tab-info',
+        antibody=antibody,
+        form=form
+    ) }}
 
     {{ dilutions_pane(
-    status='fade',
-    pane_id='tab-dilutions',
-    antibody=antibody,
-    form=dilution_form
-  ) }}
+        status='fade',
+        pane_id='tab-dilutions',
+        antibody=antibody,
+        form=dilution_form
+      ) }}
 
     {{ batch_pane(
-    status='fade',
-    pane_id='tab-batches',
-    consumable=antibody,
-    form=batch_form
-  ) }}
+        status='fade',
+        pane_id='tab-batches',
+        consumable=antibody,
+        form=batch_form
+      ) }}
 
     {{ files_pane(
-    status='fade',
-    pane_id='tab-files',
-    entity=antibody,
-    form=file_form
-  ) }}
+        status='fade',
+        pane_id='tab-files',
+        entity=antibody,
+        form=file_form
+      ) }}
 
     {{ comment_pane(
-    status='fade',
-    pane_id='tab-comments',
-    entity=antibody,
-    form=comment_form
-  ) }}
+        status='fade',
+        pane_id='tab-comments',
+        entity=antibody,
+        form=comment_form
+      ) }}
 
     {{ request_pane(
-    status='fade',
-    pane_id='tab-requests',
-    entity=antibody,
-    form=request_form
-  ) }}
+        status='fade',
+        pane_id='tab-requests',
+        entity=antibody,
+        form=request_form
+      ) }}
 
 </div>
 

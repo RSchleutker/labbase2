@@ -1,0 +1,85 @@
+{% from 'oligonucleotides/form.html' import primer_add_form %}
+
+
+{% macro pane_details(status, pane_id, oligonucleotide, form) %}
+
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+
+                <a class="text-primary me-2"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal-edit-primer-{{ oligonucleotide.id }}">
+                    <i class="fa-solid fa-pen"></i></a>
+
+                <a class="text-danger"
+                   onclick="delete_entity('{{ url_for(".delete", id_=oligonucleotide.id) }}')">
+                    <i class="fa-solid fa-trash"></i></a>
+
+            </div>
+
+        </div>
+
+        <p class="mb-4 user-select-all text-break font-monospace fs-6">{{ oligonucleotide.formatted_seq()|safe }}</p>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ oligonucleotide.id }}</td>
+            </tr>
+            <tr>
+                <td>Entry created</td>
+                <td>{{ oligonucleotide.timestamp_created | format_datetime }}</td>
+            </tr>
+            <tr>
+                <td>Origin</td>
+                <td>{{ oligonucleotide.origin }}</td>
+            </tr>
+            <tr>
+                <td>Last update</td>
+                <td>{{ oligonucleotide.timestamp_edited | format_datetime }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ oligonucleotide.label }}</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ oligonucleotide.owner.username }}</td>
+            </tr>
+            <tr>
+                <td>Order date</td>
+                <td>{{ oligonucleotide.order_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Storage place</td>
+                <td>{{ oligonucleotide.storage_place }}</td>
+            </tr>
+            <tr>
+                <td>Length</td>
+                <td>{{ oligonucleotide|length }} bases</td>
+            </tr>
+            <tr>
+                <td>GC content</td>
+                <td>{{ oligonucleotide.gc_content | round(1) }}%</td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% if oligonucleotide.description %}
+            <h3 class="mt-4">Description</h3>
+            <p class="text-justify">
+                {{ oligonucleotide.description }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {{ primer_add_form(form, ".edit", "PUT", oligonucleotide.id) }}
+
+{% endmacro %}

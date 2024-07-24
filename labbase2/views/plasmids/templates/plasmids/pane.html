@@ -1,0 +1,95 @@
+{% from 'plasmids/form.html' import plasmid_add_form %}
+
+
+{% macro pane_details(status, pane_id, plasmid, form) %}
+
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <span class="flex-shrink-0">
+
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-plasmid-{{ plasmid.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
+
+                    <a class="text-danger"
+                       onclick="delete_entity('{{ url_for(".delete", id_=plasmid.id) }}')">
+                        <i class="fa-solid fa-trash"></i></a>
+
+                </span>
+
+        </div>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ plasmid.id }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ plasmid.label }}</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ plasmid.owner.username }}</td>
+            </tr>
+            <tr>
+                <td>Cloning date</td>
+                <td>{{ plasmid.cloning_date }}</td>
+            </tr>
+            <tr>
+                <td>Insert</td>
+                <td>{{ plasmid.insert }}</td>
+            </tr>
+            <tr>
+                <td>Vector</td>
+                <td>{{ plasmid.vector }}</td>
+            </tr>
+            <tr>
+                <td>Storage place</td>
+                <td>{{ plasmid.storage_place }}</td>
+            </tr>
+            <tr>
+                <td>Glycerol stock(s)</td>
+                <td>{% if plasmid.stocks %}Yes ({{ plasmid.stocks|length }}){% else %}No{% endif %}</td>
+            </tr>
+            <tr>
+                <td>Length</td>
+                <td>{{ plasmid|length }}</td>
+            </tr>
+            <tr>
+                <td>Current plasmid file</td>
+                <td>
+                    {% if plasmid.file %}
+                        <a href="{{ url_for('files.download', id_=plasmid.file.id) }}">
+                            {{ plasmid.file.original_filename }} <i class="fa-solid fa-file-arrow-down"></i>
+                        </a>
+                    {% else %}
+                        No Genebank file uploaded.
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Reference</td>
+                <td>{{ plasmid.reference }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% if plasmid.description %}
+            <h3 class="mt-4">Description</h3>
+            <p class="text-justify">
+                {{ plasmid.description }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {{ plasmid_add_form(form, ".edit", "PUT", plasmid.id) }}
+
+{% endmacro %}
