@@ -47,9 +47,9 @@ class BaseFile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    filename_internal = db.Column(db.String(512), nullable=True, unique=True)
+    filename_internal = db.Column(db.String(64), nullable=True, unique=True)
     filename_exposed = db.Column(db.String(512), nullable=False)
-    note = db.Column(db.String(512))
+    note = db.Column(db.String(2048))
     file_type = db.Column(db.String(32), nullable=False)
     timestamp_uploaded = db.Column(db.DateTime, nullable=False, server_default=func.now())
     timestamp_edited = db.Column(db.DateTime(timezone=True), nullable=True, onupdate=func.now())

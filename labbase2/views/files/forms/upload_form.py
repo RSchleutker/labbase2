@@ -4,6 +4,7 @@ from labbase2.forms.utils import RENDER_KW
 from labbase2.forms.utils import RENDER_KW_FILE
 
 from wtforms.fields import FileField
+from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import Optional
@@ -26,9 +27,15 @@ class UploadFile(EditForm):
         validators=[DataRequired()],
         render_kw=RENDER_KW_FILE
     )
+    filename = StringField(
+        "Filename",
+        validators=[Optional(), Length(max=64)],
+        render_kw=RENDER_KW | {"placeholder": "(Optional)"},
+        description="Choose an optional filename."
+    )
     note = TextAreaField(
         "Note",
-        validators=[Optional(), Length(max=256)],
+        validators=[Optional(), Length(max=2048)],
         filters=[strip_input],
         render_kw=RENDER_KW | {"placeholder": "Note",
                                "rows": 8}
