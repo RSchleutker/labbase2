@@ -2,9 +2,13 @@
 {% from 'comments/pane.html' import comment_pane with context %}
 {% from 'files/pane.html' import files_pane with context %}
 {% from 'files/form.html' import file_upload_form %}
+{% import 'macros/pill.html' as pill %}
 
 
-<h1 class="mt-3 mb-4">{{ oligonucleotide.label }}</h1>
+{% set n_comments = oligonucleotide.comments | length %}
+
+
+<h1 class="mb-4">{{ oligonucleotide.label }}</h1>
 
 <div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
@@ -33,13 +37,14 @@
         </li>
 
         <li class="nav-item">
-            <button class="nav-link"
+            <button class="nav-link position-relative"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-comments"
                     type="button"
                     role="tab"
                     aria-selected="false">
                 Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
             </button>
         </li>
 

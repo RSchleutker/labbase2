@@ -9,9 +9,13 @@
 {% from "preparations/form.html" import preparations_add_form %}
 {% from "files/form.html" import file_upload_form %}
 {% from "files/form.html" import file_edit_form %}
+{% import 'macros/pill.html' as pill %}
 
 
-<h1 class="mt-3 mb-4">{{ plasmid.label }}</h1>
+{% set n_comments = plasmid.comments | length %}
+
+
+<h1 class="mb-4">{{ plasmid.label }}</h1>
 
 <div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
@@ -40,13 +44,14 @@
         </li>
 
         <li class="nav-item" role="presentation">
-            <button class="nav-link"
+            <button class="nav-link position-relative"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-comments"
                     type="button"
                     role="tab"
                     aria-selected="false">
                 Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
             </button>
         </li>
 

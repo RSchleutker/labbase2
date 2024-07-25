@@ -3,24 +3,27 @@
 
 {% macro pane_details(comment, form) %}
 
-    <div class="card mb-3">
-
-        <div class="card-body">
+    <div class="rounded border p-3 mb-3">
 
         <div class="d-flex flex-start align-items-center mb-3">
+
             <img class="rounded-circle shadow-1-strong me-3"
                  src="{{ url_for("static", filename="images/avatar-f.webp") }}"
                  alt="avatar"
                  width="60" height="60">
+
             <div>
                 <h5 class="mb-1">{{ comment.user.username }}</h5>
                 <p class="text-muted">{{ comment.timestamp | format_datetime }}</p>
             </div>
+
         </div>
 
         <div class="d-flex justify-content-between">
+
             <h6 class="fw-bold mb-2 flex-grow-1" style="display: inline-block">{{ comment.subject }}</h6>
-            <span class="flex-shrink-0">
+
+            <div class="flex-shrink-0">
                 <a class="text-info"
                    data-bs-toggle="collapse"
                    href="#card-comment-{{ comment.id }}"
@@ -32,51 +35,58 @@
                     <a class="text-primary ml-2 me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-comment-{{ comment.id }}">
-                          <i class="fa-solid fa-pen"></i></a>
+                        <i class="fa-solid fa-pen"></i></a>
 
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("comments.delete", id_=comment.id) }}')">
-                          <i class="fa-solid fa-trash"></i></a>
+                        <i class="fa-solid fa-trash"></i></a>
                 {% endif %}
-            </span>
+
+            </div>
+
         </div>
-            <div class="collapse show" id="card-comment-{{ comment.id }}">
-                <p>{{ comment.text }}</p>
-                {% if comment.timestamp_edited %}
+
+        <div class="collapse show" id="card-comment-{{ comment.id }}">
+
+            <p>{{ comment.text }}</p>
+
+            {% if comment.timestamp_edited %}
                 <p class="text-muted mb-0">
                     <em>(This comment was updated on {{ comment.timestamp_edited | format_datetime }})</em>
                 </p>
-                {% endif %}
-            </div>
+            {% endif %}
+
         </div>
     </div>
 
-  {{ comments_add_form(form(None, obj=comment), "comments.edit", "PUT", comment.id, comment.entity_id) }}
+    {{ comments_add_form(form(None, obj=comment), "comments.edit", "PUT", comment.id, comment.entity_id) }}
 
 {% endmacro %}
 
 
 {% macro comment_pane(status, pane_id, entity, form) %}
-  <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="flex-grow-1 mb-0">Comments</h2>
-      <span class="flex-shrink-0">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="flex-grow-1 mb-0">Comments</h2>
+            <span class="flex-shrink-0">
           <button
-            type="button"
-            class="btn btn-success btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#modal-edit-comment--1">
+              type="button"
+              class="btn btn-success btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target="#modal-edit-comment--1">
           <i class="fa-solid fa-plus"></i>
         </button>
       </span>
-  </div>
+        </div>
 
-  {% for comment in entity.comments %}
-    {{ pane_details(comment, form) }}
-  {% endfor %}
+        {% for comment in entity.comments %}
+            {{ pane_details(comment, form) }}
+        {% else %}
+            <div class="fw-bold text-center mb-3">No comments written yet!</div>
+        {% endfor %}
 
-  {{ comments_add_form(form(), "comments.add", "POST", -1, entity.id) }}
+        {{ comments_add_form(form(), "comments.add", "POST", -1, entity.id) }}
 
-  </div>
+    </div>
 {% endmacro %}

@@ -1,7 +1,7 @@
 {% from 'bacteria/form.html' import bacteria_add_form %}
 
 
-<h1 class="mt-3 mb-4">{{ stock.plasmid.label }} in {{ stock.strain }}</h1>
+<h1 class="mb-4">{{ stock.plasmid.label }} in {{ stock.strain }}</h1>
 
 <div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
@@ -50,12 +50,8 @@
                 <td>{{ stock.id }}</td>
             </tr>
             <tr>
-                <td>Plasmid ID</td>
-                <td>{{ stock.plasmid_id }}</td>
-            </tr>
-            <tr>
-                <td>Plasmid label</td>
-                <td>{{ stock.plasmid.label }}</td>
+                <td>Plasmid</td>
+                <td><a href="{{ url_for('plasmids.index', id=stock.plasmid_id) }}">{{ stock.plasmid.label }}</a></td>
             </tr>
             <tr>
                 <td>Strain</td>

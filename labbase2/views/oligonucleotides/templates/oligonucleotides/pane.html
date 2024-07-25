@@ -24,9 +24,12 @@
 
         </div>
 
-        <p class="mb-4 user-select-all text-break font-monospace fs-6">{{ oligonucleotide.formatted_seq()|safe }}</p>
+        <div class="mb-4 user-select-all text-break font-monospace fs-6 rounded border bg-light
+        py-1 px-2">
+            {{ oligonucleotide.formatted_seq()|safe }}
+        </div>
 
-        <table class="table table-details">
+        <table class="table">
             <tbody>
             <tr>
                 <td>Database ID</td>
