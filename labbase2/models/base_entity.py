@@ -1,3 +1,6 @@
+from datetime import timedelta
+from datetime import datetime
+
 from labbase2.models.mixins.export import Export
 from labbase2.models.mixins.filter import Filter
 from labbase2.models.mixins.importer import Importer
@@ -5,8 +8,10 @@ from labbase2.models.mixins.importer import Importer
 from labbase2.models import db
 
 from sqlalchemy import func
-from sqlalchemy import or_
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import column_property
 from flask_login import current_user
+from flask import current_app
 
 
 __all__ = ["BaseEntity"]
@@ -115,6 +120,11 @@ class BaseEntity(db.Model, Filter, Export, Importer):
                        "polymorphic_on": entity_type}
 
     __table_args__ = {"extend_existing": True}
+
+    @property
+    def deletable(self) -> bool:
+        hours = current_app.config["DELETABLE_HOURS"]
+        return (datetime.now() - self.timestamp_created) <= timedelta(hours=hours)
 
     def to_dict(self) -> dict:
         as_dict = super().to_dict()

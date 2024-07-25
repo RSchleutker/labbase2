@@ -16,9 +16,11 @@
                    data-bs-target="#modal-edit-antibody-{{ antibody.id }}">
                     <i class="fa-solid fa-pen"></i></a>
 
-                <a class="text-danger"
-                   onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
-                    <i class="fa-solid fa-trash"></i></a>
+                {% if antibody.deletable %}
+                    <a class="text-danger"
+                       onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
+                        <i class="fa-solid fa-trash"></i></a>
+                {% endif %}
 
             </div>
 
