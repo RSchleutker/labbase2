@@ -2,7 +2,7 @@ from .forms import EditComment
 
 from labbase2.models import db
 from labbase2.models import Comment
-from labbase2.forms.utils import err2message
+from labbase2.utils.message import Message
 
 from flask import Blueprint
 from flask_login import login_required
@@ -23,8 +23,10 @@ bp = Blueprint(
 @bp.route("/attach/<int:entity_id>", methods=["POST"])
 @login_required
 def add(entity_id: int):
-    if not (form := EditComment()).validate():
-        return err2message(form.errors), 400
+    form = EditComment()
+
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     comment = Comment(entity_id=entity_id, user_id=current_user.id)
     form.populate_obj(comment)
@@ -32,32 +34,34 @@ def add(entity_id: int):
     try:
         db.session.add(comment)
         db.session.commit()
-    except Exception as err:
-        return str(err), 400
-    else:
-        return f"Successfully added comment!", 201
+    except Exception as error:
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully added comment to '{comment.entity.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 def edit(id_: int):
-    if not (form := EditComment()).validate():
-        return err2message(form.errors), 400
+    form = EditComment()
 
-    if not (comment := Comment.query.get(id_)):
-        return f"No comment with ID {id_}!", 404
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if (comment := Comment.query.get(id_)) is None:
+        return Message.ERROR(f"No comment found with ID {id_}!")
 
     if comment.user_id != current_user.id:
-        return "Comment can only be edited by original author!", 403
+        return Message.ERROR("Comment can only be edited by original author!")
 
     form.populate_obj(comment)
 
     try:
         db.session.commit()
-    except Exception as err:
-        return str(err), 400
-    else:
-        return f"Successfully edited comment {id_}!", 200
+    except Exception as error:
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully edited comment {id_}!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
@@ -72,8 +76,8 @@ def delete(id_):
     try:
         db.session.delete(comment)
         db.session.commit()
-    except Exception as err:
+    except Exception as error:
         db.session.rollback()
-        return str(err), 400
-    else:
-        return f"Successfully deleted comment {id_}!", 200
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully deleted comment {id_}!")

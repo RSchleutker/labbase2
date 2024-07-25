@@ -1,8 +1,6 @@
 from .forms import FilterBacteria
 from .forms import EditBacterium
 
-from labbase2.forms.utils import err2message
-
 from labbase2.utils.message import Message
 from labbase2.utils.role_required import role_required
 
@@ -18,7 +16,7 @@ from flask_login import login_required
 from flask_login import current_user
 
 
-__all__: list[str] = ["bp"]
+__all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
@@ -42,8 +40,8 @@ def index():
 
     try:
         entities = GlycerolStock.filter_(**data)
-    except Exception as err:
-        flash(str(err), "danger")
+    except Exception as error:
+        flash(str(error), "danger")
         entities = GlycerolStock.filter_(order_by="label")
 
     return render_template(
@@ -51,6 +49,7 @@ def index():
         filter_form=form,
         add_form=EditBacterium(formdata=None),
         entities=entities.paginate(page=page, per_page=100),
+        total=GlycerolStock.query.count(),
         title="Glycerol stocks"
     )
 
@@ -58,68 +57,70 @@ def index():
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
 def add(plasmid_id: int):
-    if (form := EditBacterium()).validate():
-        if Plasmid.query.get(plasmid_id) is None:
-            return f"No plasmid with ID {plasmid_id}!"
-        stock = GlycerolStock()
-        form.populate_obj(stock)
-        stock.owner_id = current_user.id
-        stock.plasmid_id = plasmid_id
+    form = EditBacterium()
 
-        try:
-            db.session.add(stock)
-            db.session.commit()
-        except Exception as err:
-            return str(err), 400
-        else:
-            return f"Successfully added glycerol stock!", 201
-    else:
-        return err2message(form.errors), 400
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if (plasmid := Plasmid.query.get(plasmid_id)) is None:
+        return f"No plasmid with ID {plasmid_id}!"
+
+    stock = GlycerolStock(plasmid_id=plasmid_id, owner_id=current_user.id)
+    form.populate_obj(stock)
+
+    try:
+        db.session.add(stock)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully added glycerol stock with '{plasmid.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 @role_required(roles=["editor", "viewer"])
 def edit(id_: int):
-    if (form := EditBacterium()).validate():
-        if not (plasmid := GlycerolStock.query.get(id_)):
-            return Message.ERROR(f"No glycerol stock with ID {id_}!")
-        elif plasmid.owner_id != current_user.id:
-            return Message.ERROR("Glycerol stocks can only be edited by owner!")
-        else:
-            form.populate_obj(plasmid)
+    form = EditBacterium()
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err))
-        else:
-            return Message.SUCCESS(f"Successfully edited glycerol stock!")
-    else:
-        return err2message(form.errors)
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if not (plasmid := GlycerolStock.query.get(id_)):
+        return Message.ERROR(f"No glycerol stock with ID {id_}!")
+
+    if plasmid.owner_id != current_user.id:
+        return Message.ERROR("Glycerol stocks can only be edited by owner!")
+
+    form.populate_obj(plasmid)
+
+    try:
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback()
+        return Message.ERROR(str(err))
+
+    return Message.SUCCESS(f"Successfully edited glycerol stock!")
 
 
 @bp.route("/<int:id_>/<string:format_>", methods=["GET"])
 @login_required
 def details(id_: int, format_: str):
     if (stock := GlycerolStock.query.get(id_)) is None:
-        return Message.ERROR("Invalid ID: {}".format(id_))
-    else:
-        edit_form = EditBacterium(None, obj=stock)
+        return Message.ERROR(f"No glycerol stock with ID {id_}!")
 
-        match format_:
-            case "long":
-                template = "bacteria/details.html"
-            case "tab":
-                template = "bacteria/details-tab.html"
-            case _:
-                return Message.ERROR(f"Invalid format: {format_}")
+    edit_form = EditBacterium(None, obj=stock)
 
-        return render_template(
-            template,
-            stock=stock,
-            form=edit_form
-        )
+    match format_:
+        case "long":
+            template = "bacteria/details.html"
+        case "tab":
+            template = "bacteria/details-tab.html"
+        case _:
+            return Message.ERROR(f"Invalid format '{format_}'!")
+
+    return render_template(template, stock=stock, form=edit_form)
 
 
 @bp.route("/glycerol-stock/export/<string:format_>/", methods=["GET"])
@@ -131,8 +132,8 @@ def export(format_: str):
 
     try:
         entities = GlycerolStock.filter_(**data)
-    except Exception:
-        return "An internal error occured! Please inform the admin!", 500
+    except Exception as error:
+        return Message.ERROR(error)
 
     match format_:
         case "csv":
@@ -140,4 +141,4 @@ def export(format_: str):
         case "json":
             return GlycerolStock.to_json(entities)
         case _:
-            return Message.ERROR(f"Unsupported format: {format_}"), 400
+            return Message.ERROR(f"Unsupported format '{format_}'!")

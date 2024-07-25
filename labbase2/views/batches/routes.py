@@ -3,8 +3,6 @@ import datetime
 from .forms import EditBatch
 from .forms import FilterBatch
 
-from labbase2.forms.utils import err2message
-
 from labbase2.utils.message import Message
 from labbase2.utils.role_required import role_required
 from labbase2.models import db
@@ -17,6 +15,9 @@ from flask import flash
 from flask import current_app as app
 from flask_login import login_required
 from flask_login import current_user
+
+
+__all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
@@ -49,6 +50,7 @@ def index():
         filter_form=form,
         add_form=EditBatch(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
+        total=Batch.query.count(),
         title="Batches"
     )
 
@@ -56,111 +58,116 @@ def index():
 @bp.route("/<int:consumable_id>", methods=["POST"])
 @login_required
 def add(consumable_id: int):
-    form = EditBatch(obj=request.values)
-    if form.validate():
-        batch = Batch()
-        form.populate_obj(batch)
-        batch.consumable_id = consumable_id
+    form = EditBatch()
 
-        try:
-            db.session.add(batch)
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS("Successfully added batch!"), 201
-    else:
-        return err2message(form.errors), 400
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    batch = Batch(consumable_id=consumable_id)
+    form.populate_obj(batch)
+
+    try:
+        db.session.add(batch)
+        db.session.commit()
+    except Exception as err:
+        return Message.ERROR(err)
+
+    return Message.SUCCESS(f"Successfully added batch to '{batch.consumable.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 def edit(id_: int):
-    form = EditBatch(obj=request.values)
-    if form.validate():
-        if not (batch := Batch.query.get(id_)):
-            return Message.ERROR(f"No batch with ID {id_}!"), 404
-        else:
-            form.populate_obj(batch)
+    form = EditBatch()
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS(f"Successfully edited batch!"), 200
-    else:
-        return err2message(form.errors), 400
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if (batch := Batch.query.get(id_)) is None:
+        return Message.ERROR(f"No batch with ID {id_}!")
+
+    form.populate_obj(batch)
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully edited batch {id_}!")
 
 
-@bp.route("/in_use/<int:id_>", methods=["PUT"])
+@bp.route("/open/<int:id_>", methods=["PUT"])
 @login_required
 def in_use(id_: int):
-    if not (batch := Batch.query.get(id_)):
-        return f"No batch with ID {id_}!", 404
-    elif batch.opened_date:
-        return f"Batch {id_} has already been opened!", 201
-    else:
-        batch.opened_date = datetime.date.today()
-        batch.in_use = True
+    if (batch := Batch.query.get(id_)) is None:
+        return Message.ERROR(f"No batch with ID {id_}!")
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return str(err), 400
-        else:
-            return f"Successfully marked batch {id_} as open!", 200
+    if batch.opened_date:
+        return Message.WARNING(f"Batch {batch.id_} already marked open!")
+
+    batch.opened_date = datetime.date.today()
+    batch.in_use = True
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Marked batch {id_} as open!")
 
 
 @bp.route("/empty/<int:id_>", methods=["PUT"])
 @login_required
 def emptied(id_: int):
-    if not (batch := Batch.query.get(id_)):
-        return f"No batch with ID {id_}!", 404
-    elif batch.emptied_date:
-        return f"Batch {id_} has already been marked as empty!", 200
-    else:
-        batch.emptied_date = datetime.date.today()
-        batch.in_use = False
+    if (batch := Batch.query.get(id_)) is None:
+        return Message.ERROR(f"No batch with ID {id_}!")
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return str(err), 400
-        else:
-            return f"Successfully marked batch {id_} as empty!", 200
+    if batch.emptied_date:
+        return f"Batch {id_} already marked empty!", 200
+
+    batch.emptied_date = datetime.date.today()
+    batch.in_use = False
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Marked batch {id_} as empty!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_: int):
-    if not (batch := Batch.query.get(id_)):
-        return Message.ERROR(f"No batch with ID {id_}!"), 404
-    else:
-        try:
-            db.session.delete(batch)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS("Successfully deleted batch!"), 200
+    if (batch := Batch.query.get(id_)) is None:
+        return Message.ERROR(f"No batch with ID {id_}!")
+
+    try:
+        db.session.delete(batch)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully deleted batch {id_}!")
 
 
 @bp.route("/<int:id_>/<string:format_>", methods=["GET"])
 @login_required
 def details(id_: int, format_: str):
-    if not (batch := Batch.query.get(id_)):
-        return Message.ERROR(f"No batch with ID {id_}!"), 404
-    else:
-        match format_:
-            case "long":
-                template = "batches/details.html"
-            case "tab":
-                template = "batches/details-tab.html"
-            case _:
-                return Message.ERROR(f"Invalid format: {format_}")
+    if (batch := Batch.query.get(id_)) is None:
+        return Message.ERROR(f"No batch with ID {id_}!")
 
-        edit_form = EditBatch(None, obj=batch)
+    match format_:
+        case "long":
+            template = "batches/details.html"
+        case "tab":
+            template = "batches/details-tab.html"
+        case _:
+            return Message.ERROR(f"Invalid format '{format_}'!")
 
-        return render_template(template, batch=batch, form=edit_form), 200
+    edit_form = EditBatch(None, obj=batch)
+
+    return render_template(template, batch=batch, form=edit_form)

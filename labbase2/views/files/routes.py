@@ -148,14 +148,14 @@ def download(id_: int):
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_: int):
-    if not (file := File.query.get(id_)):
-        return f"No file with ID {id_}!", 404
+    if (file := File.query.get(id_)) is None:
+        return Message.ERROR(f"No file with ID {id_}!")
 
     try:
         db.session.delete(file)
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        return str(error)
-    else:
-        return f"Successfully deleted file {id_}!", 200
+        return Message.ERROR(error)
+
+    return f"Successfully deleted file {id_}!", 200

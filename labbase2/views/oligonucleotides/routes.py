@@ -66,8 +66,8 @@ def index():
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if not (oligonucleotide := Oligonucleotide.query.get(id_)):
-        return Message.ERROR(f"No oligonucleotide with ID {id_}!")
+    if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
+        return Message.ERROR(f"No oligonucleotide found with ID {id_}!")
 
     return render_template(
         "oligonucleotides/details.html",
@@ -81,67 +81,69 @@ def details(id_: int):
 @bp.route("/", methods=["POST"])
 @login_required
 def add():
-    if (form := EditOligonucleotide()).validate():
-        oligonucleotide = Oligonucleotide()
-        oligonucleotide.origin = f"Created via import form by {current_user.username}."
-        form.populate_obj(oligonucleotide)
+    form = EditOligonucleotide()
 
-        try:
-            db.session.add(oligonucleotide)
-            db.session.commit()
-        except IntegrityError as error:
-            return Message.ERROR(error)
-        except Exception as error:
-            return Message.ERROR(error)
-        else:
-            return Message.SUCCESS(
-                f"Successfully added oligonucleotide '{oligonucleotide.label}'!"), 201
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
 
+    oligonucleotide = Oligonucleotide()
+    oligonucleotide.origin = f"Created via import form by {current_user.username}."
+    form.populate_obj(oligonucleotide)
+
+    try:
+        db.session.add(oligonucleotide)
+        db.session.commit()
+    except IntegrityError as error:
+        return Message.ERROR(error)
+    except Exception as error:
+        return Message.ERROR(error)
     else:
-        return err2message(form.errors)
+        return Message.SUCCESS(f"Successfully added oligonucleotide '{oligonucleotide.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 @role_required(roles=["editor", "viewer"])
 def edit(id_: int):
-    if (form := EditOligonucleotide()).validate():
-        if not (oligonucleotide := Oligonucleotide.query.get(id_)):
-            return Message.ERROR(f"No oligonucleotide with ID {id_}!"), 404
-        elif oligonucleotide.owner_id != current_user.id:
-            return Message.ERROR("Oligonucleotide can only be edited by owner!"), 403
-        else:
-            form.populate_obj(oligonucleotide)
+    form = EditOligonucleotide()
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err))
-        else:
-            return Message.SUCCESS(
-                f"Successfully edited oligonucleotide {oligonucleotide.label}!"), 200
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    else:
-        return err2message(form.errors)
+    if not (oligonucleotide := Oligonucleotide.query.get(id_)):
+        return Message.ERROR(f"No oligonucleotide with ID {id_}!")
+
+    if oligonucleotide.owner_id != current_user.id:
+        return Message.ERROR("Oligonucleotide can only be edited by owner!")
+
+    form.populate_obj(oligonucleotide)
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully edited oligonucleotide {oligonucleotide.label}!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 @role_required(roles=["editor", "viewer"])
 def delete(id_):
-    if not (oligonucleotide := Oligonucleotide.query.get(id_)):
-        return Message.ERROR(f"No oligonucleotide with ID {id_}!"), 404
-    elif oligonucleotide.owner_id != current_user.id:
-        return Message.ERROR("Only owner can delete oligonucleotide!"), 403
-    else:
-        try:
-            db.session.delete(oligonucleotide)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS("Successfully deleted oligonucleotide!"), 200
+    if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
+        return Message.ERROR(f"No oligonucleotide with ID {id_}!")
+
+    if oligonucleotide.owner_id != current_user.id:
+        return Message.ERROR("Only owner can delete oligonucleotide!")
+
+    try:
+        db.session.delete(oligonucleotide)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully deleted oligonucleotide '{oligonucleotide.label}'!")
 
 
 @bp.route("/find", methods=["GET", "POST"])
@@ -186,21 +188,20 @@ def find():
         entities=results,
         length=length,
         title="Find oligonucleotides"
-    ), 200
+    )
 
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
 def export(format_: str):
     data = FilterOligonucleotide(request.args).data
-
     del data["submit"]
     del data["csrf_token"]
 
     try:
         entities = Oligonucleotide.filter_(**data)
-    except Exception:
-        return "An internal error occurred! Please inform the admin!", 500
+    except Exception as error:
+        return Message.ERROR(error)
 
     match format_.lower():
         case "csv":
@@ -210,4 +211,4 @@ def export(format_: str):
         case "fasta":
             return Oligonucleotide.to_fasta(entities)
         case _:
-            return Message.ERROR(f"Unsupported format: {format_}"), 400
+            return Message.ERROR(f"Unsupported format '{format_}'!")

@@ -15,16 +15,15 @@
             <div class="flex-shrink-0">
 
                 {% if dilution.user_id == current_user.id %}
-                    <a class="text-primary ml-2 mr-2"
+                    <a class="text-primary mx-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-dilution-{{ dilution.id }}">
-                          <i class="fa-solid fa-pen"></i>
-                      </a>
+                          <i class="fa-solid fa-pen"></i></a>
 
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("antibodies.dilutions.delete", antibody_id=dilution.antibody_id, id_=dilution.id) }}')">
-                          <i class="fa-solid fa-trash"></i>
-                      </a>
+                          <i class="fa-solid fa-trash"></i></a>
+
                 {% endif %}
 
             </div>

@@ -12,7 +12,7 @@ from flask_login import login_required
 from flask_login import current_user
 
 
-__all__: list[str] = ["bp"]
+__all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
@@ -27,58 +27,63 @@ bp = Blueprint(
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
 def add(plasmid_id: int):
-    if (form := EditPreparation()).validate():
-        if Plasmid.query.get(plasmid_id) is None:
-            return f"No plasmid with id {plasmid_id}!"
-        preparation = Preparation(
-            owner_id=current_user.id,
-            plasmid_id=plasmid_id
-        )
-        form.populate_obj(preparation)
+    form = EditPreparation()
 
-        try:
-            db.session.add(preparation)
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS(f"Successfully added preparation!"), 201
-    else:
-        return err2message(form.errors), 400
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if Plasmid.query.get(plasmid_id) is None:
+        return Message.ERROR(f"No plasmid with ID {plasmid_id}!")
+
+    preparation = Preparation(owner_id=current_user.id, plasmid_id=plasmid_id)
+    form.populate_obj(preparation)
+
+    try:
+        db.session.add(preparation)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully added preparation to '{preparation.plasmid.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 def edit(id_: int):
-    if (form := EditPreparation()).validate():
-        if not (preparation := Preparation.query.get(id_)):
-            return Message.ERROR(f"No preparation with ID {id_}!"), 404
-        elif preparation.owner_id != current_user.id:
-            return "Preparation can only be edited by owner!", 400
-        else:
-            form.populate_obj(preparation)
+    form = EditPreparation()
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return str(err), 400
-        else:
-            return f"Successfully edited preparation!", 200
-    else:
-        return err2message(form.errors), 400
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
+
+    if (preparation := Preparation.query.get(id_)) is None:
+        return Message.ERROR(f"No preparation with ID {id_}!")
+
+    if preparation.owner_id != current_user.id:
+        return Message.ERROR("Preparations can only be edited by owner!")
+
+    form.populate_obj(preparation)
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return f"Successfully edited preparation!", 200
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_: int):
     if not (preparation := Preparation.query.get(id_)):
-        return f"No preparation with ID {id_}!", 404
-    else:
-        try:
-            db.session.delete(preparation)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return str(err), 400
-        else:
-            return f"Successfully deleted preparation {id_}!", 200
+        return Message.ERROR(f"No preparation with ID {id_}!")
+
+    try:
+        db.session.delete(preparation)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.ERROR(f"Successfully deleted preparation {id_}!")

@@ -3,12 +3,9 @@ from .forms import EditPlasmid
 from . import bacteria
 from . import preparations
 
-from labbase2.forms.utils import err2message
-
 from labbase2.utils.message import Message
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
-from labbase2.views.files.forms import EditFile
 from labbase2.views.requests.forms import EditRequest
 from .preparations.forms import EditPreparation
 from .bacteria.forms import EditBacterium
@@ -27,7 +24,7 @@ from flask_login import current_user
 # from dna_features_viewer import BiopythonTranslator
 
 
-__all__ = ["bp", "index", "add", "edit", "delete", "details", "export"]
+__all__ = ["bp"]
 
 
 # class MyCustomTranslator(BiopythonTranslator):
@@ -84,8 +81,8 @@ def index():
 
     try:
         entities = Plasmid.filter_(**data)
-    except Exception as err:
-        flash(str(err), "danger")
+    except Exception as error:
+        flash(str(error), "danger")
         entities = Plasmid.filter_(order_by="label")
 
     return render_template(
@@ -102,46 +99,47 @@ def index():
 @bp.route("/", methods=["POST"])
 @login_required
 def add():
-    if (form := EditPlasmid()).validate():
-        plasmid = Plasmid()
-        form.populate_obj(plasmid)
-        plasmid.owner_id = current_user.id
+    form = EditPlasmid()
 
-        try:
-            db.session.add(plasmid)
-            db.session.commit()
-        except Exception as error:
-            print(error)
-            return Message.ERROR(str(error)), 400
-        else:
-            return Message.SUCCESS(f"Successfully added plasmid!"), 201
+    if not form.validate():
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    else:
-        return err2message(form.errors), 400
+    plasmid = Plasmid(owner_id=current_user.id)
+    form.populate_obj(plasmid)
+
+    try:
+        db.session.add(plasmid)
+        db.session.commit()
+    except Exception as error:
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully added plasmid '{plasmid.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
 @role_required(roles=["editor", "viewer"])
 def edit(id_: int):
-    if (form := EditPlasmid()).validate():
-        plasmid = Plasmid.query.get(id_)
-        if plasmid is None:
-            return Message.ERROR(f"No plasmid with ID {id_}!")
+    form = EditPlasmid()
 
-        if plasmid.owner_id != current_user.id:
-            return Message.ERROR("Plasmid can only be edited by owner!")
+    if not form.validate():
+        return Message.ERROR(f"No antibody found with ID {id_}!")
 
-            form.populate_obj(plasmid)
+    if (plasmid := Plasmid.query.get(id_)) is None:
+        return Message.ERROR(f"No plasmid with ID {id_}!")
 
-        try:
-            db.session.commit()
-        except Exception as err:
-            return Message.ERROR(str(err)), 400
-        else:
-            return Message.SUCCESS(f"Successfully edited plasmid!"), 200
+    if plasmid.owner_id != current_user.id:
+        return Message.ERROR("Plasmids can only be edited by owner!")
 
-    return err2message(form.errors), 400
+    form.populate_obj(plasmid)
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully edited plasmid!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
@@ -149,36 +147,37 @@ def edit(id_: int):
 @role_required(roles=["editor", "viewer"])
 def delete(id_: int):
     if (plasmid := Plasmid.query.get(id_)) is None:
-        return Message.ERROR(f"No plasmid with ID {id_}!"), 404
-    elif plasmid.owner_id != current_user.id:
-        return Message.ERROR("Only owner can delete plasmid!"), 403
-    else:
-        try:
-            db.session.delete(plasmid)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return print(err), 400
-        else:
-            return Message.SUCCESS("Successfully deleted plasmid!"), 200
+        return Message.ERROR(f"No plasmid with ID {id_}!")
+
+    if plasmid.owner_id != current_user.id:
+        return Message.ERROR("Only owner can delete plasmid!")
+
+    try:
+        db.session.delete(plasmid)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        return Message.ERROR(error)
+
+    return Message.SUCCESS(f"Successfully deleted plasmid '{plasmid.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
     if (plasmid := Plasmid.query.get(id_)) is None:
-        return Message.ERROR("Invalid ID: {}".format(id_)), 404
-    else:
-        return render_template(
-            "plasmids/details.html",
-            plasmid=plasmid,
-            form=EditPlasmid(None, obj=plasmid),
-            file_form=UploadFile,
-            comment_form=EditComment,
-            request_form=EditRequest,
-            preparation_form=EditPreparation,
-            bacteria_form=EditBacterium
-        ), 200
+        return Message.ERROR(f"No plasmid with ID {id_}!")
+
+    return render_template(
+        "plasmids/details.html",
+        plasmid=plasmid,
+        form=EditPlasmid(None, obj=plasmid),
+        file_form=UploadFile,
+        comment_form=EditComment,
+        request_form=EditRequest,
+        preparation_form=EditPreparation,
+        bacteria_form=EditBacterium
+    )
 
 
 # @bp.route("/plot/<int:id>", methods=["GET"])
@@ -221,8 +220,8 @@ def export(format_: str):
 
     try:
         entities = Plasmid.filter_(**data)
-    except Exception:
-        return "An internal error occured! Please inform the admin!", 500
+    except Exception as error:
+        return Message.ERROR(error)
 
     match format_:
         case "csv":
@@ -236,4 +235,4 @@ def export(format_: str):
         case "zip":
             return Plasmid.to_zip(entities)
         case _:
-            return Message.ERROR(f"Unsupported format: {format_}"), 400
+            return Message.ERROR(f"Unsupported format '{format_}'!")
