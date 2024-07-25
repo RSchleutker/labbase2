@@ -1,3 +1,4 @@
+{% from 'antibodies/pane.html' import pane_details %}
 {% from "comments/pane.html" import comment_pane with context %}
 {% from "files/pane.html" import files_pane with context %}
 {% from 'requests/pane.html' import request_pane with context %}
@@ -6,56 +7,88 @@
 {% from "antibodies/form.html" import antibody_add_form %}
 {% from "dilutions/form.html" import dilutions_add_form %}
 {% from "files/form.html" import file_upload_form %}
+{% import 'macros/pill.html' as pill %}
 
 
-<ul class="nav nav-tabs">
+{% set n_comments = antibody.comments | length %}
 
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
-  </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-dilutions">Dilutions</a>
-  </li>
+<h1 class="mb-4">{{ antibody.label }}</h1>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-batches">Batches</a>
-  </li>
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-  </li>
+    <ul class="nav nav-pills m-0" role="tablist">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-comments">
-      Comments
-    </a>
-  </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
-  </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-dilutions"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Dilutions
+            </button>
+        </li>
 
-</ul>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-batches"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Batches
+            </button>
+        </li>
 
-<div class="tab-content">
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-files"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Files
+            </button>
+        </li>
 
-  <div class="tab-pane container active" id="tab-info">
+        <li class="nav-item">
+            <button class="nav-link position-relative"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-comments"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
+            </button>
+        </li>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="flex-grow-1 mb-0">{{ antibody.label }}</h2>
-          <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-toggle="modal"
-                 data-target="#modal-edit-antibody-{{ antibody.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
-      </div>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-requests"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Requests
+            </button>
+        </li>
+
+    </ul>
+
+</div>
 
       <h3>Details</h3>
 

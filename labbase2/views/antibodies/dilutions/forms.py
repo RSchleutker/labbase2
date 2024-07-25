@@ -55,6 +55,7 @@ class EditDilution(EditForm):
         validators=[DataRequired(), Length(max=2048)],
         filters=[strip_input],
         render_kw=RENDER_KW | {"id": "edit-form-dilution-reference",
-                               "placeholder": "Reference",
+                               "placeholder": "Give a short description of the sample and "
+                                              "condition you used.",
                                "rows": 8}
     )

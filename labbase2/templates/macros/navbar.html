@@ -1,43 +1,45 @@
 {% macro link(endpoint, name) %}
 
-  {% if request.endpoint.endswith(endpoint) %}
-    <li class="nav-item active">
-      <a class="nav-link nav-link-light"
-         href="{{ url_for(endpoint) }}">{{ name|safe }}</a>
-    </li>
-  {% else %}
-    <li class="nav-item">
-      <a class="nav-link nav-link-light"
-         href="{{ url_for(endpoint) }}">{{ name|safe }}</a>
-    </li>
-  {% endif %}
+    {% if request.endpoint.endswith(endpoint) %}
+        <li class="nav-item">
+            <a class="nav-link nav-link-light active"
+               href="{{ url_for(endpoint) }}">{{ name|safe }}</a>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link nav-link-light"
+               href="{{ url_for(endpoint) }}">{{ name|safe }}</a>
+        </li>
+    {% endif %}
 
 {% endmacro %}
 
 
-{% macro dropdown(id, name) %}
+{% macro dropdown(name) %}
 
-    <a class="nav-link nav-link-light"
+    <a class="nav-link dropdown-toggle"
        href="#"
-       id="{{ id }}"
        role="button"
-       data-toggle="dropdown"
-       aria-haspopup="true"
-       aria-expanded="false">{{ name|safe }}</a>
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+        {{ name|safe }}
+    </a>
 
 {% endmacro %}
 
 
 {% macro dropdown_link(endpoint, name) %}
 
-  {% if request.endpoint.endswith(endpoint) %}
-    <a class="dropdown-item small active"
-       href="{{ url_for(endpoint, **kwargs) }}">{{ name|safe }}
-    </a>
-  {% else %}
-    <a class="dropdown-item small"
-       href="{{ url_for(endpoint, **kwargs) }}">{{ name|safe }}
-    </a>
-  {% endif %}
+    {% if request.endpoint.endswith(endpoint) %}
+        <a class="dropdown-item small active"
+           href="{{ url_for(endpoint, **kwargs) }}">
+            {{ name|safe }}
+        </a>
+    {% else %}
+        <a class="dropdown-item small"
+           href="{{ url_for(endpoint, **kwargs) }}">
+            {{ name|safe }}
+        </a>
+    {% endif %}
 
 {% endmacro %}

@@ -1,0 +1,21 @@
+{% macro flash() %}
+
+    <div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if not category or category == 'message' %}
+                        {% set category = "info" %}
+                    {% endif %}
+                    <p class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    </div>
+
+{% endmacro %}

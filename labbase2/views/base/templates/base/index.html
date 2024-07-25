@@ -1,12 +1,15 @@
-{% extends "base-site-authenticated.html" %}
+{% extends 'base-site-authenticated.html' %}
+{% import 'macros/flash.html' as flash %}
 
 
 {% block content %}
 
-<div class="container">
+    <div class="container">
 
-  <h1>Welcome to Labbase2</h1>
+        {{ flash.flash() }}
 
-</div>
+        <h1 class="mt-4">Welcome to Labbase2</h1>
+
+    </div>
 
 {% endblock %}

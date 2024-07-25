@@ -1,129 +1,80 @@
+{% from 'oligonucleotides/pane.html' import pane_details %}
 {% from 'comments/pane.html' import comment_pane with context %}
 {% from 'files/pane.html' import files_pane with context %}
-{% from 'oligonucleotides/form.html' import primer_add_form %}
-{% from "files/form.html" import file_upload_form %}
+{% from 'files/form.html' import file_upload_form %}
+{% import 'macros/pill.html' as pill %}
 
 
-<ul class="nav nav-tabs">
-
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
-  </li>
-
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-  </li>
-
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-comments">
-      Comments
-    </a>
-  </li>
-
-</ul>
+{% set n_comments = oligonucleotide.comments | length %}
 
 
-<!--
-The actual tab panes.
--->
+<h1 class="mb-4">{{ oligonucleotide.label }}</h1>
 
-<div class="tab-content">
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
-  <div class="tab-pane container active" id="tab-info">
+    <ul class="nav nav-pills m-0" role="tablist">
 
-      <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="flex-grow-1 mb-0">{{ oligonucleotide.label }}</h2>
-          <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-toggle="modal"
-                 data-target="#modal-edit-primer-{{ oligonucleotide.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=oligonucleotide.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
-      </div>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
 
-    <div class="primer-sequence mb-4">
-      {{ oligonucleotide.formatted_seq()|safe }}
-    </div>
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-files"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Files
+            </button>
+        </li>
 
-    <h3>Details</h3>
+        <li class="nav-item">
+            <button class="nav-link position-relative"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-comments"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
+            </button>
+        </li>
 
-    <table class="table table-details">
-      <tbody>
-        <tr>
-          <td>Database ID</td>
-          <td>{{ oligonucleotide.id }}</td>
-        </tr>
-        <tr>
-          <td>Entry created</td>
-          <td>{{ oligonucleotide.timestamp_created | format_datetime }}</td>
-        </tr>
-        <tr>
-            <td>Origin</td>
-            <td>{{ oligonucleotide.origin }}</td>
-        </tr>
-        <tr>
-          <td>Last update</td>
-          <td>{{ oligonucleotide.timestamp_edited | format_datetime }}</td>
-        </tr>
-        <tr>
-          <td>Label</td>
-          <td>{{ oligonucleotide.label }}</td>
-        </tr>
-        <tr>
-          <td>Owner</td>
-          <td>{{ oligonucleotide.owner.username }}</td>
-        </tr>
-        <tr>
-          <td>Order date</td>
-          <td>{{ oligonucleotide.order_date | format_date }}</td>
-        </tr>
-        <tr>
-          <td>Storage place</td>
-          <td>{{ oligonucleotide.storage_place }}</td>
-        </tr>
-        <tr>
-          <td>Length</td>
-          <td>{{ oligonucleotide|length }} bases</td>
-        </tr>
-        <tr>
-          <td>GC content</td>
-          <td>{{ oligonucleotide.gc_content | round(1) }}%</td>
-        </tr>
-      </tbody>
-    </table>
-
-      {% if oligonucleotide.description %}
-        <h3 class="mt-4">Description</h3>
-        <p class="text-justify">
-            {{ oligonucleotide.description }}
-        </p>
-      {% endif %}
-
-    <br>
-
-  </div>
-
-  {{ files_pane(
-    status='fade',
-    pane_id='tab-files',
-    entity=oligonucleotide,
-    form=file_form
-  ) }}
-
-  {{ comment_pane(
-    status='fade',
-    pane_id='tab-comments',
-    entity=oligonucleotide,
-    form=comment_form
-  ) }}
+    </ul>
 
 </div>
 
-<br>
+<div class="tab-content bg-white rounded border my-3">
 
-{{ primer_add_form(form, ".edit", "PUT", oligonucleotide.id) }}
+        {{ pane_details(
+            status='active',
+            pane_id='tab-info',
+            oligonucleotide=oligonucleotide,
+            form=form
+        ) }}
+
+        {{ files_pane(
+            status='fade',
+            pane_id='tab-files',
+            entity=oligonucleotide,
+            form=file_form
+          ) }}
+
+        {{ comment_pane(
+            status='fade',
+            pane_id='tab-comments',
+            entity=oligonucleotide,
+            form=comment_form
+          ) }}
+
+    </div>
+
+

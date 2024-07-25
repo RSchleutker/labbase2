@@ -104,7 +104,7 @@ class FilterPlasmids(FilterForm):
         self.owner_id.choices += users
 
     def fields(self) -> list:
-        return [self.label, self.insert, self.vector, self.owner_id,
+        return [self.id, self.label, self.insert, self.vector, self.owner_id,
                 self.description, self.order_by, self.ascending]
 
 

@@ -3,9 +3,10 @@
 
 {% macro pane_details(request, form) %}
 
-    <div class="card mb-3">
-    <div class="card-body">
-        <div class="d-flex flex-start align-items-start mb-2">
+    <div class="rounded border p-3 mb-3">
+
+        <div class="d-flex flex-start align-items-start m3-2">
+
             <div class="flex-grow-1">
                 <h5 class="mb-1">{{ request.requested_by }}</h5>
                 <p class="text-muted mb-1">
@@ -17,19 +18,20 @@
                     {% endif %}
                 </p>
             </div>
-            <span class="flex-shrink-0">
+
+            <div class="flex-shrink-0">
+
                 {% if True %}
-                    <a class="text-primary ml-2 mr-2"
-                       data-toggle="modal"
-                       data-target="#modal-edit-request-{{ request.id }}">
-                          <i class="fa-solid fa-pen"></i>
-                      </a>
+                    <a class="text-primary mx-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-request-{{ request.id }}">
+                          <i class="fa-solid fa-pen"></i></a>
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("requests.delete", id_=request.id) }}')">
-                          <i class="fa-solid fa-trash"></i>
-                      </a>
+                          <i class="fa-solid fa-trash"></i></a>
                 {% endif %}
-            </span>
+
+            </div>
         </div>
 
     <p class="mb-0">
@@ -53,8 +55,8 @@
           <button
             type="button"
             class="btn btn-success btn-sm"
-            data-toggle="modal"
-            data-target="#modal-edit-request--1">
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-request--1">
           <i class="fa-solid fa-plus"></i>
         </button>
       </span>
@@ -63,6 +65,8 @@
 
   {% for request in entity.requests %}
     {{ pane_details(request, form) }}
+  {% else %}
+      <div class="fw-bold text-center mb-3">Not requested yet!</div>
   {% endfor %}
 
   {{ requests_add_form(form(), "requests.add", "POST", -1, entity.id) }}

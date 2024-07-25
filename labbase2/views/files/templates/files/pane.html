@@ -5,48 +5,55 @@
 
 {% macro pane_details(file, form) %}
 
-    <div class="card">
-        <div class="card-body">
+        <div class="rounded border p-3 mb-3">
+
             <div class="d-flex flex-start align-items-center mb-0">
+
                 <div class="flex-fill">
+
                     <h5 class="mb-1">{{ file.original_filename }}</h5>
+
                     <p class="mb-0">{{ file.timestamp | format_datetime }} by {{ file.user.username }}</p>
+
                     <p>
                         {% if file.note %}
-                        <a class="text-info mr-2"
-                           data-toggle="collapse"
+                        <a class="text-info me-2"
+                           data-bs-toggle="collapse"
                            href="#card-file-{{ file.id }}"
                            aria-expanded="false"
                            aria-controls="card-file-{{ file.id }}">
-                            <i class="fa-solid fa-circle-info"></i>
-                        </a>
+                            <i class="fa-solid fa-circle-info"></i></a>
                         {% endif %}
-                        <a class="text-info mr-2" href="{{ url_for('files.download', id_=file.id, download=1) }}">
-                            <i class="fa-solid fa-download"></i>
-                        </a>
-                        <a class="text-primary mr-2"
-                           data-toggle="modal"
-                           data-target="#modal-edit-file-{{ file.id }}">
-                            <i class="fa-solid fa-pen"></i>
-                        </a>
+
+                        <a class="text-info me-2"
+                           href="{{ url_for('files.download', id_=file.id, download=1) }}">
+                            <i class="fa-solid fa-download"></i></a>
+
+                        <a class="text-primary me-2"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modal-edit-file-{{ file.id }}">
+                            <i class="fa-solid fa-pen"></i></a>
+
                         <a class="text-danger"
                            onclick="delete_entity('{{ url_for("files.delete", id_=file.id) }}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </a>
+                            <i class="fa-solid fa-trash"></i></a>
+
                     </p>
+
                 </div>
+
                 {% if file.type == "image" %}
                     <img class="rounded ml-3"
                          src="{{ url_for('files.download', id_=file.id) }}"
                          width="70" height="70">
                 {% endif %}
+
             </div>
 
             {% if file.note %}
             <p class="collapse hide mt-3" id="card-file-{{ file.id }}">{{ file.note }}</p>
             {% endif %}
   </div>
-    </div>
 
   {{ file_edit_form(form(None, obj=file), "files.edit", "PUT", file.id) }}
 
@@ -56,21 +63,26 @@
 {% macro files_pane(status, pane_id, entity, form) %}
   <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-  <h2 class="mb-4" style="display: inline-block">Files</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <div class="float-right">
-    <button
-        type="button"
-        class="btn btn-success btn-sm"
-        data-toggle="modal"
-        data-target="#modal-edit-file--1">
-      <i class="fa-solid fa-plus"></i>
-    </button>
+      <h2 class="flex-grow-1 mb-0">Files</h2>
+
+      <span class="flex-shrink-0">
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-file--1">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </span>
+
   </div>
 
     {% for file in entity.files %}
       {{ pane_details(file, form) }}
-      <br>
+    {% else %}
+        <div class="fw-bold text-center mb-3">No files uploaded yet!</div>
     {% endfor %}
 
   {{ file_upload_form(form(), "files.add", "POST", -1, entity.id) }}

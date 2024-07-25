@@ -1,3 +1,4 @@
+{% from 'plasmids/pane.html' import pane_details %}
 {% from 'comments/pane.html' import comment_pane with context %}
 {% from 'files/pane.html' import files_pane with context %}
 {% from 'requests/pane.html' import request_pane with context %}
@@ -8,162 +9,131 @@
 {% from "preparations/form.html" import preparations_add_form %}
 {% from "files/form.html" import file_upload_form %}
 {% from "files/form.html" import file_edit_form %}
+{% import 'macros/pill.html' as pill %}
 
 
-<ul class="nav nav-tabs">
+{% set n_comments = plasmid.comments | length %}
 
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
-  </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-preps">Preps</a>
-  </li>
+<h1 class="mb-4">{{ plasmid.label }}</h1>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-comments">
-      Comments
-    </a>
-  </li>
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-bacteria">Stocks</a>
-  </li>
+    <ul class="nav nav-pills m-0" role="tablist">
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
-  </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
 
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
-  </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-preps"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Preps
+            </button>
+        </li>
 
-</ul>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link position-relative"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-comments"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
+            </button>
+        </li>
 
-<div class="tab-content">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-bacteria"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Stocks
+            </button>
+        </li>
 
-  <div class="tab-pane container active" id="tab-info">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-files"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Files
+            </button>
+        </li>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-          <h2 class="flex-grow-1 mb-0">{{ plasmid.label }}</h2>
-          <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-toggle="modal"
-                 data-target="#modal-edit-plasmid-{{ plasmid.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-              <a class="text-danger"
-                 onclick="delete_entity('{{ url_for(".delete", id_=plasmid.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
-      </div>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-requests"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Requests
+            </button>
+        </li>
 
-    <h3>Details</h3>
-
-    <table class="table table-details">
-      <tbody>
-        <tr>
-          <td>Database ID</td>
-          <td>{{ plasmid.id }}</td>
-        </tr>
-        <tr>
-          <td>Label</td>
-          <td>{{ plasmid.label }}</td>
-        </tr>
-        <tr>
-          <td>Owner</td>
-          <td>{{ plasmid.owner.username }}</td>
-        </tr>
-        <tr>
-          <td>Cloning date</td>
-          <td>{{ plasmid.cloning_date }}</td>
-        </tr>
-        <tr>
-          <td>Insert</td>
-          <td>{{ plasmid.insert }}</td>
-        </tr>
-        <tr>
-          <td>Vector</td>
-          <td>{{ plasmid.vector }}</td>
-        </tr>
-        <tr>
-          <td>Storage place</td>
-          <td>{{ plasmid.storage_place }}</td>
-        </tr>
-        <tr>
-          <td>Glycerol stock(s)</td>
-          <td>{% if plasmid.stocks %}Yes ({{ plasmid.stocks|length }}){% else %}No{% endif %}</td>
-        </tr>
-        <tr>
-          <td>Length</td>
-          <td>{{ plasmid|length }}</td>
-        </tr>
-        <tr>
-          <td>Current plasmid file</td>
-          <td>
-            {% if plasmid.file %}
-              <a href="{{ url_for('files.download', id_=plasmid.file.id) }}">
-                {{ plasmid.file.original_filename }} <i class="fa-solid fa-file-arrow-down"></i>
-              </a>
-            {% else %}
-              No Genebank file uploaded.
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <td>Reference</td>
-          <td>{{ plasmid.reference }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    {% if plasmid.description %}
-      <h3 class="mt-4">Description</h3>
-      <p class="text-justify">
-          {{ plasmid.description }}
-      </p>
-    {% endif %}
-
-  </div>
-
-  {{ preparations_pane(
-    status='fade',
-    pane_id='tab-preps',
-    plasmid=plasmid,
-    form=preparation_form
-  ) }}
-
-  {{ files_pane(
-    status='fade',
-    pane_id='tab-files',
-    entity=plasmid,
-    form=file_form
-  ) }}
-
-  {{ comment_pane(
-    status='fade',
-    pane_id='tab-comments',
-    entity=plasmid,
-    form=comment_form
-  ) }}
-
-  {{ bacteria_pane(
-    status='fade',
-    pane_id='tab-bacteria',
-    plasmid=plasmid,
-    form=bacteria_form
-  ) }}
-
-  {{ request_pane(
-    status='fade',
-    pane_id='tab-requests',
-    entity=plasmid,
-    form=request_form
-  ) }}
+    </ul>
 
 </div>
 
-<br>
+<div class="tab-content bg-white rounded border my-3">
 
-{{ plasmid_add_form(form, ".edit", "PUT", plasmid.id) }}
+    {{ pane_details(
+            status='active',
+            pane_id='tab-info',
+            plasmid=plasmid,
+            form=form
+        ) }}
+
+    {{ preparations_pane(
+            status='fade',
+            pane_id='tab-preps',
+            plasmid=plasmid,
+            form=preparation_form
+          ) }}
+
+    {{ files_pane(
+            status='fade',
+            pane_id='tab-files',
+            entity=plasmid,
+            form=file_form
+          ) }}
+
+    {{ comment_pane(
+            status='fade',
+            pane_id='tab-comments',
+            entity=plasmid,
+            form=comment_form
+          ) }}
+
+    {{ bacteria_pane(
+            status='fade',
+            pane_id='tab-bacteria',
+            plasmid=plasmid,
+            form=bacteria_form
+          ) }}
+
+    {{ request_pane(
+            status='fade',
+            pane_id='tab-requests',
+            entity=plasmid,
+            form=request_form
+          ) }}
+
+</div>

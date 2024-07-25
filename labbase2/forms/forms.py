@@ -37,8 +37,8 @@ class FilterForm(BaseForm):
         description="Internal database ID."
     )
     ascending = BooleanField(
-        label="Ascending",
-        render_kw={"class": 'form-check-input', "id": "filter-form-ascending"},
+        label="Sort ascending",
+        render_kw={"class": "form-check-input", "id": "filter-form-ascending"},
         default=True,
         description="Uncheck to sort results in descending order."
     )
@@ -46,7 +46,7 @@ class FilterForm(BaseForm):
         label="Order by",
         choices=[('id', 'ID')],
         default='id',
-        render_kw=RENDER_KW | {"id": "filter-form-order-by", "size": 1},
+        render_kw={"size": 1},
         description="The column by which the results shall be ordered."
     )
     download_csv = SubmitField(
@@ -85,5 +85,7 @@ class EditEntityForm(EditForm):
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-label"}
+        render_kw=RENDER_KW | {"id": "edit-form-label",
+                               "placeholder": "Name"},
+        description="Must be unique among ALL database entries."
     )

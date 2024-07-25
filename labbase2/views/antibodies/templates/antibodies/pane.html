@@ -1,0 +1,75 @@
+{% from 'antibodies/form.html' import antibody_add_form %}
+
+
+{% macro pane_details(status, pane_id, antibody, form) %}
+
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+                <a class="text-primary mr-2"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal-edit-antibody-{{ antibody.id }}">
+                    <i class="fa-solid fa-pen"></i>
+                </a>
+                <a class="text-danger"
+                   onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+
+        </div>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ antibody.id }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ antibody.label }}</td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td>{{ antibody.location }}</td>
+            </tr>
+            <tr>
+                <td>Clone</td>
+                <td>{{ antibody.clone }}</td>
+            </tr>
+            <tr>
+                <td>Host</td>
+                <td>{{ antibody.host }}</td>
+            </tr>
+            <tr>
+                <td>Antigen</td>
+                <td>{{ antibody.antigen }}</td>
+            </tr>
+            <tr>
+                <td>Clonality</td>
+                <td>{{ antibody.specification }}</td>
+            </tr>
+            <tr>
+                <td>Conjugate</td>
+                <td>{{ antibody.conjugate }}</td>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td>{{ antibody.source }}</td>
+            </tr>
+            <tr>
+                <td>Storage</td>
+                <td>{{ antibody.storage_temp }}°C</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    {{ antibody_add_form(form, ".edit", "PUT", antibody.id) }}
+
+{% endmacro %}

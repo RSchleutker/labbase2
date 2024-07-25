@@ -15,7 +15,6 @@ class EditFile(EditForm):
         "Note",
         validators=[Optional(), Length(max=256)],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-upload-note",
-                               "placeholder": "Note",
+        render_kw=RENDER_KW | {"placeholder": "Note",
                                "rows": 8}
     )

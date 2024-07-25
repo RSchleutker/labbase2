@@ -1,3 +1,30 @@
+{% macro field_row(field, label) %}
+
+    <label class="col-sm-2 col-form-label">{{ label }}</label>
+    <div class="col-sm-10">
+        {% if field.type == "SelectField" %}
+            {{ field(class_="custom-select") }}
+        {% else %}
+            {{ field() }}
+        {% endif %}
+        <div class="form-text">
+            {{ field.description }}
+        </div>
+    </div>
+
+{% endmacro %}
+
+
+{% macro field_file_row(field) %}
+
+    <div class="custom-file">
+        {{ field(class_='custom-file-input') }}
+        <label class="custom-file-label">Choose file</label>
+    </div>
+
+{% endmacro %}
+
+
 {% macro field(field, label) %}
 
   <div class="input-group form-group">

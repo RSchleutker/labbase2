@@ -1,51 +1,71 @@
-{% extends "base-site.html" %}
+{% extends 'base-site.html' %}
+{% import 'macros/flash.html' as flash %}
 
 {% block body %}
 
-    <div id="welcome">
+    <section class="h-100">
 
-        <!-- Login form -->
-        <div class="container">
-            <div class="d-flex justify-content-center h-100">
-                <div class="card-login">
-                    <div class="card-header">
-                        <h2>Sign in to Labbase2</h2>
+        <div class="px-4 py-5 px-md-5 text-center text-lg-start h-100">
+            <div class="container">
+
+                {{ flash.flash() }}
+
+                <div class="row gx-lg-5 align-items-center">
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <h1 class="my-5 display-3 fw-bold ls-tight">
+                            Labbase2<br>
+                            <span class="text-primary">Easier. Better. Prettier.</span>
+                        </h1>
+                        <p>
+                            Labbase2 is a great way for storing and organizing your laboratory ressources including
+                            stocks, plasmids, oligonucleotides, and antibodies. Get started by signing in.
+                        </p>
+                        <p>
+                            Don't have an account yet? Ask an admin to create you one!
+                        </p>
                     </div>
-                    <div class="card-body">
-                        <form action="" method="post">
-                            {{ login_form.hidden_tag() }}
-                            <div class="input-group form-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><span class="fas fa-user"></span></span>
-                                </div>
-                                {{ login_form.user() }}
+
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <div class="card">
+                            <div class="card-body py-5 px-md-5">
+
+                                <h4>Sign in</h4>
+
+                                <form action="" method="post">
+
+                                    {{ login_form.hidden_tag() }}
+
+                                    <!-- Email input -->
+                                    <div data-mdb-input-init class="form-outline mb-4">
+                                        {{ login_form.user(id='login-form-username') }}
+                                        <label class="form-label" for="login-form-username">Email address / Username</label>
+                                    </div>
+
+                                    <!-- Password input -->
+                                    <div data-mdb-input-init class="form-outline mb-4">
+                                        {{ login_form.password(id='login-form-password') }}
+                                        <label class="form-label" for="login-form-password">Password</label>
+                                    </div>
+
+                                    <!-- Checkbox -->
+                                    <div class="form-check d-flex justify-content-center mb-4">
+                                        <input class="form-check-input me-2" type="checkbox" value="" id="form2Example33" checked />
+                                        <label class="form-check-label" for="form2Example33">
+                                            Remember me
+                                        </label>
+                                    </div>
+
+                                    <!-- Submit button -->
+                                    {{ login_form.submit(class_='btn btn-primary btn-block mb-4') }}
+
+                                </form>
                             </div>
-                            <div class="input-group form-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><span class="fas fa-key"></span></span>
-                                </div>
-                                {{ login_form.password() }}
-                            </div>
-                            <div class="row align-items-center remember">
-                                {{ login_form.remember_me() }} Remember me
-                            </div>
-                            <div class="form-group align-items-center">
-                                {{ login_form.submit() }}
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer">
-                        <div class="d-flex justify-content-center links">
-                            Don't have an account?&nbsp;<strong>Contact the admin!</strong>
-                        </div>
-                        <div class="d-flex justify-content-center">
-{#                            <a href="{{ url_for('user.forgot_password') }}">Forgot your password?</a>#}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-    </div>
+    </section>
 
 {% endblock %}

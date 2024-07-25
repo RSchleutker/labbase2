@@ -1,76 +1,51 @@
 {% import 'macros/forms.html' as forms %}
+{% import 'macros/modal.html' as modal %}
 
 
 {% macro comments_add_form(form, endpoint, method, id, entity_id) %}
 
-  {% if id == -1 %}
-    {% set action = url_for(endpoint, entity_id=entity_id) %}
-  {% else %}
-    {% set action = url_for(endpoint, id_=id) %}
-  {% endif %}
+    {% if id == -1 %}
+        {% set action = url_for(endpoint, entity_id=entity_id) %}
+        {% set title = 'Write Comment' %}
+    {% else %}
+        {% set action = url_for(endpoint, id_=id) %}
+        {% set title = 'Edit Comment' %}
+    {% endif %}
 
-  <div id="modal-edit-comment-{{ id }}"
-       class="modal fade"
-       role="dialog">
-    <div class="modal-dialog modal-lg">
+    {% set modal_id = 'modal-edit-comment-' ~ id %}
+    {% set form_id = 'form-edit-comment-' ~ id %}
 
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Edit Comment</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;
-          </button>
-        </div>
-        <div class="modal-body" id="modal-edit-comment-{{ id }}-body">
+    {% call modal.modal(id=modal_id, title=title) %}
 
-          <div>
+        <form action="{{ action }}" method="get" id="{{ form_id }}">
 
-            <div class="row">
-              <div class="col-12">
+            {{ form.hidden_tag() }}
 
-                <form action="{{ action }}"
-                      method="get"
-                      id="form-edit-comment-{{ id }}">
-                  {{ form.hidden_tag() }}
-                    <div class="row">
-                    <div class="col-12">
-                      {{ forms.field(form.subject, label="Subject") }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-12">
-                      {{ forms.field_no_label(form.text) }}
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    {{ form.submit() }}
-                  </div>
-                </form>
-
-                <div id="form-edit-comment-{{ id }}-messages">
-
-                </div>
-
-              </div>
+            <div class="row mb-3">
+                {{ forms.field_row(form.subject, 'Subject') }}
             </div>
 
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+            <div class="row mb-3">
+                {{ forms.field_row(form.text, 'Comment') }}
+            </div>
 
+            <div class="row mb-3">
+                <div class="col-sm-10">
+                    {{ form.submit() }}
+                </div>
+            </div>
 
-  {{ forms.script_send_form(
-      form,
-      'form-edit-comment-' + id|string,
-      method,
-      'form-edit-comment-' + id|string + '-messages'
-      ) }}
+        </form>
+
+        <div id="{{ form_id }}-messages"></div>
+
+        {{ forms.script_send_form(
+            form=form,
+            form_name=form_id,
+            method=method,
+            message_field=form_id ~ '-messages'
+         ) }}
+
+    {% endcall %}
 
 {% endmacro %}

@@ -4,37 +4,112 @@
 {% from "macros/pagination.html" import render_pagination %}
 {% from "macros/pagination.html" import results_pagination %}
 {% import 'macros/forms.html' as forms %}
-{#{% from "base/upload-import-file-form.html" import upload_import_file_form %}#}
+{% import 'macros/flash.html' as flash %}
+{% import 'macros/toast.html' as toast %}
+{% from 'imports/macros/form.html' import upload_file_form %}
 
 
 {% set args = dict(request.args) %}
 {% set _ = args.pop("page", 1) %}
 
 
+{% block navbar_right %}
+
+    <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvas-filters" aria-controls="offcanvas-filters">
+        <i class="fa-solid fa-filter"></i>
+    </button>
+
+{% endblock %}
+
+
 {% block content %}
 
-  <div id="filters">
-      {% block filters %}
-        {{ filter_form.render()|safe }}
-      {% endblock %}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvas-filters" aria-labelledby="offcanvas-filters">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasExampleLabel">Filter</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
 
-      {% block toolbar %}{% endblock %}
-  </div>
+            {{ filter_form.render()|safe }}
 
-    <div id="horizontal-flex-container">
+        </div>
+    </div>
 
-      <div id="content">
-        {% block main %}
-          {{ render_pagination(entities) }}
-          {{ results_pagination(entities) }}
-          {{ table(entities.items) }}
-          {{ render_pagination(entities) }}
-        {% endblock %}
-      </div>
+    <div class="container-fluid py-2 bg-white border-bottom">
+        {{ flash.flash() }}
 
-      <div id="sidebar-right">
-        {% block sidebar_right %}{% endblock %}
-      </div>
+        <h1 class="mb-4">{{ title }}</h1>
+    </div>
+
+    <div class="container-fluid d-flex align-items-start p-0 overflow-auto" style="height: 100%">
+
+        <div id="content" class="p-3">
+
+            {% block main %}
+
+                <div class="d-flex align-items-start">
+
+                    <button type="button"
+                            class="btn btn-sm bg-white border me-2"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvas-filters"
+                            aria-controls="offcanvas-filters">
+                        <i class="fa-solid fa-filter"></i>
+                    </button>
+
+                    <div class="rounded-1 border bg-white flex-shrink-0 fw-lighter py-1 px-2 me-2">
+                        {{ results_pagination(entities) }}
+                    </div>
+
+                    <div class="rounded-1 border bg-white flex-shrink-0 fw-lighter py-1 px-2">
+                        <i class="fa-solid fa-database"></i> <strong>{{ total }}</strong>
+                    </div>
+
+                    <div class="flex-fill"></div>
+
+                    <div class="btn-group me-2" role="group" aria-label="Basic example">
+                        {% block import %}{% endblock %}
+                        <button type="button"
+                                class="btn btn-sm bg-white border border-start-0"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal-import-file">
+                            <i class="fa-solid fa-file-import"></i>
+                        </button>
+                    </div>
+
+                    <div class="dropdown flex-shrink-0 me-2">
+                        <button class="btn btn-sm border bg-white dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <ul class="dropdown-menu fw-lighter">
+                            {% block download %}{% endblock %}
+                        </ul>
+                    </div>
+
+                    <div class="flex-shrink-0">
+                        {{ render_pagination(entities) }}
+                    </div>
+
+                </div>
+
+
+                {{ table(entities.items) }}
+                {{ render_pagination(entities) }}
+
+            {% endblock %}
+
+        </div>
+
+        <div id="sidebar-right" class="flex-shrink-0 overflow-auto h-100 py-3">
+
+            {% block sidebar_right %}{% endblock %}
+
+        </div>
 
     </div>
 
@@ -43,56 +118,56 @@
 
 {% block scripts %}
 
-  {{ super() }}
+    {{ super() }}
 
     <!--
     Highlights the table row that a user clicked on.
     -->
     <script>
-    $(document).ready(function () {
-      $("#table-results-body tr").click(function () {
-        $("#table-results-body tr").removeClass("active");
-        $(this).addClass("active");
-      });
-    });
-  </script>
+        $(document).ready(function () {
+            $("#table-results-body tr").click(function () {
+                $("#table-results-body tr").removeClass("active");
+                $(this).addClass("active");
+            });
+        });
+    </script>
 
-  <!-- Request details about a ressource from the sever and display it in the
-  right sidebar. The script is typically invoked by clicking on a table row. -->
-  <script type="text/javascript">
-    function request_details(url) {
-      let request = $.ajax({url: url, method: "GET"});
-      request.always(function (data) {$("#sidebar-right").html(data);});
-    }
-  </script>
-
-  <!-- Deletes an entity entirely from the database. -->
-  <script type="text/javascript">
-    function delete_entity(url) {
-        if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
-            let request = $.ajax({url: url, method: "DELETE"});
+    <!-- Request details about a ressource from the sever and display it in the
+    right sidebar. The script is typically invoked by clicking on a table row. -->
+    <script type="text/javascript">
+        function request_details(url) {
+            let request = $.ajax({url: url, method: "GET"});
             request.always(function (data) {$("#sidebar-right").html(data);});
         }
-    }
-  </script>
+    </script>
 
-  <script type="text/javascript">
-    function batch_action(url) {
-        if (confirm('Are you sure?')) {
-            let request = $.ajax({url: url, method: "PUT"});
-            request.always(function (data) {
-                $("#modal-messages-body").html(data);
-                $("#modal-messages").modal()
-            });
+    <!-- Deletes an entity entirely from the database. -->
+    <script type="text/javascript">
+        function delete_entity(url) {
+            if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
+                let request = $.ajax({url: url, method: "DELETE"});
+                request.always(function (data) {$("#sidebar-right").html(data);});
+            }
         }
-    }
-  </script>
+    </script>
 
-  <script type="text/javascript">
-    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
-        event.preventDefault();
-        $(this).ekkoLightbox();
-    });
-  </script>
+    <script type="text/javascript">
+        function batch_action(url) {
+            if (confirm('Are you sure?')) {
+                let request = $.ajax({url: url, method: "PUT"});
+                request.always(function (data) {
+                    $("#modal-messages-body").html(data);
+                    $("#modal-messages").modal()
+                });
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+            event.preventDefault();
+            $(this).ekkoLightbox();
+        });
+    </script>
 
 {% endblock %}

@@ -1,49 +1,47 @@
-{% extends "base-site-entities.html" %}
+{% extends 'base-site-entities.html' %}
 
-{% from "oligonucleotides/form.html" import primer_add_form %}
-{% from "oligonucleotides/table.html" import table %}
-{% from "macros/import-modal.html" import import_modal %}
+{% from 'oligonucleotides/form.html' import primer_add_form %}
+{% from 'oligonucleotides/table.html' import table %}
 
 
-{% block toolbar %}
+{% block import %}
 
-  <div class="d-flex flex-row justify-content-center">
-    <div class="p-2">
-       <div class="btn-group btn-group-sm">
-         <button type="button" class="btn btn-success disabled"><i class="fa-solid fa-upload"></i></button>
-         <button type="button"
-                 class="btn btn-success"
-                 data-toggle="modal"
-                 data-target="#modal-edit-primer--1">
-           FORM
-         </button>
-         <button type="button"
-                 class="btn btn-success"
-                 data-toggle="modal"
-                 data-target="#modal-import-file">
-           FILE
-         </button>
-       </div>
-    </div>
-    <div class="p-2">
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-warning disabled"><i class="fa-solid fa-download"></i></button>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="csv", **args) }}">CSV</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="json", **args) }}">JSON</a>
-        <a type="button" class="btn btn-warning" href="{{ url_for(".export", format_="fasta", **args) }}">FASTA</a>
-      </div>
-    </div>
-  </div>
+    <button type="button"
+            class="btn btn-sm btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-primer--1">
+        <i class="fa-solid fa-plus"></i>
+    </button>
 
-  {{ import_modal(import_file_form, "oligonucleotide") }}
+{% endblock %}
+
+
+{% block download %}
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="csv", **args) }}">
+        <i class="bi bi-filetype-csv me-1"></i> Download CSV file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="json", **args) }}">
+        <i class="bi bi-filetype-json me-1"></i> Down JSON file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+        <i class="bi bi-file-earmark me-1"></i> Download FASTA file
+    </a>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+        <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
+    </a>
 
 {% endblock %}
 
 
 {% block scripts %}
 
-  {{ super() }}
+    {{ super() }}
 
-  {{ primer_add_form(add_form, ".add", "POST", -1) }}
+    {{ upload_file_form(import_file_form, url_for("imports.upload", type_="oligonucleotide")) }}
+    {{ primer_add_form(add_form, ".add", "POST", -1) }}
 
 {% endblock %}

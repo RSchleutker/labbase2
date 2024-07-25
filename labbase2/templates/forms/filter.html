@@ -1,37 +1,59 @@
-<form id="filter-form" action="" method="{{ method }}" class="form-inline">
+<form id="filter-form" action="" method="{{ method }}">
 
-  {% if csrf %}
-    {{ form.hidden_tag() }}
-  {% endif %}
+    {% if csrf %}
+        {{ form.hidden_tag() }}
+    {% endif %}
 
-  {% for field in form.fields() %}
+    {% for field in form.fields() %}
 
-      <div class="mb-3 mr-sm-3">
-        <label>
-          {{ field.label }}&nbsp;&nbsp;&nbsp;
-          <span class="fas fa-info-circle"
-                data-toggle="collapse"
-                data-target="#help-{{ field.short_name }}"></span>
-        </label>
-        {{ field() }}
-      </div>
+        {% if field.type == 'BooleanField' %}
 
-  {% endfor %}
+            <div class="form-check form-switch mb-3 mx-2">
+                {{ field(class_='form-check-input', type='checkbox', role='switch') }}
+                <label class="form-check-label">{{ field.label }}</label>
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
 
-  {{ form.submit() }}
+        {% elif field.type == 'SelectField' %}
+
+            <div class="mb-3 mx-2">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field(class_='form-select form-select-sm') }}
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
+
+        {% else %}
+
+            <div class="mb-3 mx-2">
+                <label class="form-label">{{ field.label }}</label>
+                {{ field() }}
+                <div class="form-text">
+                    {{ field.description }}
+                </div>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+    {{ form.submit() }}
 
 </form>
 
 <div id="filter-help">
 
-{% for field in form.fields() %}
+    {% for field in form.fields() %}
 
-  <div id="help-{{ field.short_name }}"
-       class="collapse"
-       data-parent="#filter-help">
-    <span class="fas fa-info-circle"></span> {{ field.description }}
-  </div>
+        <div id="help-{{ field.short_name }}"
+             class="collapse"
+             data-parent="#filter-help">
+            <span class="fas fa-info-circle"></span> {{ field.description }}
+        </div>
 
-{% endfor %}
+    {% endfor %}
 
 </div>

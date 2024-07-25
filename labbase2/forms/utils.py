@@ -3,7 +3,7 @@ from labbase2.utils.message import Message
 from wtforms.validators import ValidationError
 
 
-RENDER_KW: dict = {'size': 16, 'class': 'form-control'}
+RENDER_KW: dict = {'class': 'form-control form-control-sm'}
 
 RENDER_KW_ID: dict = {
     **RENDER_KW,
@@ -18,7 +18,6 @@ RENDER_KW_BTN: dict = {
 
 RENDER_KW_FILE: dict = {
     **RENDER_KW,
-    'class': 'custom-filepath-input',
     'type': 'file'
 }
 
