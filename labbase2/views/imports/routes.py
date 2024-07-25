@@ -10,7 +10,7 @@ from labbase2.models import db
 from labbase2.models import Antibody
 from labbase2.models import Plasmid
 from labbase2.models import Oligonucleotide
-from labbase2.models import File
+from labbase2.models import BaseFile
 from labbase2.models import ImportJob
 from labbase2.models import ColumnMapping
 from labbase2.views.files.forms import UploadFile

@@ -14,7 +14,7 @@ class ImportJob(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     timestamp = db.Column(db.DateTime, default=func.now())
     timestamp_edited = db.Column(db.DateTime, default=func.now())
-    file_id = db.Column(db.Text, db.ForeignKey("file.id"), nullable=False)
+    file_id = db.Column(db.Text, db.ForeignKey("base_file.id"), nullable=False)
     is_finished = db.Column(db.Boolean, default=False, nullable=False)
     entity_type = db.Column(db.Text, nullable=False)
 
@@ -27,7 +27,7 @@ class ImportJob(db.Model):
     )
 
     file = db.relationship(
-        "File",
+        "BaseFile",
         backref="import_job",
         lazy=True,
         cascade="all, delete",

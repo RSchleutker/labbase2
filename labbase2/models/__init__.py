@@ -7,10 +7,8 @@ db = SQLAlchemy()
 from .user import User
 from .user import UserRole
 from .comment import Comment
-from .file import File
-from .file import FileImage
-from .file import FileDocument
-from .file import FilePlasmid
+from .file import BaseFile
+from .file import EntityFile
 from .base_entity import BaseEntity
 from .antibody import Antibody
 from .antibody import Dilution

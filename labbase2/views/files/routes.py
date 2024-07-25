@@ -3,10 +3,8 @@ from .forms import EditFile
 
 from labbase2.models import db
 from labbase2.models import BaseEntity
-from labbase2.models import File
-from labbase2.models import FileDocument
-from labbase2.models import FileImage
-from labbase2.models import FilePlasmid
+from labbase2.models import BaseFile
+from labbase2.models import EntityFile
 from labbase2.utils.message import Message
 
 from flask import Blueprint

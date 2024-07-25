@@ -25,7 +25,7 @@ def intercept_deleted_to_detached(session, obj) -> None:
     None
     """
 
-    if isinstance(obj, file.File):
+    if isinstance(obj, file.BaseFile):
         obj.path.unlink(missing_ok=True)
 
 

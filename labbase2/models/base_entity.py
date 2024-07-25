@@ -101,9 +101,9 @@ class BaseEntity(db.Model, Filter, Export, Importer):
         cascade="all, delete-orphan"
     )
     files = db.relationship(
-        "File",
+        "EntityFile",
         backref="entity",
-        order_by="File.timestamp.desc()",
+        order_by="EntityFile.timestamp_uploaded.desc()",
         lazy=True,
         cascade="all, delete-orphan"
     )
