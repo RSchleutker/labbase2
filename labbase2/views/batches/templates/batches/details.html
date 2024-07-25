@@ -1,115 +1,122 @@
 {% from 'batches/form.html' import batch_add_form %}
 
 
-<div class="card">
+<h1 class="mb-4">{{ batch.consumable.label }}</h1>
 
-    <div class="card-header">
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
 
-        <h1 class="mb-4">{{ batch.consumable.label }}</h1>
+    <ul class="nav nav-pills m-0" role="tablist">
 
-        <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
 
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#tab-info">Details</a>
-            </li>
+    </ul>
 
-        </ul>
+</div>
 
-    </div>
+<div class="tab-content bg-white rounded border my-3">
 
-    <div class="tab-content">
+    <div class="tab-pane container active" id="tab-info">
 
-        <div class="tab-pane container active" id="tab-info">
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="flex-grow-1 mb-0">Details</h2>
-                <span class="flex-shrink-0">
-              <a class="text-primary mr-2"
-                 data-bs-toggle="modal"
-                 data-bs-target="#modal-edit-batch-{{ batch.id }}">
-                <i class="fa-solid fa-pen"></i>
-              </a>
-                    {% if (not batch.in_use) and (batch.emptied_date is none) %}
-                        <a class="text-info mr-2"
-                           onclick="batch_action('{{ url_for("batches.in_use", id_=batch.id) }}')">
-                    <i class="fa-solid fa-box-open"></i>
-                  </a>
-                    {% endif %}
-                    {% if batch.in_use and batch.emptied_date is none %}
-                        <a class="text-danger mr-2"
-                           onclick="batch_action('{{ url_for("batches.emptied", id_=batch.id) }}')">
-                    <i class="fa-solid fa-battery-empty"></i>
-                  </a>
-                    {% endif %}
-                    <a class="text-danger"
-                       onclick="delete_entity('{{ url_for(".delete", id_=batch.id) }}')">
-              <i class="fa-solid fa-trash"></i>
-              </a>
-          </span>
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+
+                <a class="text-primary me-2"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal-edit-batch-{{ batch.id }}">
+                    <i class="fa-solid fa-pen"></i></a>
+
+                {% if (not batch.in_use) and (batch.emptied_date is none) %}
+                    <a class="text-info me-2"
+                       onclick="batch_action('{{ url_for("batches.in_use", id_=batch.id) }}')">
+                        <i class="fa-solid fa-box-open"></i></a>
+                {% endif %}
+
+                {% if batch.in_use and batch.emptied_date is none %}
+                    <a class="text-danger me-2"
+                       onclick="batch_action('{{ url_for("batches.emptied", id_=batch.id) }}')">
+                        <i class="fa-solid fa-battery-empty"></i></a>
+                {% endif %}
+
+                <a class="text-danger"
+                   onclick="delete_entity('{{ url_for(".delete", id_=batch.id) }}')">
+                    <i class="fa-solid fa-trash"></i></a>
+
             </div>
-
-            <table class="table table-details">
-                <tbody>
-                <tr>
-                    <td>Database ID</td>
-                    <td>{{ batch.id }}</td>
-                </tr>
-                <tr>
-                    <td>Consumable ID</td>
-                    <td>{{ batch.consumable_id }}</td>
-                </tr>
-                <tr>
-                    <td>Supplier</td>
-                    <td>{{ batch.supplier }}</td>
-                </tr>
-                <tr>
-                    <td>Article number</td>
-                    <td>{{ batch.article_number }}</td>
-                </tr>
-                <tr>
-                    <td>Lot</td>
-                    <td>{{ batch.lot }}</td>
-                </tr>
-                <tr>
-                    <td>Amount</td>
-                    <td>{{ batch.amount }}</td>
-                </tr>
-                <tr>
-                    <td>Order date</td>
-                    <td>{{ batch.order_date | format_date }}</td>
-                </tr>
-                <tr>
-                    <td>Expiration date</td>
-                    <td>{{ batch.expiration_date | format_date }}</td>
-                </tr>
-                <tr>
-                    <td>Price</td>
-                    <td>{{ batch.price }}</td>
-                </tr>
-                <tr>
-                    <td>Storage place</td>
-                    <td>{{ batch.storage_place }}</td>
-                </tr>
-                <tr>
-                    <td>Currently in use</td>
-                    <td>{% if batch.in_use %}Yes{% else %}No{% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Opened on</td>
-                    <td>{{ batch.opened_date | format_date }}</td>
-                </tr>
-                <tr>
-                    <td>Emptied on</td>
-                    <td>{{ batch.emptied_date | format_date }}</td>
-                </tr>
-                </tbody>
-            </table>
 
         </div>
 
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ batch.id }}</td>
+            </tr>
+            <tr>
+                <td>Consumable ID</td>
+                <td>{{ batch.consumable_id }}</td>
+            </tr>
+            <tr>
+                <td>Supplier</td>
+                <td>{{ batch.supplier }}</td>
+            </tr>
+            <tr>
+                <td>Article number</td>
+                <td>{{ batch.article_number }}</td>
+            </tr>
+            <tr>
+                <td>Lot</td>
+                <td>{{ batch.lot }}</td>
+            </tr>
+            <tr>
+                <td>Amount</td>
+                <td>{{ batch.amount }}</td>
+            </tr>
+            <tr>
+                <td>Order date</td>
+                <td>{{ batch.order_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Expiration date</td>
+                <td>{{ batch.expiration_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Price</td>
+                <td>{{ batch.price }}</td>
+            </tr>
+            <tr>
+                <td>Storage place</td>
+                <td>{{ batch.storage_place }}</td>
+            </tr>
+            <tr>
+                <td>Currently in use</td>
+                <td>{% if batch.in_use %}Yes{% else %}No{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Opened on</td>
+                <td>{{ batch.opened_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Emptied on</td>
+                <td>{{ batch.emptied_date | format_date }}</td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
 
-    {{ batch_add_form(form, ".edit", "PUT", batch.id) }}
-
 </div>
+
+{{ batch_add_form(form, ".edit", "PUT", batch.id) }}
