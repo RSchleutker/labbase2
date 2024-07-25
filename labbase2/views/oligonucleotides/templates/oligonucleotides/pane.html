@@ -18,7 +18,7 @@
 
                 {% if oligonucleotide.deletable %}
                     <a class="text-danger"
-                       onclick="delete_entity('{{ url_for(".delete", id_=oligonucleotide.id) }}')">
+                       onclick="delete_entity('{{ url_for("oligonucleotides.delete", id_=oligonucleotide.id) }}')">
                         <i class="fa-solid fa-trash"></i></a>
                 {% endif %}
 
@@ -85,6 +85,6 @@
 
     </div>
 
-    {{ primer_add_form(form, ".edit", "PUT", oligonucleotide.id) }}
+    {{ primer_add_form(form, "oligonucleotides.edit", "PUT", oligonucleotide.id) }}
 
 {% endmacro %}

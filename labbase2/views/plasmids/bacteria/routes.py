@@ -1,5 +1,6 @@
 from .forms import FilterBacteria
 from .forms import EditBacterium
+from labbase2.views.plasmids.forms import EditPlasmid
 
 from labbase2.utils.message import Message
 from labbase2.utils.role_required import role_required
@@ -120,7 +121,12 @@ def details(id_: int, format_: str):
         case _:
             return Message.ERROR(f"Invalid format '{format_}'!")
 
-    return render_template(template, stock=stock, form=edit_form)
+    return render_template(
+        template,
+        stock=stock,
+        form=edit_form,
+        plasmid_form=EditPlasmid(None, obj=stock.plasmid)
+    )
 
 
 @bp.route("/glycerol-stock/export/<string:format_>/", methods=["GET"])

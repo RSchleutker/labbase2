@@ -1,4 +1,5 @@
 {% from 'bacteria/form.html' import bacteria_add_form %}
+{% from 'plasmids/pane.html' import pane_details %}
 
 
 <h1 class="mb-4">{{ stock.plasmid.label }} in {{ stock.strain }}</h1>
@@ -15,6 +16,17 @@
                     role="tab"
                     aria-selected="true">
                 Details
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-plasmid"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Plasmid
             </button>
         </li>
 
@@ -78,6 +90,13 @@
 
     </div>
 
+    {{ pane_details(
+            status='fade',
+            pane_id='tab-plasmid',
+            plasmid=stock.plasmid,
+            form=plasmid_form
+        ) }}
+
 </div>
 
-{{ bacteria_add_form(form, ".edit", "PUT", stock.id, stock.plasmid_id) }}
+{{ bacteria_add_form(form, "plasmids.bacteria.edit", "PUT", stock.id, stock.plasmid_id) }}

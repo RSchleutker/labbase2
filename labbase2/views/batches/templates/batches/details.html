@@ -50,7 +50,7 @@
                 {% endif %}
 
                 <a class="text-danger"
-                   onclick="delete_entity('{{ url_for(".delete", id_=batch.id) }}')">
+                   onclick="delete_entity('{{ url_for("batches.delete", id_=batch.id) }}')">
                     <i class="fa-solid fa-trash"></i></a>
 
             </div>
@@ -64,8 +64,16 @@
                 <td>{{ batch.id }}</td>
             </tr>
             <tr>
-                <td>Consumable ID</td>
-                <td>{{ batch.consumable_id }}</td>
+                <td>Consumable</td>
+                <td>
+                    {% if batch.consumable.entity_type == 'antibody' %}
+                        <a href="{{ url_for('antibodies.index', id=batch.consumable_id) }}">
+                            {{ batch.consumable.label }}
+                        </a>
+                    {% else %}
+                        {{ batch.consumable.label }}
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <td>Supplier</td>
@@ -119,4 +127,4 @@
 
 </div>
 
-{{ batch_add_form(form, ".edit", "PUT", batch.id) }}
+{{ batch_add_form(form, "batches.edit", "PUT", batch.id) }}

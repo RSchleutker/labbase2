@@ -36,7 +36,7 @@
                           {% endif %}
 
                       <a class="text-danger"
-                         onclick="delete_entity('{{ url_for(".delete", id_=batch.id) }}')">
+                         onclick="delete_entity('{{ url_for("batches.delete", id_=batch.id) }}')">
                       <i class="fa-solid fa-trash"></i></a>
 
                 </div>
