@@ -11,9 +11,9 @@
 
                 <div class="flex-fill">
 
-                    <h5 class="mb-1">{{ file.original_filename }}</h5>
+                    <h5 class="mb-1">{{ file.filename_exposed }}</h5>
 
-                    <p class="mb-0">{{ file.timestamp | format_datetime }} by {{ file.user.username }}</p>
+                    <p class="mb-0">{{ file.timestamp_uploaded | format_datetime }} by {{ file.user.username }}</p>
 
                     <p>
                         {% if file.note %}
@@ -55,7 +55,7 @@
             {% endif %}
   </div>
 
-  {{ file_edit_form(form(None, obj=file), "files.edit", "PUT", file.id) }}
+  {{ file_edit_form(form(filename=file.filename_exposed, obj=file), "files.edit", "PUT", file.id) }}
 
 {% endmacro %}
 

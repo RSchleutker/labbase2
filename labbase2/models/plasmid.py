@@ -112,12 +112,6 @@ class Plasmid(BaseEntity, Sequence):
         return None
 
     @property
-    def file(self):
-        for file in self.files:
-            if file.type == "plasmid":
-                return file
-
-    @property
     def seqrecord(self) -> SeqRecord | None:
         """The sequence of this plasmid.
 
@@ -132,30 +126,29 @@ class Plasmid(BaseEntity, Sequence):
         available if such a filepath was uploaded.
         """
 
-        if not (file := self.file):
-            return None
-
-        match file.path.suffix.lower():
-            case ".gb" | ".gbk":
-                format = "genbank"
-                reader = io.StringIO
-            case ".dna":
-                format = "snapgene"
-                reader = io.BytesIO
-            case ".xdna":
-                format = "xdna"
-                reader = io.BytesIO
-            case _:
-                return None
-
-        with reader(file.data) as handle:
-            try:
-                record = SeqIO.read(handle, format=format)
-            except Exception as error:
-                print(error)
-                return None
-            else:
-                return record
+        return None
+        #
+        # match file.path.suffix.lower():
+        #     case ".gb" | ".gbk":
+        #         format = "genbank"
+        #         reader = io.StringIO
+        #     case ".dna":
+        #         format = "snapgene"
+        #         reader = io.BytesIO
+        #     case ".xdna":
+        #         format = "xdna"
+        #         reader = io.BytesIO
+        #     case _:
+        #         return None
+        #
+        # with reader(file.data) as handle:
+        #     try:
+        #         record = SeqIO.read(handle, format=format)
+        #     except Exception as error:
+        #         print(error)
+        #         return None
+        #     else:
+        #         return record
 
     @classmethod
     def to_zip(cls, entities):

@@ -18,6 +18,7 @@ from werkzeug.utils import secure_filename
 from pathlib import Path
 
 from typing import Optional
+from typing import Union
 
 
 __all__ = ["bp"]
@@ -32,8 +33,39 @@ bp = Blueprint(
 )
 
 
+def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFile]:
+    file = form.file.data
+
+    if form.filename.data:
+        filename = secure_filename(form.filename.data)
+    else:
+        filename = secure_filename(file.filename)
+
+    db_file = class_(
+        user_id=current_user.id,
+        filename_exposed=filename,
+        note=form.note.data,
+        **kwargs
+    )
+
+    db.session.add(db_file)
+    db.session.commit()
+
+    db_file.set_filename()
+    db.session.commit()
+
+    try:
+        file.save(db_file.path)
+    except Exception as error:
+        db.session.delete(db_file)
+        db.session.commit()
+        raise error
+
+    return db_file
+
+
 @bp.route("/", defaults={"entity_id": None})
-@bp.route("/attach/<int:entity_id>", methods=["POST"])
+@bp.route("/upload/<int:entity_id>", methods=["POST"])
 @login_required
 def add(entity_id: Optional[int] = None):
     previous_site = request.referrer
@@ -44,54 +76,12 @@ def add(entity_id: Optional[int] = None):
     if not (form := UploadFile()).validate():
         return redirect(previous_site)
 
-    data = form.file.data
-    save_filename = Path(secure_filename(data.filename))
-
-    # Get appropriate file class based on suffix of uploaded file.
-    match save_filename.suffix.lower():
-        case ".pdf":
-            file_class = FileDocument
-        case ".jpg" | ".jpeg" | ".png" | ".tif" | ".tiff":
-            file_class = FileImage
-        case ".gb" | ".gbk" | ".dna" | ".xdna":
-            file_class = FilePlasmid
-        case _:
-            file_class = File
-
-    # Create file instance without internal filename. That will be later assigned based on the
-    # database ID.
-    file = file_class(
-        entity_id=entity_id,
-        user_id=current_user.id,
-        note=form.note.data,
-        original_filename=str(save_filename)
-    )
-
-    # A database ID should be assigned to the file now. Use that to create filename to store file.
-    try:
-        db.session.add(file)
-        db.session.flush()
-    except Exception as error:
-        flash(Message.ERROR(error))
+    if entity_id is not None:
+        file = upload_file(form, EntityFile, entity_id=entity_id)
     else:
-        file.set_filename()
+        file = upload_file(form, BaseFile)
 
-    # Next, try to save the file to disk.
-    try:
-        data.save(file.path)
-    except Exception as error:
-        db.session.rollback()
-        flash(Message.ERROR(error))
-        return redirect(previous_site)
-
-    # Lastly, commit changes to database. Don't know if this requires a try-except block since at
-    # this point the flush was already successful. But better be safe than sorry.
-    try:
-        db.session.commit()
-    except Exception as error:
-        file.path.unlink(missing_ok=True)
-        db.session.rollback()
-        return str(error), 400
+    flash(f"Successfully uploaded '{file.filename_exposed}'!", "success")
 
     return redirect(previous_site)
 
@@ -102,51 +92,42 @@ def edit(id_: int):
     if not (form := EditFile()).validate():
         return str(form.errors), 400
 
-    if not (file := File.query.get(id_)):
+    if not (file := BaseFile.query.get(id_)):
         return f"No file with ID {id_}!", 404
     elif file.user_id != current_user.id:
         return "File can only be edited by owner!", 400
     else:
-        form.populate_obj(file)
+        file.note = form.note.data
+        file.filename_exposed = form.filename.data
 
     try:
         db.session.commit()
     except Exception as error:
         return str(error), 400
-    else:
-        return f"Successfully edited file {file.original_filename}!", 200
+
+    return f"Successfully edited file {file.filename_exposed}!", 200
 
 
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def download(id_: int):
-    if not (file := File.query.get(id_)):
+    if not (file := BaseFile.query.get(id_)):
         return f"No file with ID {id_}!", 404
 
     as_attachment = request.args.get("download", False, type=bool)
 
     return send_from_directory(
         file.path.parent,
-        file.filename,
+        file.filename_exposed,
         as_attachment=as_attachment,
         mimetype=file.mimetype
     )
-
-    # match request.args.get("format", None):
-    #     case "bytes" | None:
-    #         return Response(file.data, mimetype="image/png")
-    #     case "base64":
-    #         data = base64.b64encode(file.data)
-    #         img = "<img src='data:image/png;base64,{}' style='width: 100%; height: auto'/>"
-    #         return img.format(data.decode())
-    #     case _:
-    #         return
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_: int):
-    if (file := File.query.get(id_)) is None:
+    if (file := BaseFile.query.get(id_)) is None:
         return Message.ERROR(f"No file with ID {id_}!")
 
     try:

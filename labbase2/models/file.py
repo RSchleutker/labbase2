@@ -82,8 +82,8 @@ class BaseFile(db.Model):
         return f"application/{ext.lower()}"
 
     def set_filename(self):
-        _, ext = self.original_filename.split(".", 1)
-        self.filename = "{0:07d}.{ext}".format(self.id, ext=ext)
+        _, ext = self.filename_exposed.split(".", 1)
+        self.filename_internal = "{0:07d}.{ext}".format(self.id, ext=ext)
 
 
 class EntityFile(BaseFile):
