@@ -8,8 +8,9 @@
         <div class="d-flex flex-start align-items-center mb-3">
 
             <img class="rounded-circle shadow-1-strong me-3"
-                 src="{{ url_for("static", filename="images/avatar-f.webp") }}"
+                 src="{{ url_for("files.download", id_=comment.user.file_picture_id) }}"
                  alt="avatar"
+                 style="object-fit: cover"
                  width="60" height="60">
 
             <div>

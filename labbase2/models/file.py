@@ -78,8 +78,8 @@ class BaseFile(db.Model):
 
     @property
     def mimetype(self) -> str:
-        _, ext = self.filename.split(".", 1)
-        return f"application/{ext.lower()}"
+        _, ext = self.filename_internal.split(".", 1)
+        return f"image/{ext.lower()}"
 
     def set_filename(self):
         _, ext = self.filename_exposed.split(".", 1)

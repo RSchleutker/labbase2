@@ -8,6 +8,7 @@ from werkzeug.security import check_password_hash
 from email_validator import validate_email
 from email_validator import EmailNotValidError
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from typing import Optional
 
@@ -17,6 +18,7 @@ __all__ = ["login_manager", "User", "UserRole", "user_roles", "ResetPassword"]
 
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
+login_manager.login_message_category = "warning"
 
 # Map users to their roles in a many-to-many relationship.
 user_roles = db.Table(
@@ -97,13 +99,25 @@ class User(db.Model, UserMixin, Export):
     __tablename__: str = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
+    first_name = db.Column(db.String(64), nullable=False)
+    last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    picture_id = db.Column(db.Integer, db.ForeignKey("file.id"), nullable=True)
+    file_picture_id = db.Column(db.Integer, db.ForeignKey("base_file.id"), nullable=True)
     timestamp_created = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    timestamp_last_login = db.Column(db.DateTime, nullable=True)
     timezone = db.Column(db.String(64), nullable=False, default="UTC")
-    status = db.Column(db.String(32), nullable=False, default="active")
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+
+    # Set relationship for profile picture.
+    picture = db.relationship(
+        "BaseFile",
+        backref="profile",
+        lazy=True,
+        foreign_keys=[file_picture_id],
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
 
     # One-to-many relationships.
     comments = db.relationship("Comment", backref="user", lazy=True)
@@ -117,7 +131,12 @@ class User(db.Model, UserMixin, Export):
     )
     preparations = db.relationship("Preparation", backref="owner", lazy=True)
     dilutions = db.relationship("Dilution", backref="user", lazy=True)
-    files = db.relationship("BaseFile", backref="user", lazy=True)
+    files = db.relationship(
+        "EntityFile",
+        backref="user",
+        lazy=True,
+        foreign_keys="EntityFile.user_id"
+    )
     modifications = db.relationship("Modification", backref="user", lazy=True)
     fly_stocks = db.relationship("FlyStock", backref="owner", lazy=True, foreign_keys="FlyStock.owner_id")
     responsibilities = db.relationship(
@@ -150,6 +169,14 @@ class User(db.Model, UserMixin, Export):
         lazy="subquery",
         backref=db.backref("users", lazy=True)
     )
+
+    @hybrid_property
+    def username(self):
+        return self.first_name + " " + self.last_name
+
+    @username.expression
+    def username(cls):
+        return cls.first_name + " " + cls.last_name
 
     def set_password(self, password: str) -> None:
         """Creates a hash that is stored in the database to validate the user's password.

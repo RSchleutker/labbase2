@@ -44,14 +44,21 @@ class RegisterForm(FlaskForm):
     of the site since the users should not be allowed to choose their own roles.
     """
 
-    username = StringField(
-        label="Name",
+    first_name = StringField(
+        label="First name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=RENDER_KW | {"id": "register-form-username",
-                               "placeholder": "Username"},
+        render_kw=RENDER_KW | {"placeholder": "First name"},
         description="""
         A unique username, typically the first and last name of the person.
         """
+    )
+    last_name = StringField(
+        label="Last name",
+        validators=[DataRequired(), Length(max=64)],
+        render_kw=RENDER_KW | {"placeholder": "First name"},
+        description="""
+            A unique username, typically the first and last name of the person.
+            """
     )
     email = StringField(
         label="E-Mail Address",
@@ -76,8 +83,8 @@ class RegisterForm(FlaskForm):
     )
     timezone = SelectField(
         "Timezone",
-        choices=[(tz, tz) for tz in zoneinfo.available_timezones()],
-        default=current_app.config["DEFAULT_TIMEZONE"],
+        choices=[(tz, tz) for tz in sorted(zoneinfo.available_timezones())],
+        default=lambda: current_app.config["DEFAULT_TIMEZONE"],
         validators=[DataRequired()],
         render_kw=RENDER_KW,
         description="Select the timezone in which dates and times shall be displayed for you."

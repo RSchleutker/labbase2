@@ -21,9 +21,17 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <label>
-                                            Username
+                                            First name
                                         </label>
-                                        {{ form.username() }}
+                                        {{ form.first_name() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Last name
+                                        </label>
+                                        {{ form.last_name() }}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -32,6 +40,14 @@
                                             Email address
                                         </label>
                                         {{ form.email() }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label>
+                                            Timezone
+                                        </label>
+                                        {{ form.timezone() }}
                                     </div>
                                 </div>
                                 <div class="row">
@@ -72,10 +88,6 @@
             </div>
 
             <div class="col-8">
-
-                <strong>Username</strong>
-
-                <p>{{ form.username.description }}</p>
 
                 <strong>Email address</strong>
 

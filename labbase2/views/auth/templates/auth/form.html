@@ -1,0 +1,77 @@
+{% import 'macros/forms.html' as forms %}
+
+
+{% macro edit_user_form(form, endpoint, id) %}
+
+    {% set action = url_for(endpoint) %}
+    {% set form_id = 'form-edit-user-' ~ id %}
+
+    <form action="{{ action }}" method="post" id="{{ form_id }}" enctype=multipart/form-data>
+
+        {{ form.hidden_tag() }}
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.first_name, 'First name') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.last_name, 'Last name') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.email, 'E-Mail address') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.timezone, 'Timezone') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.file, 'Picture') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.password, 'Password') }}
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-10">
+                {{ form.submit() }}
+            </div>
+        </div>
+
+    </form>
+
+{% endmacro %}
+
+
+{% macro change_password_form(form, endpoint, id) %}
+
+    {% set action = url_for(endpoint) %}
+    {% set form_id = 'form-change-password-' ~ id %}
+
+    <form action="{{ action }}" method="post" id="{{ form_id }}">
+
+        {{ form.hidden_tag() }}
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.new_password, 'New password') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.new_password2, 'Repeat new password') }}
+        </div>
+
+        <div class="row mb-3">
+            {{ forms.field_row(form.old_password, 'Old password') }}
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm-10">
+                {{ form.submit() }}
+            </div>
+        </div>
+
+    </form>
+
+{% endmacro %}

@@ -33,13 +33,15 @@ def create_app(config_filename):
 
         # Add the 'admin' user.
         if not User.query.first():
-            admin = User(username="admin", email=app.config.get("EMAIL"))
+            admin = User(
+                first_name=app.config.get("USER")[0],
+                last_name=app.config.get("USER")[1],
+                email=app.config.get("USER")[2]
+            )
             admin.set_password("admin")
             admin.roles.append(UserRole.query.filter_by(name="admin").first())
             db.session.add(admin)
             db.session.commit()
-
-            print("A user 'admin' with password 'admin' was created. Please log in and change the password ASAP.")
 
     from labbase2.views import base
     from labbase2.views import auth

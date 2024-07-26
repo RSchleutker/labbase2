@@ -11,7 +11,7 @@ from flask import Blueprint
 from flask import flash
 from flask import request
 from flask import redirect
-from flask import send_from_directory
+from flask import send_file
 from flask_login import login_required
 from flask_login import current_user
 from werkzeug.utils import secure_filename
@@ -35,8 +35,9 @@ bp = Blueprint(
 
 def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFile]:
     file = form.file.data
+    print(file)
 
-    if form.filename.data:
+    if hasattr(form, "filename") and form.filename.data:
         filename = secure_filename(form.filename.data)
     else:
         filename = secure_filename(file.filename)
@@ -44,7 +45,7 @@ def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFil
     db_file = class_(
         user_id=current_user.id,
         filename_exposed=filename,
-        note=form.note.data,
+        note=form.note.data if hasattr(form, "note") else None,
         **kwargs
     )
 
@@ -111,14 +112,14 @@ def edit(id_: int):
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def download(id_: int):
-    if not (file := BaseFile.query.get(id_)):
-        return f"No file with ID {id_}!", 404
+    if (file := BaseFile.query.get(id_)) is None:
+        return f"No file with ID {id_}!"
 
     as_attachment = request.args.get("download", False, type=bool)
 
-    return send_from_directory(
-        file.path.parent,
-        file.filename_exposed,
+    return send_file(
+        file.path,
+        download_name=file.filename_exposed,
         as_attachment=as_attachment,
         mimetype=file.mimetype
     )

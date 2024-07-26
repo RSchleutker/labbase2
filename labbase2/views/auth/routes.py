@@ -9,15 +9,21 @@ from flask_login import login_required
 from flask_login import login_user
 from flask_login import logout_user
 from flask_login import current_user
+from sqlalchemy import func
 from sqlalchemy.exc import DataError
 from email_validator import validate_email
 
 from .forms.login import LoginForm
 from .forms.register import RegisterForm
+from .forms.edit import EditUserForm
+from .forms.password import ChangePassword
 from labbase2.models import db
 from labbase2.models import User
 from labbase2.models import UserRole
+from labbase2.models import BaseFile
 from labbase2.utils.role_required import role_required
+from labbase2.utils.message import Message
+from labbase2.views.files.routes import upload_file
 
 
 __all__ = ["bp", "login"]
@@ -49,20 +55,26 @@ def login() -> str | Response:
 
     # POST fork with correct credentials.
     if form.validate_on_submit():
-        user = User.get_by_name_or_email(form.user.data)
+        user = User.query.filter_by(email=form.email.data).first()
 
         if not user:
             flash("Invalid email address or username!", "danger")
-        elif user.status == "inactive":
+        elif not user.is_active:
             flash("Your account is inactive! Get in touch with an admin!", "warning")
         elif not user.verify_password(form.password.data):
             flash("Wrong password!", "danger")
         else:
             login_user(user, remember=form.remember_me.data)
+
+            user.timestamp_last_login = func.now()
+            db.session.commit()
+
             flash("Successfully logged in!", "success")
             next_page = request.args.get("next")
+
             if not next_page: # or url_parse(next_page).netloc:
                 next_page = url_for("base.index")
+
             return redirect(next_page)
 
     # GET fork or POST with wrong credentials.
@@ -115,3 +127,52 @@ def register() -> str:
                 flash(f"{field}: {error}", "danger")
 
     return render_template("auth/register.html", title="Register", form=form)
+
+
+@bp.route("/edit", methods=["GET", "POST"])
+@login_required
+def edit_user():
+    if request.method == "GET":
+        form = EditUserForm(None, obj=current_user)
+        return render_template("auth/edit-user.html", form=form)
+
+    form = EditUserForm()
+
+    if not form.validate():
+        for error in form.errors:
+            flash(str(error), "danger")
+        return render_template("auth/edit-user.html", form=form)
+
+    if not current_user.verify_password(form.password.data):
+        flash("Password is incorrect!", "danger")
+    else:
+        form.populate_obj(current_user)
+
+        if form.file.data:
+            file = upload_file(form, BaseFile)
+            current_user.picture = file
+
+        db.session.commit()
+
+    flash("Successfully edited user profile!", "success")
+
+    return render_template("auth/edit-user.html", form=form)
+
+
+@bp.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    form = ChangePassword()
+
+    if form.validate_on_submit():
+        if current_user.verify_password(form.old_password.data):
+            current_user.set_password(form.new_password.data)
+            db.session.commit()
+            flash("Your password has been updated!", "success")
+        else:
+            flash("Old password incorrect!", "danger")
+
+    return render_template(
+        "auth/change-password.html",
+        form=form
+    )

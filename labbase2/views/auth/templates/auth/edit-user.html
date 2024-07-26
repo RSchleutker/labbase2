@@ -1,0 +1,15 @@
+{% extends 'auth/base-site-user.html' %}
+{% from 'auth/form.html' import edit_user_form %}
+
+
+{% block content2 %}
+
+    <h1 class="mt-3 mb-4">Edit Profile</h1>
+
+    <div class="bg-white rounded border p-3 my-3">
+
+        {{ edit_user_form(form, 'auth.edit_user', current_user.id) }}
+
+    </div>
+
+{% endblock %}

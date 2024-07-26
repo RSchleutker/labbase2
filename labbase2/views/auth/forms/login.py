@@ -26,13 +26,13 @@ class LoginForm(FlaskForm):
         ...
     """
 
-    user = StringField(
+    email = StringField(
         "User",
         validators=[DataRequired()],
         filters=[strip_input, make_lower],
-        render_kw=RENDER_KW | {"placeholder": "Username or e-mail address"},
+        render_kw=RENDER_KW | {"placeholder": "E-mail address"},
         description="""
-        Enter your username or e-mail address.
+        Enter your E-mail address.
         """
     )
     password = PasswordField(
