@@ -12,14 +12,14 @@ def format_date(x: date) -> str:
     if not x:
         return ""
 
-    return x.strftime("%b %d, %Y")
+    return x.strftime("%B %d, %Y")
 
 
 def format_datetime(x: datetime) -> str:
     if not x:
         return ""
 
-    tz = getattr(current_user, "tz", "Europe/Berlin")
+    tz = getattr(current_user, "timezone", "Europe/Berlin")
 
-    return x.astimezone(ZoneInfo(tz)).strftime("%b %d, %Y %I:%M %p")
+    return x.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
 
