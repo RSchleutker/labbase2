@@ -49,26 +49,19 @@ class EditUserForm(FlaskForm):
         label="First name",
         validators=[DataRequired(), Length(max=64)],
         render_kw=RENDER_KW | {"placeholder": "First name"},
-        description="""
-        A unique username, typically the first and last name of the person.
-        """
+        description="You given name. You may use initials for middle names."
     )
     last_name = StringField(
         label="Last name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=RENDER_KW | {"placeholder": "First name"},
-        description="""
-            A unique username, typically the first and last name of the person.
-            """
+        render_kw=RENDER_KW | {"placeholder": "First name"}
     )
     email = StringField(
         label="E-Mail Address",
         validators=[DataRequired(), Email(), Length(max=128)],
         render_kw=RENDER_KW | {"id": "register-form-email",
                                "placeholder": "Email Address"},
-        description="""
-        The university email address.
-        """
+        description="The university email address."
     )
     timezone = SelectField(
         "Timezone",
@@ -80,7 +73,8 @@ class EditUserForm(FlaskForm):
     )
     file = FileField(
         "Picture",
-        render_kw=RENDER_KW_FILE
+        render_kw=RENDER_KW_FILE,
+        description="Ideally use a portrait with 1:1 aspect ratio."
     )
     password = PasswordField(
         "Password",

@@ -5,6 +5,11 @@ from sqlalchemy import func
 from pathlib import Path
 from datetime import date
 
+from skimage import io
+from skimage import util
+from skimage.transform import resize
+import math
+
 
 __all__ = ["BaseFile", "EntityFile"]
 
@@ -77,6 +82,19 @@ class BaseFile(db.Model):
                 return file.read()
 
     @property
+    def type_(self):
+        _, ext = self.filename_internal.rsplit(".", 1)
+        match ext.lower():
+            case "pdf":
+                return "document"
+            case "jpg" | "jpeg" | "png" | "tif" | "tiff":
+                return "image"
+            case "dna" | "gb" | "gbk":
+                return "plasmid"
+            case _:
+                return "misc"
+
+    @property
     def mimetype(self) -> str:
         _, ext = self.filename_internal.split(".", 1)
         return f"image/{ext.lower()}"
@@ -84,6 +102,27 @@ class BaseFile(db.Model):
     def set_filename(self):
         _, ext = self.filename_exposed.split(".", 1)
         self.filename_internal = "{0:07d}.{ext}".format(self.id, ext=ext)
+
+    def resize(self, longest: int):
+        if not self.type_ == "image":
+            return
+
+        img = io.imread(self.path)
+        height, width, _ = img.shape
+
+        if width <= longest and height <= longest:
+            return
+
+        if width > height:
+            height = math.ceil(height / width * longest)
+            width = longest
+        else:
+            width = math.ceil(width / height * longest)
+            height = longest
+
+        resized = resize(img, (height, width), anti_aliasing=True)
+
+        io.imsave(self.path, util.img_as_ubyte(resized))
 
 
 class EntityFile(BaseFile):

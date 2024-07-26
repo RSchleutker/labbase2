@@ -151,6 +151,7 @@ def edit_user():
         if form.file.data:
             file = upload_file(form, BaseFile)
             current_user.picture = file
+            file.resize(512)
 
         db.session.commit()
 
@@ -165,10 +166,17 @@ def change_password():
     form = ChangePassword()
 
     if form.validate_on_submit():
+
         if current_user.verify_password(form.old_password.data):
-            current_user.set_password(form.new_password.data)
-            db.session.commit()
-            flash("Your password has been updated!", "success")
+
+            try:
+                current_user.set_password(form.new_password.data)
+                db.session.commit()
+            except Exception as error:
+                flash(str(error), "danger")
+            else:
+                flash("Your password has been updated!", "success")
+
         else:
             flash("Old password incorrect!", "danger")
 

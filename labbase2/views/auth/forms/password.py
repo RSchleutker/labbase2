@@ -24,7 +24,11 @@ class ChangePassword(FlaskForm):
         validators=[DataRequired(), Length(min=12), ContainsLower(),
                     ContainsUpper(), ContainsNumber(), ContainsSpecial(),
                     ContainsNotSpace(), AllASCII()],
-        render_kw=RENDER_KW | {"placeholder": "new password"}
+        render_kw=RENDER_KW | {"placeholder": "new password"},
+        description="""
+        Minimum 12 characters. Contains lower- and uppercase characters. Contains at least 1 
+        number. Contains a special character. Does not contain spaces. Only ASCII characters.
+        """
     )
     new_password2 = PasswordField(
         "Repeat new password",

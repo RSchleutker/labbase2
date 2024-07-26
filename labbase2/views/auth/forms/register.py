@@ -97,19 +97,15 @@ class RegisterForm(FlaskForm):
         render_kw=RENDER_KW | {"id": "register-form-password",
                                "placeholder": "Password"},
         description="""
-        Choose a password. The password should have at least a length of 12 
-        characters and contain upper and lower letters, at least one number, 
-        and at least one special characters. Only ASCII characters are valid.
+        Minimum 12 characters. Contains lower- and uppercase characters. Contains at least 1 
+        number. Contains a special character. Does not contain spaces. Only ASCII characters.
         """
     )
     password2 = PasswordField(
         "Repeat Password",
         validators=[DataRequired(), EqualTo("password")],
         render_kw=RENDER_KW | {"id": "register-form-password2",
-                               "placeholder": "Repeat Password"},
-        description="""
-        Repeat the password.
-        """
+                               "placeholder": "Repeat Password"}
     )
     submit = SubmitField(
         "Submit",
