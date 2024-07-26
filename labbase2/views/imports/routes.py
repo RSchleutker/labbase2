@@ -10,9 +10,10 @@ from labbase2.models import db
 from labbase2.models import Antibody
 from labbase2.models import Plasmid
 from labbase2.models import Oligonucleotide
-from labbase2.models import File
+from labbase2.models import BaseFile
 from labbase2.models import ImportJob
 from labbase2.models import ColumnMapping
+from labbase2.views.files.routes import upload_file
 from labbase2.views.files.forms import UploadFile
 
 from flask import Blueprint
@@ -77,35 +78,7 @@ def upload(type_: str):
     if not form.validate():
         return redirect(request.referrer)
 
-    data = form.file.data
-    file = File(user_id=current_user.id, original_filename=secure_filename(data.filename))
-
-    # A database ID is assigned to the file now. Use that to create filename to store file.
-    try:
-        db.session.add(file)
-        db.session.flush()
-    except Exception as error:
-        flash(Message.ERROR(error))
-    else:
-        file.set_filename()
-
-    # Next, try to save the file to disk.
-    try:
-        data.save(file.path)
-    except Exception as error:
-        db.session.rollback()
-        flash(Message.ERROR(error))
-        return redirect(request.referrer)
-
-    # Lastly, commit changes to database. Don't know if this requires a try-except block
-    # since at this point the flush was already successful. But better be safe than sorry.
-    try:
-        db.session.commit()
-    except Exception as error:
-        flash(f"An error occurred during file upload! {error}", "danger")
-        file.path.unlink(missing_ok=True)
-        db.session.rollback()
-        return redirect(request.referrer)
+    file = upload_file(form, BaseFile)
 
     # Try to read the file.
     match file.path.suffix:
@@ -246,7 +219,7 @@ def execute(id_: int):
             if isinstance(value, str):
                 row[key] = value.strip()
 
-        origin = f"Created from file {file.original_filename} by {current_user.username}."
+        origin = f"Created from file {file.filename_exposed} by {current_user.username}."
         entity = entity_cls(origin=origin, **row)
 
         try:

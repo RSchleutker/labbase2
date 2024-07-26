@@ -117,7 +117,7 @@ class User(db.Model, UserMixin, Export):
     )
     preparations = db.relationship("Preparation", backref="owner", lazy=True)
     dilutions = db.relationship("Dilution", backref="user", lazy=True)
-    files = db.relationship("File", backref="user", lazy=True)
+    files = db.relationship("BaseFile", backref="user", lazy=True)
     modifications = db.relationship("Modification", backref="user", lazy=True)
     fly_stocks = db.relationship("FlyStock", backref="owner", lazy=True, foreign_keys="FlyStock.owner_id")
     responsibilities = db.relationship(

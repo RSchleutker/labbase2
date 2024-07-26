@@ -26,6 +26,10 @@
             </div>
 
             <div class="row mb-3">
+                {{ forms.field_row(form.filename, 'Filename') }}
+            </div>
+
+            <div class="row mb-3">
                 {{ forms.field_row(form.note, 'Note') }}
             </div>
 
@@ -62,6 +66,10 @@
         <form action="{{ action }}" method="{{ method }}" id="{{ form_id }}">
 
             {{ form.hidden_tag() }}
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.filename, 'Filename') }}
+            </div>
 
             <div class="row mb-3">
                 {{ forms.field_row(form.note, 'Note') }}
