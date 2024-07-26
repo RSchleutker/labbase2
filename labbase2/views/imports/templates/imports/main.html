@@ -1,5 +1,4 @@
-{% extends "base-site-authenticated.html" %}
-
+{% extends 'imports/base-site.html' %}
 {% import 'macros/forms.html' as forms %}
 
 
@@ -40,20 +39,17 @@
 {% endmacro %}
 
 
-{% block content %}
+{% block content2 %}
 
-  <div class="container">
+    <h1 class="mt-3 mb-4">Pending imports</h1>
 
-  <h2 class="mb-4 mt-2">Imports waiting for review</h2>
+    <div class="bg-white rounded border p-3 my-3">
 
-  {% for job in jobs %}
+        {% for job in jobs %}
+            {{ import_card(job) }}<br>
+        {% endfor %}
 
-      {{ import_card(job) }}
-      <br>
-
-  {% endfor %}
-
-  </div>
+    </div>
 
 {% endblock %}
 

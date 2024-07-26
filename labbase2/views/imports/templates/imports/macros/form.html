@@ -31,3 +31,22 @@
     {% endcall %}
 
 {% endmacro %}
+
+
+{% macro map_columns_form(form, endpoint) %}
+
+    <form method="post">
+
+            {{ form.hidden_tag() }}
+
+            {% for field in form.mapping.entries %}
+                <div class="row mb-3">
+                    {{ forms.field_row(field, field.label) }}
+                </div>
+            {% endfor %}
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+
+{% endmacro %}

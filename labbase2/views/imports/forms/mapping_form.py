@@ -44,7 +44,8 @@ class MappingForm(FlaskForm):
         "Name",
         choices=[(None, "-")],
         default=None,
-        validate_choice=False
+        validate_choice=False,
+        render_kw={"class": "form-select form-select-sm"}
     ))
     submit = SubmitField(
         label="Update mapping",

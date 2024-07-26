@@ -1,66 +1,61 @@
-{% extends "base-site-authenticated.html" %}
+{% extends 'imports/base-site.html' %}
 
 {% import 'macros/table_from_pandas.html' as table_from_pd %}
 {% import 'macros/forms.html' as forms %}
+{% from 'imports/macros/form.html' import map_columns_form %}
 
 
-{% block content %}
+{% block content2 %}
 
-    <div class="container pb-5">
+    <h1 class="mt-3 mb-4">Uploaded data</h1>
 
-    <h2>Uploaded data</h2>
+    <div class="bg-white rounded border p-3 my-3">
 
-    <p>
-    Below you see the first five rows of the uploaded data. This is the starting point for the import.
-    Please choose a column mapping further below and update to see how these rows will be imported.
-    </p>
+        <p>
+            Below you see the first five rows of the uploaded data. This is the starting point for the import.
+            Please choose a column mapping further below and update to see how these rows will be imported.
+        </p>
 
         {{ table_from_pd.table_from_pandas(table.head()) }}
 
-    <h2 class="mt-4">Map columns to database</h2>
+    </div>
 
-    <p>
-      Below, you find all fields present in the database. Please select from the dropdown menu
-      the column in the uploaded file that should be mapped to the respective field.
-    </p>
+    <h1 class="mt-3 mb-4">Map columns to database</h1>
 
+    <div class="bg-white rounded border p-3 my-3">
 
-    <form method="post" class="form-inline">
+        <p>
+            Below, you find all fields present in the database. Please select from the dropdown menu
+            the column in the uploaded file that should be mapped to the respective field.
+        </p>
 
-      {{ form.hidden_tag() }}
+    {{ map_columns_form(form, '') }}
 
-        {% for field in form.mapping.entries %}
-          <div class="mb-3 ml-3 mr-3">
-            <label class="mb-2 justify-content-start">{{ field.label }}</label>
-            {{ field(class="form-control") }}
-          </div>
-        {% endfor %}
-        <div>
-            {{ form.submit() }}
-        </div>
-    </form>
+    </div>
 
 
-    <h2 class="mt-4">Import data to database</h2>
+    <h1 class="mt-3 mb-4">Uploaded data</h1>
 
-    <p>
-    Once you have selected the correct column mapping (and saved it by clicking on 'Update
-      mapping'), you can try to import the rows of your file to the database.
-    </p>
+    <div class="bg-white rounded border p-3 my-3">
 
-    <a href="{{ url_for("imports.execute", id_=job.id) }}"
-       type="button"
-       class="btn btn-success">
-      Import to database
-    </a>
+        <p>
+            Once you have selected the correct column mapping (and saved it by clicking on 'Update
+            mapping'), you can try to import the rows of your file to the database.
+        </p>
 
-    {% for error in errors %}
+        <a href="{{ url_for("imports.execute", id_=job.id) }}"
+           type="button"
+           class="btn btn-success">
+            Import to database
+        </a>
 
-      <span class="alert alert-danger">
+        {% for error in errors %}
+
+            <span class="alert alert-danger">
         {{ error }}
       </span>
 
-    {% endfor %}
+        {% endfor %}
 
     </div>
 

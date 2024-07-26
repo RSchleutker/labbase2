@@ -1,22 +1,22 @@
 {% macro table_from_pandas(df) %}
 
     <table class="table">
-    <thead>
-    <tr>
-    {% for column in df.columns %}
-        <th scope="col">{{ column }}</th>
-    {% endfor %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in df.itertuples(index=False) %}
-    <tr>
-    {% for col in row %}
-    <td>{{ col }}</td>
-    {% endfor %}
-    </tr>
-    {% endfor %}
-    </tbody>
+        <thead>
+        <tr>
+            {% for column in df.columns %}
+                <th scope="col">{{ column }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in df.itertuples(index=False) %}
+            <tr>
+                {% for col in row %}
+                    <td>{{ col | string | truncate(64, True, '[...]') }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
     </table>
 
 {% endmacro %}

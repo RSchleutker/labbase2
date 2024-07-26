@@ -1,0 +1,33 @@
+{% extends 'base-site-authenticated.html' %}
+
+{% import 'macros/navbar.html' as nav with context %}
+
+
+{% block content %}
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-3">
+
+                <ul class="nav flex-column sticky-top my-3">
+                    {{ nav.link('imports.index', 'Pending imports') }}
+                    {{ nav.link('imports.index', 'Archived imports') }}
+                </ul>
+
+            </div>
+
+            <div class="col-9">
+
+                {{ flash.flash() }}
+
+                {% block content2 %}{% endblock %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
