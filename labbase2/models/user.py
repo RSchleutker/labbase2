@@ -120,13 +120,25 @@ class User(db.Model, UserMixin, Export):
     )
 
     # One-to-many relationships.
-    comments = db.relationship("Comment", backref="user", lazy=True)
-    plasmids = db.relationship("Plasmid", backref="owner", lazy=True, foreign_keys="Plasmid.owner_id")
+    comments = db.relationship(
+        "Comment",
+        backref="user",
+        order_by="Comment.timestamp_created.desc()",
+        lazy=True
+    )
+    plasmids = db.relationship(
+        "Plasmid",
+        backref="owner",
+        lazy=True,
+        order_by="Plasmid.timestamp_created.desc()",
+        foreign_keys="Plasmid.owner_id"
+    )
     glycerol_stocks = db.relationship("GlycerolStock", backref="owner", lazy=True)
     oligonucleotides = db.relationship(
         "Oligonucleotide",
         backref="owner",
         lazy=True,
+        order_by="Oligonucleotide.timestamp_created.desc()",
         foreign_keys="Oligonucleotide.owner_id"
     )
     preparations = db.relationship("Preparation", backref="owner", lazy=True)

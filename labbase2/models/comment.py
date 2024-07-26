@@ -45,16 +45,16 @@ class Comment(db.Model, Importer, Export):
         nullable=False,
         info={"importable": True}
     )
-    timestamp = db.Column(
+    timestamp_created = db.Column(
         db.DateTime,
         nullable=False,
-        server_default=func.now(timezone=True),
+        server_default=func.now(),
         info={"importable": True}
     )
     timestamp_edited = db.Column(
         db.DateTime(timezone=True),
         nullable=True,
-        onupdate=func.now(timezone=True),
+        onupdate=func.now(),
         info={"importable": True}
     )
     subject = db.Column(

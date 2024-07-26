@@ -9,7 +9,6 @@ from sqlalchemy import asc
 from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy.orm import column_property
-from sqlalchemy.types import TypeDecorator
 from flask_login import current_user
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -52,7 +51,7 @@ class Oligonucleotide(BaseEntity, Sequence):
         in the database.
     owner_id : int
         Foreign key to the user owning this oligonucleotide.
-    order_date : date
+    date_ordered : date
         The date this oligo was ordered.
     sequence : str
         The sequence of the primer. This should be all uppercase. Lowercase letters can be used to highlight special
@@ -72,7 +71,7 @@ class Oligonucleotide(BaseEntity, Sequence):
         primary_key=True,
         info={"importable": False}
     )
-    order_date = db.Column(
+    date_ordered = db.Column(
         db.Date,
         nullable=False,
         info={"importable": True}

@@ -70,7 +70,7 @@ class FilterOligonucleotide(FilterForm):
             .all()
         self.owner_id.choices += user
         self.order_by.choices += [("label", "Label"),
-                                  ("order_date", "Order date"),
+                                  ("date_ordered", "Order date"),
                                   ("length", "Length"),
                                   ("sequence", "Sequence"),
                                   ("timestamp_edited", "Last edited")]

@@ -32,13 +32,13 @@ class Batch(db.Model, Filter, Export):
         The amoint that was ordered. For some companies this is already indicated by the article number but for some
         is not. The information is straightforward for chemicals. For enzymes this might be the number of reactions
         or the total activity in U. For antibodies the total volume along with the concentration would suffice.
-    order_date : date
+    date_ordered : date
         The date at which this batch was ordered.
-    opened_date : date
+    date_opened : date
         The date at which this batch was opened.
-    expiration_date : date
+    date_expiration : date
         The expiration date that was set by the supplier.
-    emptied_date : date
+    date_emptied : date
         The date at which this batch was emptied.
     price : float
         The price in euros.
@@ -64,17 +64,17 @@ class Batch(db.Model, Filter, Export):
     supplier = db.Column(db.String(64), nullable=False)
     article_number = db.Column(db.String(32), nullable=False)
     amount = db.Column(db.String(32))
-    order_date = db.Column(db.Date)
-    opened_date = db.Column(db.Date)
-    expiration_date = db.Column(db.Date)
-    emptied_date = db.Column(db.Date)
+    date_ordered = db.Column(db.Date)
+    date_opened = db.Column(db.Date)
+    date_expiration = db.Column(db.Date)
+    date_emptied = db.Column(db.Date)
     price = db.Column(db.Float())
     storage_place = db.Column(db.String(64), nullable=False)
     lot = db.Column(db.String(64), nullable=False)
     in_use = db.Column(db.Boolean, nullable=False, default=False)
 
-    is_open = column_property(opened_date.isnot(None).label("is_open"), deferred=True)
-    is_empty = column_property(emptied_date.isnot(None).label("is_empty"), deferred=True)
+    is_open = column_property(date_opened.isnot(None).label("is_open"), deferred=True)
+    is_empty = column_property(date_emptied.isnot(None).label("is_empty"), deferred=True)
 
     @classmethod
     def _filters(cls, **fields) -> list:
@@ -108,8 +108,8 @@ class Batch(db.Model, Filter, Export):
                 field = Consumable.entity_type
             case "supplier":
                 field = cls.supplier
-            case "order_date":
-                field = cls.order_date
+            case "date_ordered":
+                field = cls.date_ordered
             case _:
                 raise ValueError("Unknown order field!")
 
@@ -155,7 +155,7 @@ class Consumable(BaseEntity, Export):
         "Batch",
         backref="consumable",
         lazy=True,
-        order_by="Batch.emptied_date, Batch.in_use.desc(), Batch.order_date"
+        order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered"
     )
 
     # Proper setup for joined table inheritance.

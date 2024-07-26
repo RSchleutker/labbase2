@@ -8,8 +8,6 @@ from labbase2.models.mixins.importer import Importer
 from labbase2.models import db
 
 from sqlalchemy import func
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import column_property
 from flask_login import current_user
 from flask import current_app
 
@@ -73,11 +71,11 @@ class BaseEntity(db.Model, Filter, Export, Importer):
     timestamp_created = db.Column(
         db.DateTime,
         nullable=False,
-        server_default=func.now(timezone=True),
+        server_default=func.now(),
         info={"importable": False}
     )
     timestamp_edited = db.Column(
-        db.DateTime(timezone=True),
+        db.DateTime(),
         nullable=True,
         onupdate=func.now(),
         info={"importable": True}
@@ -89,14 +87,14 @@ class BaseEntity(db.Model, Filter, Export, Importer):
         default=lambda: current_user.id,
         info={"importable": True}
     )
-    origin = db.Column(db.String(256), nullable=True)
+    origin = db.Column(db.String(256), nullable=True, info={"importable": False})
     entity_type = db.Column(db.String(32), nullable=False, info={"importable": False})
 
     # One-to-many relationships.
     comments = db.relationship(
         "Comment",
         backref="entity",
-        order_by="Comment.timestamp.desc()",
+        order_by="Comment.timestamp_created.desc()",
         lazy=True,
         cascade="all, delete-orphan"
     )
@@ -131,5 +129,3 @@ class BaseEntity(db.Model, Filter, Export, Importer):
 
         return as_dict | {"comments": [c.to_dict() for c in self.comments],
                           "requests": [r.to_dict() for r in self.requests]}
-
-

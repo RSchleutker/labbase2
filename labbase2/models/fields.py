@@ -26,6 +26,8 @@ class SequenceString(TypeDecorator):
         if value is None:
             return None
 
+        value = value.upper()
+
         # Remove any whitespace characters from the sequence.
         return "".join(value.split())
 

@@ -163,23 +163,23 @@ class EditBatch(EditForm):
         render_kw=RENDER_KW | {'id': 'edit-form-batch-amount',
                                'placeholder': 'Amount'}
     )
-    order_date = DateField(
+    date_ordered = DateField(
         'Ordered',
         validators=[Optional()],
         render_kw=RENDER_KW | {'type': 'date', 'id': 'edit-form-batch-ordered'}
     )
-    open_date = DateField(
+    date_opened = DateField(
         'Opened',
         validators=[Optional()],
         render_kw=RENDER_KW | {'id': 'edit-form-batch-opened', 'type': 'date'}
     )
-    expiration_date = DateField(
+    date_expiration = DateField(
         'Expiration date',
         validators=[Optional()],
         render_kw=RENDER_KW | {'type': 'date',
                                'id': 'edit-form-batch-expiration'}
     )
-    emptied_date = DateField(
+    date_emptied = DateField(
         'Emptied at',
         validators=[Optional()],
         render_kw=RENDER_KW | {'type': 'date', 'id': 'edit-form-batch-empty'}

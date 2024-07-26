@@ -51,7 +51,7 @@ class Antibody(Consumable):
         "Dilution",
         backref="antibody",
         lazy=True,
-        order_by="Dilution.application, Dilution.timestamp.desc(), Dilution.id",
+        order_by="Dilution.application, Dilution.timestamp_created.desc(), Dilution.id",
         cascade="all, delete-orphan"
     )
 
@@ -106,7 +106,7 @@ class Dilution(db.Model, Export):
         nullable=False,
         info={"importable": True}
     )
-    timestamp = db.Column(
+    timestamp_created = db.Column(
         db.DateTime,
         server_default=func.now(timezone=True),
         info={"importable": True}

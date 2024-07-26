@@ -105,7 +105,7 @@ class Plasmid(BaseEntity, Sequence):
     @property
     def storage_place(self) -> str:
         for preparation in self.preparations:
-            if (preparation.emptied_date is not None
+            if (preparation.date_emptied is not None
                     and preparation.owner_id == current_user.id):
                 return preparation.restricted_storage_place
 

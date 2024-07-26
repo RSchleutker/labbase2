@@ -24,7 +24,7 @@ __all__ = ["EditOligonucleotide"]
 
 
 class EditOligonucleotide(EditEntityForm):
-    order_date = DateField(
+    date_ordered = DateField(
         "Order date",
         default=date.today,
         validators=[Optional()],

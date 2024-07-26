@@ -27,10 +27,10 @@
                 <td>{{ label }}</td>
                 <td>{{ batch.supplier }}</td>
                 <td>{{ batch.lot }}</td>
-                <td>{{ batch.ordered }}</td>
+                <td>{{ batch.date_ordered | format_date }}</td>
                 <td>
-                    {% if batch.emptied_date is not none %}
-                        {{ batch.emptied_date }}
+                    {% if batch.date_emtpied is not none %}
+                        {{ batch.date_emptied | format_date }}
                     {% endif %}
                 </td>
                 <td>{% if batch.in_use %}Yes{% else %}No{% endif %}</td>

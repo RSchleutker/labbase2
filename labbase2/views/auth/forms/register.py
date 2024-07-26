@@ -48,26 +48,19 @@ class RegisterForm(FlaskForm):
         label="First name",
         validators=[DataRequired(), Length(max=64)],
         render_kw=RENDER_KW | {"placeholder": "First name"},
-        description="""
-        A unique username, typically the first and last name of the person.
-        """
+        description="You given name. You may use initials for middle names."
     )
     last_name = StringField(
         label="Last name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=RENDER_KW | {"placeholder": "First name"},
-        description="""
-            A unique username, typically the first and last name of the person.
-            """
+        render_kw=RENDER_KW | {"placeholder": "First name"}
     )
     email = StringField(
         label="E-Mail Address",
         validators=[DataRequired(), Email(), Length(max=128)],
         render_kw=RENDER_KW | {"id": "register-form-email",
                                "placeholder": "Email Address"},
-        description="""
-        The university email address.
-        """
+        description="The university email address."
     )
     roles = SelectMultipleField(
         "Roles",
@@ -86,7 +79,7 @@ class RegisterForm(FlaskForm):
         choices=[(tz, tz) for tz in sorted(zoneinfo.available_timezones())],
         default=lambda: current_app.config["DEFAULT_TIMEZONE"],
         validators=[DataRequired()],
-        render_kw=RENDER_KW,
+        render_kw={"class": "form-select form-select-sm"},
         description="Select the timezone in which dates and times shall be displayed for you."
     )
     password = PasswordField(

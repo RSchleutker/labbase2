@@ -37,13 +37,13 @@
                    data-bs-target="#modal-edit-batch-{{ batch.id }}">
                     <i class="fa-solid fa-pen"></i></a>
 
-                {% if (not batch.in_use) and (batch.emptied_date is none) %}
+                {% if (not batch.in_use) and (batch.date_emptied is none) %}
                     <a class="text-info me-2"
                        onclick="batch_action('{{ url_for("batches.in_use", id_=batch.id) }}')">
                         <i class="fa-solid fa-box-open"></i></a>
                 {% endif %}
 
-                {% if batch.in_use and batch.emptied_date is none %}
+                {% if batch.in_use and batch.date_emptied is none %}
                     <a class="text-danger me-2"
                        onclick="batch_action('{{ url_for("batches.emptied", id_=batch.id) }}')">
                         <i class="fa-solid fa-battery-empty"></i></a>
@@ -93,11 +93,11 @@
             </tr>
             <tr>
                 <td>Order date</td>
-                <td>{{ batch.order_date | format_date }}</td>
+                <td>{{ batch.date_ordered | format_date }}</td>
             </tr>
             <tr>
                 <td>Expiration date</td>
-                <td>{{ batch.expiration_date | format_date }}</td>
+                <td>{{ batch.date_expiration | format_date }}</td>
             </tr>
             <tr>
                 <td>Price</td>
@@ -114,11 +114,11 @@
             </tr>
             <tr>
                 <td>Opened on</td>
-                <td>{{ batch.opened_date | format_date }}</td>
+                <td>{{ batch.date_opened | format_date }}</td>
             </tr>
             <tr>
                 <td>Emptied on</td>
-                <td>{{ batch.emptied_date | format_date }}</td>
+                <td>{{ batch.date_emptied | format_date }}</td>
             </tr>
             </tbody>
         </table>

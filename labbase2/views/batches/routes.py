@@ -102,10 +102,10 @@ def in_use(id_: int):
     if (batch := Batch.query.get(id_)) is None:
         return Message.ERROR(f"No batch with ID {id_}!")
 
-    if batch.opened_date:
+    if batch.date_opened:
         return Message.WARNING(f"Batch {batch.id_} already marked open!")
 
-    batch.opened_date = datetime.date.today()
+    batch.date_opened = datetime.date.today()
     batch.in_use = True
 
     try:
@@ -123,10 +123,10 @@ def emptied(id_: int):
     if (batch := Batch.query.get(id_)) is None:
         return Message.ERROR(f"No batch with ID {id_}!")
 
-    if batch.emptied_date:
+    if batch.date_emptied:
         return f"Batch {id_} already marked empty!", 200
 
-    batch.emptied_date = datetime.date.today()
+    batch.date_emptied = datetime.date.today()
     batch.in_use = False
 
     try:

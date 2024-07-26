@@ -9,7 +9,7 @@
 
             <div class="flex-grow-1">
                 <h5 class="mb-1">{{ dilution.application | capitalize }}</h5>
-                <p class="text-muted">{{ dilution.timestamp | format_datetime }} by {{ dilution.user.username }}</p>
+                <p class="text-muted">{{ dilution.timestamp_created | format_datetime }} by {{ dilution.user.username }}</p>
             </div>
 
             <div class="flex-shrink-0">
