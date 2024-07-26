@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from email_validator import validate_email
 from email_validator import EmailNotValidError
+from sqlalchemy import func
 
 from typing import Optional
 
@@ -99,6 +100,10 @@ class User(db.Model, UserMixin, Export):
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    picture_id = db.Column(db.Integer, db.ForeignKey("file.id"), nullable=True)
+    timestamp_created = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    timezone = db.Column(db.String(64), nullable=False, default="UTC")
+    status = db.Column(db.String(32), nullable=False, default="active")
 
     # One-to-many relationships.
     comments = db.relationship("Comment", backref="user", lazy=True)
@@ -131,11 +136,6 @@ class User(db.Model, UserMixin, Export):
         backref="user",
         lazy=True,
         order_by="ImportJob.timestamp.asc()"
-    )
-    find_oligo_jobs = db.relationship(
-        "FindOligoJob",
-        backref="user",
-        lazy=True
     )
     resets = db.relationship(
         "ResetPassword",

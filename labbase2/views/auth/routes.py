@@ -42,6 +42,7 @@ bp = Blueprint(
 def login() -> str | Response:
     # Current user is already authenticated.
     if current_user.is_authenticated:
+        flash("You are already logged in!", "warning")
         return redirect(url_for("base.index"))
 
     form = LoginForm()
@@ -52,6 +53,8 @@ def login() -> str | Response:
 
         if not user:
             flash("Invalid email address or username!", "danger")
+        elif user.status == "inactive":
+            flash("Your account is inactive! Get in touch with an admin!", "warning")
         elif not user.verify_password(form.password.data):
             flash("Wrong password!", "danger")
         else:

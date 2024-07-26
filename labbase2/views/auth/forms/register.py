@@ -6,6 +6,7 @@ from labbase2.forms.validators import ContainsUpper
 from labbase2.forms.validators import ContainsSpecial
 from labbase2.forms.validators import ContainsNotSpace
 
+from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField
 from wtforms.fields import PasswordField
@@ -18,6 +19,8 @@ from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import Length
 from wtforms.validators import Optional
+
+import zoneinfo
 
 
 __all__ = ["RegisterForm"]
@@ -70,6 +73,14 @@ class RegisterForm(FlaskForm):
         description="""
         Select the roles the user should have.
         """
+    )
+    timezone = SelectField(
+        "Timezone",
+        choices=[(tz, tz) for tz in zoneinfo.available_timezones()],
+        default=current_app.config["DEFAULT_TIMEZONE"],
+        validators=[DataRequired()],
+        render_kw=RENDER_KW,
+        description="Select the timezone in which dates and times shall be displayed for you."
     )
     password = PasswordField(
         "Password",

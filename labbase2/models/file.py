@@ -111,7 +111,7 @@ class FileImage(File):
     def mimetype(self) -> str:
         _, ext = self.filename.split(".", 1)
         match ext.lower():
-            case "jpg"| "jpeg":
+            case "jpg" | "jpeg":
                 return "image/jpeg"
             case "png":
                 return "image/png"
