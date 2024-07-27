@@ -33,10 +33,10 @@ class EditComment(EditForm):
 
     subject = StringField(
         label="Subject",
-        validators=[Optional(), Length(max=128)],
+        validators=[DataRequired(), Length(max=128)],
         filters=[strip_input],
         render_kw=RENDER_KW | {"id": "edit-form-comment-subject",
-                               "placeholder": "Subject (optional)"},
+                               "placeholder": "Subject"},
     )
     text = TextAreaField(
         label="Comment",

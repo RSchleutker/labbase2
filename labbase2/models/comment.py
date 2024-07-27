@@ -59,7 +59,7 @@ class Comment(db.Model, Importer, Export):
     )
     subject = db.Column(
         db.String(128),
-        nullable=True,
+        nullable=False,
         info={"importable": True}
     )
     text = db.Column(
