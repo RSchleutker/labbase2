@@ -13,7 +13,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional
 
 
-__all__ = ["login_manager", "User", "UserRole", "user_roles", "ResetPassword"]
+__all__ = ["login_manager", "User", "Permission", "user_permissions", "ResetPassword"]
 
 
 login_manager = LoginManager()
@@ -21,8 +21,8 @@ login_manager.login_view = "auth.login"
 login_manager.login_message_category = "warning"
 
 # Map users to their roles in a many-to-many relationship.
-user_roles = db.Table(
-    "user_roles",
+user_permissions = db.Table(
+    "user_permissions",
     db.Column(
         "user_id",
         db.Integer,
@@ -32,7 +32,7 @@ user_roles = db.Table(
     db.Column(
         "role_id",
         db.Integer,
-        db.ForeignKey("user_role.id"),
+        db.ForeignKey("permission.name"),
         primary_key=True
     )
 )
@@ -52,7 +52,7 @@ class User(db.Model, UserMixin, Export):
     password_hash : str
         This is a hash of the password set by the user. This attribute is not set manually. Instead, the clear password
         is passed to the 'set_password' method.
-    roles : list[UserRole]
+    permissions : list[Permission]
         Roles of this user. The set of roles determines hat a user can see and do in the application.
     comments : list[Comment]
         A list of all comments that were created by this person.
@@ -108,6 +108,7 @@ class User(db.Model, UserMixin, Export):
     timestamp_last_login = db.Column(db.DateTime, nullable=True)
     timezone = db.Column(db.String(64), nullable=False, default="UTC")
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     # Set relationship for profile picture.
     picture = db.relationship(
@@ -175,9 +176,9 @@ class User(db.Model, UserMixin, Export):
     )
 
     # Many-to-many relationships.
-    roles = db.relationship(
-        "UserRole",
-        secondary=user_roles,
+    permissions = db.relationship(
+        "Permission",
+        secondary=user_permissions,
         lazy="subquery",
         backref=db.backref("users", lazy=True)
     )
@@ -265,7 +266,7 @@ class User(db.Model, UserMixin, Export):
         return user
 
 
-class UserRole(db.Model, Export):
+class Permission(db.Model, Export):
     """Roles a user could possibly have.
 
     Attributes
@@ -280,10 +281,10 @@ class UserRole(db.Model, Export):
     On the database levels roles don't have any meaning. They are just names. Meaning is conferred by the application.
     """
 
-    __tablename__: str = "user_role"
+    __tablename__: str = "permission"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32), unique=True, nullable=False)
+    name = db.Column(db.String(32), primary_key=True, nullable=False)
+    description = db.Column(db.String(512), nullable=True)
 
 
 class ResetPassword(db.Model):

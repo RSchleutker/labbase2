@@ -1,16 +1,19 @@
+from labbase2.models import Permission
+
 from flask import request
 from flask import flash
 from flask import redirect
+from flask import url_for
 from flask_login import current_user
 from functools import wraps
 
 from typing import Callable
 
 
-__all__ = ["role_required"]
+__all__ = ["permission_required"]
 
 
-def role_required(roles: list) -> Callable:
+def permission_required(*allowed) -> Callable:
     """Check whether the current user has sufficient role to access a ressource.
 
     This is a very simple decorator op to add user role system to the
@@ -18,7 +21,7 @@ def role_required(roles: list) -> Callable:
 
     Parameters
     ----------
-    roles : list of str
+    *allowed : list of str
         A list of roles that are allowe to access the page. Available roles
         are currently 'guest', 'viewer', 'editor', and 'admin'.
 
@@ -35,20 +38,35 @@ def role_required(roles: list) -> Callable:
     view the resource.
     """
 
-    allowed_roles = set(roles) | {"Admin"}
-
     def decorator(func: Callable):
 
         @wraps(func)
         def decorated_view(*args, **kwargs):
-            has_roles = {r.name for r in current_user.roles}
+
+            verified = []
+
+            for permission in allowed:
+                permission_db = Permission.query.get(permission)
+                if permission_db is None:
+                    flash(f"Permission '{permission}' not found. Please inform the developer!",
+                        "warning")
+                else:
+                    verified.append(permission_db)
 
             # Check if allowed and actual roles have non-empty intersection.
-            if "admin" in has_roles or (allowed_roles & has_roles):
+            if current_user.is_admin:
                 return func(*args, **kwargs)
-            else:
-                flash("No permission to enter this site!", "warning")
-                return redirect(request.referrer), 403
+
+            if not verified:
+                flash("No valid permissions defined for this site!", "danger")
+                return redirect(url_for("base.index"))
+
+            for permission in current_user.permissions:
+                if permission in verified:
+                    return func(*args, **kwargs)
+
+            flash("No permission to enter this site!", "warning")
+            return redirect(url_for("base.index"))
 
         return decorated_view
 

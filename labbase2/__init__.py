@@ -13,7 +13,7 @@ def create_app(config_filename):
     upload_folder.mkdir(parents=True, exist_ok=True)
 
     from labbase2.models import db
-    from labbase2.models import User, UserRole
+    from labbase2.models import User, Permission
     from labbase2.models.user import login_manager
 
     # Register extensions with app.
@@ -25,21 +25,22 @@ def create_app(config_filename):
         # Create database and add tables (if not yet present).
         db.create_all()
 
-        # Add default roles to database.
-        for role in app.config['USER_ROLES']:
-            if not UserRole.query.filter_by(name=role).first():
-                db.session.add(UserRole(name=role))
-                db.session.commit()
+        # Add permissions to database.
+        for name, description in app.config.get("PERMISSIONS"):
+            permission = Permission.query.get(name)
+            if permission is None:
+                db.session.add(Permission(name=name, description=description))
+            else:
+                permission.description = description
+            db.session.commit()
 
         # Add the 'admin' user.
         if not User.query.first():
-            admin = User(
-                first_name=app.config.get("USER")[0],
-                last_name=app.config.get("USER")[1],
-                email=app.config.get("USER")[2]
-            )
+            first, last, email = app.config.get("USER")
+            admin = User(first_name=first, last_name=last, email=email)
             admin.set_password("admin")
-            admin.roles.append(UserRole.query.filter_by(name="admin").first())
+            admin.permissions = Permission.query.all()
+
             db.session.add(admin)
             db.session.commit()
 

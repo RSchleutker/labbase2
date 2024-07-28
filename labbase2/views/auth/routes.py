@@ -19,9 +19,9 @@ from .forms.edit import EditUserForm
 from .forms.password import ChangePassword
 from labbase2.models import db
 from labbase2.models import User
-from labbase2.models import UserRole
+from labbase2.models import Permission
 from labbase2.models import BaseFile
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 from labbase2.utils.message import Message
 from labbase2.views.files.routes import upload_file
 
@@ -90,9 +90,9 @@ def logout() -> str | Response:
 
 @bp.route("/register", methods=["GET", "POST"])
 @login_required
-@role_required(["User Editor"])
+@permission_required(["User Editor"])
 def register() -> str:
-    role_choices = UserRole.query.with_entities(UserRole.id, UserRole.name)
+    role_choices = Permission.query.with_entities(Permission.id, Permission.name)
     form = RegisterForm(role_choices=role_choices)
 
     # POST fork of view.
@@ -106,8 +106,8 @@ def register() -> str:
             flash("Email address already exists!", "danger")
         else:
             user = User(username=username, email=email)
-            user.roles = [
-                UserRole.query.get(id_) for id_ in form.roles.data
+            user.permissions = [
+                Permission.query.get(id_) for id_ in form.roles.data
                 if id_ > 0
             ]
             user.set_password(form.password.data)

@@ -4,7 +4,7 @@ from .forms import EditBatch
 from .forms import FilterBatch
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 from labbase2.models import db
 from labbase2.models import Batch
 

@@ -6,7 +6,7 @@ from .lcsfinder import LCSFinder
 from labbase2.forms.utils import err2message
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 from labbase2.models import db
 from labbase2.models import Oligonucleotide
 from labbase2.views.files.forms import UploadFile
@@ -103,7 +103,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@role_required(roles=["editor", "viewer"])
+@permission_required(["editor", "viewer"])
 def edit(id_: int):
     form = EditOligonucleotide()
 
@@ -128,7 +128,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@role_required(roles=["editor", "viewer"])
+@permission_required(["editor", "viewer"])
 def delete(id_):
     if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")

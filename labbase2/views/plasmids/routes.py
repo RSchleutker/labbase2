@@ -9,7 +9,7 @@ from labbase2.views.files.forms import UploadFile
 from labbase2.views.requests.forms import EditRequest
 from .preparations.forms import EditPreparation
 from .bacteria.forms import EditBacterium
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 from labbase2.models import db
 from labbase2.models import Plasmid
 
@@ -71,6 +71,7 @@ bp.register_blueprint(preparations.bp)
 
 @bp.route("/", methods=["GET"])
 @login_required
+@permission_required("Add plasmid")
 def index():
     page = request.args.get("page", 1, type=int)
     form = FilterPlasmids(request.args)
@@ -98,6 +99,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
+@permission_required(["Add plasmid", "Add plasm"])
 def add():
     form = EditPlasmid()
 
@@ -118,7 +120,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@role_required(roles=["editor", "viewer"])
+@permission_required(["editor", "viewer"])
 def edit(id_: int):
     form = EditPlasmid()
 
@@ -144,7 +146,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@role_required(roles=["editor", "viewer"])
+@permission_required(["editor", "viewer"])
 def delete(id_: int):
     if (plasmid := Plasmid.query.get(id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")

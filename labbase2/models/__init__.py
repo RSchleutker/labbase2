@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 
 from .user import User
-from .user import UserRole
+from .user import Permission
 from .comment import Comment
 from .file import BaseFile
 from .file import EntityFile

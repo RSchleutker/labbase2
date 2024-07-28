@@ -5,7 +5,7 @@ from .forms import MappingForm
 from labbase2.forms.utils import err2message
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 from labbase2.models import db
 from labbase2.models import Antibody
 from labbase2.models import Plasmid

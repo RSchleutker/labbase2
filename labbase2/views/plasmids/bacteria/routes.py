@@ -3,7 +3,7 @@ from .forms import EditBacterium
 from labbase2.views.plasmids.forms import EditPlasmid
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import role_required
+from labbase2.utils.role_required import permission_required
 
 from labbase2.models import db
 from labbase2.models import Plasmid
@@ -81,7 +81,7 @@ def add(plasmid_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@role_required(roles=["editor", "viewer"])
+@permission_required(["editor", "viewer"])
 def edit(id_: int):
     form = EditBacterium()
 
