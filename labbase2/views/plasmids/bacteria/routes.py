@@ -3,7 +3,7 @@ from .forms import EditBacterium
 from labbase2.views.plasmids.forms import EditPlasmid
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 
 from labbase2.models import db
 from labbase2.models import Plasmid
@@ -57,6 +57,7 @@ def index():
 
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
+@permission_required("Add glycerol stocks")
 def add(plasmid_id: int):
     form = EditBacterium()
 
@@ -81,7 +82,7 @@ def add(plasmid_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add glycerol stocks")
 def edit(id_: int):
     form = EditBacterium()
 
@@ -131,6 +132,7 @@ def details(id_: int, format_: str):
 
 @bp.route("/glycerol-stock/export/<string:format_>/", methods=["GET"])
 @login_required
+@permission_required("Export content")
 def export(format_: str):
     data = FilterBacteria(request.args).data
     del data["submit"]

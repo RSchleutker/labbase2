@@ -6,6 +6,7 @@ from labbase2.models import BaseEntity
 from labbase2.models import BaseFile
 from labbase2.models import EntityFile
 from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
 
 from flask import Blueprint
 from flask import flash
@@ -68,6 +69,7 @@ def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFil
 @bp.route("/", defaults={"entity_id": None})
 @bp.route("/upload/<int:entity_id>", methods=["POST"])
 @login_required
+@permission_required("Upload files")
 def add(entity_id: Optional[int] = None):
     previous_site = request.referrer
 
@@ -89,6 +91,7 @@ def add(entity_id: Optional[int] = None):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("Upload files")
 def edit(id_: int):
     if not (form := EditFile()).validate():
         return str(form.errors), 400
@@ -127,6 +130,7 @@ def download(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("Upload files")
 def delete(id_: int):
     if (file := BaseFile.query.get(id_)) is None:
         return Message.ERROR(f"No file with ID {id_}!")

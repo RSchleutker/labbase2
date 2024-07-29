@@ -21,7 +21,7 @@ from labbase2.models import db
 from labbase2.models import User
 from labbase2.models import Permission
 from labbase2.models import BaseFile
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 from labbase2.utils.message import Message
 from labbase2.views.files.routes import upload_file
 
@@ -90,26 +90,19 @@ def logout() -> str | Response:
 
 @bp.route("/register", methods=["GET", "POST"])
 @login_required
-@permission_required(["User Editor"])
-def register() -> str:
-    role_choices = Permission.query.with_entities(Permission.id, Permission.name)
-    form = RegisterForm(role_choices=role_choices)
+@permission_required("Manage users")
+def register():
+    form = RegisterForm()
 
     # POST fork of view.
     if form.validate_on_submit():
-        username = form.username.data
         email = validate_email(form.email.data).email
 
-        if User.query.filter(User.username.ilike(username)).count() > 0:
-            flash("Username already exists!", "danger")
-        elif User.query.filter(User.email.ilike(email)).count() > 0:
+        if User.query.filter(User.email.ilike(email)).count() > 0:
             flash("Email address already exists!", "danger")
         else:
-            user = User(username=username, email=email)
-            user.permissions = [
-                Permission.query.get(id_) for id_ in form.roles.data
-                if id_ > 0
-            ]
+            user = User(email=email)
+            form.populate_obj(user)
             user.set_password(form.password.data)
 
             try:
@@ -184,3 +177,16 @@ def change_password():
         "auth/change-password.html",
         form=form
     )
+
+
+@bp.route("/change-permissions/<int:id_>", methods=["GET", "POST"])
+@login_required
+@permission_required("Manage users")
+def change_permissions(id_: int):
+    return redirect(request.referrer)
+
+
+@bp.route("/users", methods=["GET"])
+@login_required
+def users():
+    return redirect(request.referrer)

@@ -4,7 +4,7 @@ from .forms import EditBatch
 from .forms import FilterBatch
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import db
 from labbase2.models import Batch
 
@@ -57,6 +57,7 @@ def index():
 
 @bp.route("/<int:consumable_id>", methods=["POST"])
 @login_required
+@permission_required("Add consumable batches")
 def add(consumable_id: int):
     form = EditBatch()
 
@@ -77,6 +78,7 @@ def add(consumable_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("Add consumable batches")
 def edit(id_: int):
     form = EditBatch()
 
@@ -140,6 +142,7 @@ def emptied(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("Add consumable batches")
 def delete(id_: int):
     if (batch := Batch.query.get(id_)) is None:
         return Message.ERROR(f"No batch with ID {id_}!")

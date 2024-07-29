@@ -9,7 +9,7 @@ from labbase2.views.files.forms import UploadFile
 from labbase2.views.requests.forms import EditRequest
 from .preparations.forms import EditPreparation
 from .bacteria.forms import EditBacterium
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import db
 from labbase2.models import Plasmid
 
@@ -99,7 +99,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required(["Add plasmid", "Add plasm"])
+@permission_required("Add plasmid")
 def add():
     form = EditPlasmid()
 
@@ -120,7 +120,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add plasmid")
 def edit(id_: int):
     form = EditPlasmid()
 
@@ -146,7 +146,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add plasmid")
 def delete(id_: int):
     if (plasmid := Plasmid.query.get(id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
@@ -182,39 +182,9 @@ def details(id_: int):
     )
 
 
-# @bp.route("/plot/<int:id>", methods=["GET"])
-# @login_required
-# def plot(id: int):
-#     if (plasmid := Plasmid.query.get(id)) is None:
-#         return Message.ERROR("Invalid ID: {}".format(id)), 404
-#     elif record := plasmid.seqrecord:
-#         graphic_record = MyCustomTranslator()\
-#             .translate_record(record)
-#
-#         if request.args.get("multiline", "False").lower() == "true":
-#             ax, _ = graphic_record.plot_on_multiple_lines(
-#                 nucl_per_line=2500,
-#                 figure_width=12
-#             )
-#         else:
-#             ax, _ = graphic_record.plot(figure_width=8)
-#
-#         ax.figure.tight_layout()
-#         with io.BytesIO() as memory:
-#             ax.figure.savefig(memory)
-#             memory.seek(0)
-#             match request.args.get("format", None):
-#                 case "bytes" | None:
-#                     return Response(memory.getvalue(), mimetype="image/png")
-#                 case "base64":
-#                     img = base64.b64encode(memory.getvalue())
-#                     return f"<img src='data:image/png;base64,{img.decode()}' style='width: 100%; height: auto'/>"
-#                 case _:
-#                     return
-
-
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
+@permission_required("Export content")
 def export(format_: str):
     data = FilterPlasmids(request.args).data
     del data["submit"]

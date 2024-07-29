@@ -3,6 +3,7 @@ from .forms import EditComment
 from labbase2.models import db
 from labbase2.models import Comment
 from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
 
 from flask import Blueprint
 from flask_login import login_required
@@ -22,6 +23,7 @@ bp = Blueprint(
 
 @bp.route("/attach/<int:entity_id>", methods=["POST"])
 @login_required
+@permission_required("Write comment")
 def add(entity_id: int):
     form = EditComment()
 
@@ -42,6 +44,7 @@ def add(entity_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("Write comment")
 def edit(id_: int):
     form = EditComment()
 
@@ -66,6 +69,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("Write comment")
 def delete(id_):
     if not (comment := Comment.query.get(id_)):
         return f"No comment with ID {id_}!", 404

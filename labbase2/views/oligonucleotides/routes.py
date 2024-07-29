@@ -6,7 +6,7 @@ from .lcsfinder import LCSFinder
 from labbase2.forms.utils import err2message
 
 from labbase2.utils.message import Message
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import db
 from labbase2.models import Oligonucleotide
 from labbase2.views.files.forms import UploadFile
@@ -80,6 +80,7 @@ def details(id_: int):
 
 @bp.route("/", methods=["POST"])
 @login_required
+@permission_required("Add oligonucleotide")
 def add():
     form = EditOligonucleotide()
 
@@ -103,7 +104,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add oligonucleotide")
 def edit(id_: int):
     form = EditOligonucleotide()
 
@@ -128,7 +129,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add oligonucleotide")
 def delete(id_):
     if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")
@@ -193,6 +194,7 @@ def find():
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
+@permission_required("Export content")
 def export(format_: str):
     data = FilterOligonucleotide(request.args).data
     del data["submit"]

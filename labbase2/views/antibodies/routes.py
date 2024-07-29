@@ -6,7 +6,7 @@ from .dilutions.forms import EditDilution
 from labbase2.utils.message import Message
 from labbase2.views.requests.forms import EditRequest
 from labbase2.views.batches.forms import EditBatch
-from labbase2.utils.role_required import permission_required
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import db
 from labbase2.models import Antibody
 from labbase2.views.files.forms import UploadFile
@@ -82,6 +82,7 @@ def details(id_: int):
 
 @bp.route("/", methods=["POST"])
 @login_required
+@permission_required("Add antibody")
 def add():
     form = EditAntibody()
 
@@ -105,7 +106,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add antibody")
 def edit(id_: int):
     form = EditAntibody()
 
@@ -127,7 +128,7 @@ def edit(id_: int):
 
 @bp.route("/delete/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required(["editor", "viewer"])
+@permission_required("Add antibody")
 def delete(id_):
     if (antibody := Antibody.query.get(id_)) is None:
         return Message.ERROR(f"No antibody found with ID {id_}!")
@@ -144,6 +145,7 @@ def delete(id_):
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
+@permission_required("Export content")
 def export(format_: str):
     data = FilterAntibodies(request.args).data
     del data["submit"]

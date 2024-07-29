@@ -1,10 +1,9 @@
 from .forms import EditPreparation
 
-from labbase2.forms.utils import err2message
-
 from labbase2.models import db
 from labbase2.models import Preparation
 from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import Plasmid
 
 from flask import Blueprint
@@ -26,6 +25,7 @@ bp = Blueprint(
 
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
+@permission_required("Add preparations")
 def add(plasmid_id: int):
     form = EditPreparation()
 
@@ -50,6 +50,7 @@ def add(plasmid_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("Add preparations")
 def edit(id_: int):
     form = EditPreparation()
 
@@ -75,6 +76,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("Add preparations")
 def delete(id_: int):
     if not (preparation := Preparation.query.get(id_)):
         return Message.ERROR(f"No preparation with ID {id_}!")

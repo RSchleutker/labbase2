@@ -1,6 +1,7 @@
 from .forms import EditDilution
 
 from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
 from labbase2.models import db
 from labbase2.models import Dilution
 
@@ -22,6 +23,7 @@ bp = Blueprint(
 
 @bp.route("/<int:antibody_id>", methods=["POST"])
 @login_required
+@permission_required("Add dilution")
 def add(antibody_id: int):
     form = EditDilution()
 
@@ -42,6 +44,7 @@ def add(antibody_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("Add dilution")
 def edit(id_: int):
     form = EditDilution()
 
@@ -68,6 +71,7 @@ def edit(id_: int):
 
 @bp.route("<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("Add dilution")
 def delete(id_: int):
     if (dilution := Dilution.query.get(id_)) is None:
         return Message.ERROR(f"No dilution found with ID {id_}!")

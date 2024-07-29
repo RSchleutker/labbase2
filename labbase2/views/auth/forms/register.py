@@ -6,6 +6,8 @@ from labbase2.forms.validators import ContainsUpper
 from labbase2.forms.validators import ContainsSpecial
 from labbase2.forms.validators import ContainsNotSpace
 
+from labbase2.models import Permission
+
 from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField
@@ -62,18 +64,6 @@ class RegisterForm(FlaskForm):
                                "placeholder": "Email Address"},
         description="The university email address."
     )
-    roles = SelectMultipleField(
-        "Roles",
-        choices=[(-1, "-")],
-        coerce=int,
-        validators=[Optional()],
-        render_kw=RENDER_KW | {"id": "register-form-roles",
-                               'size': 5},
-        widget=Select(multiple=True),
-        description="""
-        Select the roles the user should have.
-        """
-    )
     timezone = SelectField(
         "Timezone",
         choices=[(tz, tz) for tz in sorted(zoneinfo.available_timezones())],
@@ -105,7 +95,3 @@ class RegisterForm(FlaskForm):
         render_kw=RENDER_KW | {"id": "register-form-submit",
                                "class": "btn btn-primary btn-block btn-sm"}
     )
-
-    def __init__(self, role_choices: list[tuple[int, str]], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.roles.choices += role_choices
