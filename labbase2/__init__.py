@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_moment import Moment
 from pathlib import Path
 import tomllib
 
@@ -19,7 +18,6 @@ def create_app(config_filename):
     # Register extensions with app.
     db.init_app(app)
     login_manager.init_app(app)
-    moment = Moment(app)
 
     with app.app_context():
         # Create database and add tables (if not yet present).
