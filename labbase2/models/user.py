@@ -191,6 +191,14 @@ class User(db.Model, UserMixin, Export):
     def username(cls):
         return cls.first_name + " " + cls.last_name
 
+    @property
+    def form_permissions(self) -> dict:
+        out = {}
+        for permission in self.permissions:
+            out[permission.name.lower().replace(" ", "_")] = True
+
+        return out
+
     def set_password(self, password: str) -> None:
         """Creates a hash that is stored in the database to validate the user's password.
 

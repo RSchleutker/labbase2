@@ -78,15 +78,19 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="flex-grow-1 mb-0">Batches</h2>
-            <span class="flex-shrink-0">
-          <button
-              type="button"
-              class="btn btn-success btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#modal-edit-batch--1">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </span>
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission('Add consumable batches') %}
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-edit-batch--1">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                {% endif %}
+
+            </div>
         </div>
 
         {% for batch in consumable.batches %}

@@ -21,55 +21,59 @@
 
             <div class="flex-shrink-0">
 
-                {% if True %}
+                {% if current_user.has_permission('Add requests') %}
                     <a class="text-primary mx-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-request-{{ request.id }}">
-                          <i class="fa-solid fa-pen"></i></a>
+                        <i class="fa-solid fa-pen"></i></a>
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("requests.delete", id_=request.id) }}')">
-                          <i class="fa-solid fa-trash"></i></a>
+                        <i class="fa-solid fa-trash"></i></a>
                 {% endif %}
 
             </div>
         </div>
 
-    <p class="mb-0">
-        {{ request.note }}
-    </p>
+        <p class="mb-0">
+            {{ request.note }}
+        </p>
 
     </div>
     </div>
 
-  {{ requests_add_form(form(None, obj=request), "requests.edit", "PUT", request.id, request.entity_id) }}
+    {{ requests_add_form(form(None, obj=request), "requests.edit", "PUT", request.id, request.entity_id) }}
 
 {% endmacro %}
 
 
 {% macro request_pane(status, pane_id, entity, form) %}
-  <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="flex-grow-1 mb-0">Requests</h2>
-      <span class="flex-shrink-0">
-          <button
-            type="button"
-            class="btn btn-success btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#modal-edit-request--1">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </span>
-  </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="flex-grow-1 mb-0">Requests</h2>
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission('Add requests') %}
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-edit-request--1">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                {% endif %}
+
+            </div>
+        </div>
 
 
-  {% for request in entity.requests %}
-    {{ pane_details(request, form) }}
-  {% else %}
-      <div class="fw-bold text-center mb-3">Not requested yet!</div>
-  {% endfor %}
+        {% for request in entity.requests %}
+            {{ pane_details(request, form) }}
+        {% else %}
+            <div class="fw-bold text-center mb-3">Not requested yet!</div>
+        {% endfor %}
 
-  {{ requests_add_form(form(), "requests.add", "POST", -1, entity.id) }}
+        {{ requests_add_form(form(), "requests.add", "POST", -1, entity.id) }}
 
-  </div>
+    </div>
 {% endmacro %}

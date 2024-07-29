@@ -71,7 +71,6 @@ bp.register_blueprint(preparations.bp)
 
 @bp.route("/", methods=["GET"])
 @login_required
-@permission_required("Add plasmid")
 def index():
     page = request.args.get("page", 1, type=int)
     form = FilterPlasmids(request.args)

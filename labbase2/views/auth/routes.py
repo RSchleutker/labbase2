@@ -12,11 +12,13 @@ from flask_login import current_user
 from sqlalchemy import func
 from sqlalchemy.exc import DataError
 from email_validator import validate_email
+from zoneinfo import ZoneInfo
 
 from .forms.login import LoginForm
 from .forms.register import RegisterForm
 from .forms.edit import EditUserForm
 from .forms.password import ChangePassword
+from .forms.edit_permissions import EditPermissions
 from labbase2.models import db
 from labbase2.models import User
 from labbase2.models import Permission
@@ -24,6 +26,7 @@ from labbase2.models import BaseFile
 from labbase2.utils.permission_required import permission_required
 from labbase2.utils.message import Message
 from labbase2.views.files.routes import upload_file
+from wtforms import BooleanField
 
 
 __all__ = ["bp", "login"]
@@ -66,10 +69,19 @@ def login() -> str | Response:
         else:
             login_user(user, remember=form.remember_me.data)
 
+            flash("Successfully logged in!", "success")
+
+            last_login = current_user.timestamp_last_login
+            if last_login is None:
+                flash("This is your first log in!", "info")
+            else:
+                tz = current_user.timezone
+                formatted = last_login.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
+                flash(f"Last login was on {formatted}!", "info")
+
             user.timestamp_last_login = func.now()
             db.session.commit()
 
-            flash("Successfully logged in!", "success")
             next_page = request.args.get("next")
 
             if not next_page: # or url_parse(next_page).netloc:
@@ -179,11 +191,38 @@ def change_password():
     )
 
 
+@bp.route("/change-permissions", methods=["GET"], defaults={"id_": None})
 @bp.route("/change-permissions/<int:id_>", methods=["GET", "POST"])
 @login_required
 @permission_required("Manage users")
-def change_permissions(id_: int):
-    return redirect(request.referrer)
+def change_permissions(id_: int = None):
+    if id_ is None:
+        user = current_user
+    else:
+        user = User.query.get(id_)
+
+    form = EditPermissions(**user.form_permissions)
+
+    if form.validate_on_submit():
+        user.permissions.clear()
+        for field in form:
+            if not field.type == "BooleanField":
+                continue
+            if not field.data:
+                continue
+
+            permission = Permission.query.get(field.name.replace("_", " ").capitalize())
+            user.permissions.append(permission)
+
+        db.session.commit()
+        flash(f"Successfully updated permissions for {user.username}!", "success")
+
+    return render_template(
+        "auth/edit-permissions.html",
+        form=form,
+        selected_user=user,
+        users=User.query.filter(User.is_active).order_by(User.last_name).all()
+    )
 
 
 @bp.route("/users", methods=["GET"])
