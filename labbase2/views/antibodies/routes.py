@@ -82,7 +82,7 @@ def details(id_: int):
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add antibody")
+@permission_required("Add antibodies")
 def add():
     form = EditAntibody()
 
@@ -106,7 +106,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add antibody")
+@permission_required("Add antibodies")
 def edit(id_: int):
     form = EditAntibody()
 
@@ -128,7 +128,7 @@ def edit(id_: int):
 
 @bp.route("/delete/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add antibody")
+@permission_required("Add antibodies")
 def delete(id_):
     if (antibody := Antibody.query.get(id_)) is None:
         return Message.ERROR(f"No antibody found with ID {id_}!")

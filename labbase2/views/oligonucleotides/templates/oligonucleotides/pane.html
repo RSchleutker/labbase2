@@ -11,15 +11,17 @@
 
             <div class="flex-shrink-0">
 
-                <a class="text-primary me-2"
-                   data-bs-toggle="modal"
-                   data-bs-target="#modal-edit-primer-{{ oligonucleotide.id }}">
-                    <i class="fa-solid fa-pen"></i></a>
+                {% if current_user.has_permission('Add oligonucleotide') %}
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-primer-{{ oligonucleotide.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
 
-                {% if oligonucleotide.deletable %}
-                    <a class="text-danger"
-                       onclick="delete_entity('{{ url_for("oligonucleotides.delete", id_=oligonucleotide.id) }}')">
-                        <i class="fa-solid fa-trash"></i></a>
+                    {% if oligonucleotide.deletable %}
+                        <a class="text-danger"
+                           onclick="delete_entity('{{ url_for("oligonucleotides.delete", id_=oligonucleotide.id) }}')">
+                            <i class="fa-solid fa-trash"></i></a>
+                    {% endif %}
                 {% endif %}
 
             </div>

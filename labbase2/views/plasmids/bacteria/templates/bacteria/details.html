@@ -1,5 +1,5 @@
 {% from 'bacteria/form.html' import bacteria_add_form %}
-{% from 'plasmids/pane.html' import pane_details %}
+{% from 'plasmids/pane.html' import pane_details with context %}
 
 
 <h1 class="mb-4">{{ stock.plasmid.label }} in {{ stock.strain }}</h1>
@@ -43,14 +43,16 @@
 
             <h2 class="flex-grow-1 mb-0">Details</h2>
 
-            <span class="flex-shrink-0">
+            <div class="flex-shrink-0">
 
-                      <a class="text-primary me-2"
-                         data-bs-toggle="modal"
-                         data-bs-target="#modal-edit-glycerol-stock-{{ stock.id }}">
+                {% if current_user.has_permission('Add glycerol stocks') %}
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-glycerol-stock-{{ stock.id }}">
                         <i class="fa-solid fa-pen"></i></a>
+                {% endif %}
 
-                  </span>
+            </div>
 
         </div>
 

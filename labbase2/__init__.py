@@ -37,7 +37,7 @@ def create_app(config_filename):
         # Add the 'admin' user.
         if not User.query.first():
             first, last, email = app.config.get("USER")
-            admin = User(first_name=first, last_name=last, email=email)
+            admin = User(first_name=first, last_name=last, email=email, is_admin=True)
             admin.set_password("admin")
             admin.permissions = Permission.query.all()
 
@@ -68,8 +68,10 @@ def create_app(config_filename):
 
     from labbase2.utils.template_filters import format_date
     from labbase2.utils.template_filters import format_datetime
+    from labbase2.utils.template_filters import user_has_permission
 
-    app.jinja_env.filters['format_date'] = format_date
-    app.jinja_env.filters['format_datetime'] = format_datetime
+    app.jinja_env.filters["format_date"] = format_date
+    app.jinja_env.filters["format_datetime"] = format_datetime
+    app.jinja_env.globals.update(user_has_permission=user_has_permission)
 
     return app

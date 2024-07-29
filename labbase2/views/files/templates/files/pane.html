@@ -5,26 +5,27 @@
 
 {% macro pane_details(file, form) %}
 
-        <div class="rounded border p-3 mb-3">
+    <div class="rounded border p-3 mb-3">
 
-            <div class="d-flex flex-start align-items-center mb-0">
+        <div class="d-flex flex-start align-items-center mb-0">
 
-                <div class="flex-fill">
+            <div class="flex-fill">
 
-                    <h5 class="mb-1">{{ file.filename_exposed }}</h5>
+                <h5 class="mb-1">{{ file.filename_exposed }}</h5>
 
-                    <p class="mb-0">{{ file.timestamp_uploaded | format_datetime }} by {{ file.user.username }}</p>
+                <p class="mb-0">{{ file.timestamp_uploaded | format_datetime }} by {{ file.user.username }}</p>
 
-                    <p>
-                        {% if file.note %}
+                <p>
+                    {% if file.note %}
                         <a class="text-info me-2"
                            data-bs-toggle="collapse"
                            href="#card-file-{{ file.id }}"
                            aria-expanded="false"
                            aria-controls="card-file-{{ file.id }}">
                             <i class="fa-solid fa-circle-info"></i></a>
-                        {% endif %}
+                    {% endif %}
 
+                    {% if current_user.has_permission('Upload files') %}
                         <a class="text-info me-2"
                            href="{{ url_for('files.download', id_=file.id, download=1) }}">
                             <i class="fa-solid fa-download"></i></a>
@@ -37,55 +38,58 @@
                         <a class="text-danger"
                            onclick="delete_entity('{{ url_for("files.delete", id_=file.id) }}')">
                             <i class="fa-solid fa-trash"></i></a>
+                    {% endif %}
 
-                    </p>
-
-                </div>
-
-                {% if file.type == "image" %}
-                    <img class="rounded ml-3"
-                         src="{{ url_for('files.download', id_=file.id) }}"
-                         width="70" height="70">
-                {% endif %}
+                </p>
 
             </div>
 
-            {% if file.note %}
-            <p class="collapse hide mt-3" id="card-file-{{ file.id }}">{{ file.note }}</p>
+            {% if file.type == "image" %}
+                <img class="rounded ml-3"
+                     src="{{ url_for('files.download', id_=file.id) }}"
+                     width="70" height="70">
             {% endif %}
-  </div>
 
-  {{ file_edit_form(form(filename=file.filename_exposed, obj=file), "files.edit", "PUT", file.id) }}
+        </div>
+
+        {% if file.note %}
+            <p class="collapse hide mt-3" id="card-file-{{ file.id }}">{{ file.note }}</p>
+        {% endif %}
+    </div>
+
+    {{ file_edit_form(form(filename=file.filename_exposed, obj=file), "files.edit", "PUT", file.id) }}
 
 {% endmacro %}
 
 
 {% macro files_pane(status, pane_id, entity, form) %}
-  <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-      <h2 class="flex-grow-1 mb-0">Files</h2>
+            <h2 class="flex-grow-1 mb-0">Files</h2>
 
-      <span class="flex-shrink-0">
-          <button
-            type="button"
-            class="btn btn-success btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#modal-edit-file--1">
-          <i class="fa-solid fa-plus"></i>
-        </button>
-      </span>
+            <div class="flex-shrink-0">
+                {% if current_user.has_permission('Upload files') %}
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-edit-file--1">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                {% endif %}
+            </div>
 
-  </div>
+        </div>
 
-    {% for file in entity.files %}
-      {{ pane_details(file, form) }}
-    {% else %}
-        <div class="fw-bold text-center mb-3">No files uploaded yet!</div>
-    {% endfor %}
+        {% for file in entity.files %}
+            {{ pane_details(file, form) }}
+        {% else %}
+            <div class="fw-bold text-center mb-3">No files uploaded yet!</div>
+        {% endfor %}
 
-  {{ file_upload_form(form(), "files.add", "POST", -1, entity.id) }}
+        {{ file_upload_form(form(), "files.add", "POST", -1, entity.id) }}
 
-  </div>
+    </div>
 {% endmacro %}

@@ -234,6 +234,13 @@ class User(db.Model, UserMixin, Export):
 
         return check_password_hash(self.password_hash, password)
 
+    def has_permission(self, permission: str) -> bool:
+        permission_db = Permission.query.get(permission)
+        if permission_db is None:
+            raise ValueError(f"Unknown permission '{permission}'!")
+
+        return permission_db in self.permissions
+
     @classmethod
     def get_by_name_or_email(cls, name_email: str) -> Optional['User']:
         """Load a user from username or email address.
