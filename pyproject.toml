@@ -1,16 +1,18 @@
 [project]
 name = "labbase2"
-version="0.0.1"
+version="0.9.1"
 description="A database application to manage lab ressources."
 dependencies = [
-    "flask",
-    "flask-login",
-    "flask-sqlalchemy",
-    "flask-wtf",
-    "pillow",
-    "biopython",
-    "email-validator",
-    "rq"
+    "flask>=3.0.0",
+    "flask-login>=0.6.3",
+    "flask-sqlalchemy>=3.0.0",
+    "flask-wtf>=1.2.1",
+    "pandas>=2.2.2",
+    "pillow>10.0.0",
+    "numpy>1.26.0",
+    "scikit-image>0.23.0",
+    "biopython>=1.78",
+    "email-validator>=1.2.1"
 ]
 
 [build-system]
