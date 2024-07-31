@@ -75,12 +75,12 @@ def add(entity_id: Optional[int] = None):
 @permission_required("Upload files")
 def edit(id_: int):
     if not (form := EditFile()).validate():
-        return str(form.errors), 400
+        return str(form.errors)
 
     if not (file := BaseFile.query.get(id_)):
-        return f"No file with ID {id_}!", 404
+        return Message.ERROR(f"No file with ID {id_}!")
     elif file.user_id != current_user.id:
-        return "File can only be edited by owner!", 400
+        return Message.ERROR("File can only be edited by owner!")
     else:
         file.note = form.note.data
         file.filename_exposed = form.filename.data
@@ -88,9 +88,9 @@ def edit(id_: int):
     try:
         db.session.commit()
     except Exception as error:
-        return str(error), 400
+        return str(error)
 
-    return f"Successfully edited file {file.filename_exposed}!", 200
+    return Message.SUCCESS(f"Successfully edited file {file.filename_exposed}!")
 
 
 @bp.route("/<int:id_>", methods=["GET"])
@@ -123,4 +123,4 @@ def delete(id_: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return f"Successfully deleted file {id_}!", 200
+    return Message.SUCCESS(f"Successfully deleted file {id_}!")

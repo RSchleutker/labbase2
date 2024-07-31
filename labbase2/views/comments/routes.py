@@ -63,10 +63,10 @@ def edit(id_: int):
 @permission_required("Write comment")
 def delete(id_):
     if not (comment := Comment.query.get(id_)):
-        return f"No comment with ID {id_}!", 404
+        return Message.ERROR(f"No comment with ID {id_}!")
 
     if comment.user_id != current_user.id:
-        return "Comment can only be deleted by original author!", 403
+        return Message.ERROR("Comment can only be deleted by original author!")
 
     try:
         db.session.delete(comment)
