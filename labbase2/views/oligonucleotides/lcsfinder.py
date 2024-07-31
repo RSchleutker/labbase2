@@ -1,9 +1,8 @@
 import json
-import numpy as np
-from numpy.typing import NDArray
-
 from typing import Iterable
 
+import numpy as np
+from numpy.typing import NDArray
 
 __all__ = ["LCSFinder", "LCSResult"]
 
@@ -30,11 +29,6 @@ class LCSFinder:
     profile: NDArray
         A 1-dimensional array of dtype uint8 the same length as 'seq'. The
         profile indicates the longest substring at each position in 'seq'.
-    lcs_length: int
-        The length of the longest common substring.
-    lcs_position: int
-        The index of the first element of the longest common substring in
-        'seq'.
     """
 
     _bases: NDArray = np.array(["A", "T", "C", "G"], dtype=np.dtype("U1"))
@@ -48,7 +42,7 @@ class LCSFinder:
     def __len__(self) -> int:
         return len(self.seq)
 
-    def __call__(self, query: str) -> 'LCSResult':
+    def __call__(self, query: str) -> "LCSResult":
         """
 
         Parameters
@@ -73,7 +67,7 @@ class LCSFinder:
 
         for i, base in enumerate(query.upper()):
             j = self._base2idx[base]
-            self.idx2len[i, j] = self.idx2len[i-1, j-1] + 1
+            self.idx2len[i, j] = self.idx2len[i - 1, j - 1] + 1
 
         return LCSResult(self.seq, self.idx2len)
 
@@ -93,7 +87,7 @@ class LCSFinder:
         base2idx = {}
 
         for base in cls._bases:
-            idx, = (seq == base).nonzero()  # 'nonzero' returns tuples.
+            (idx,) = (seq == base).nonzero()  # 'nonzero' returns tuples.
             base2idx |= {base: idx}
 
         return base2idx
@@ -109,7 +103,7 @@ class LCSResult:
 
         self.length = self.profile[lcs_pos]
         self.start = lcs_pos - self.length + 1
-        self.lcs = seq[self.start:(self.start + self.length)]
+        self.lcs = seq[self.start : (self.start + self.length)]
         self.lcs = "".join(self.lcs)
 
     def to_jsarray(self) -> str:

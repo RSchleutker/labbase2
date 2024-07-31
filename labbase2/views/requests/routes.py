@@ -1,22 +1,14 @@
-from .forms import EditRequest
-
-from labbase2.models import db
-from labbase2.models import Request
-from labbase2.forms.utils import err2message
-
 from flask import Blueprint
 from flask_login import login_required
+from labbase2.forms.utils import errors2messages
+from labbase2.models import Request, db
+
+from .forms import EditRequest
+
+__all__ = ["bp"]
 
 
-__all__: list = ["bp"]
-
-
-bp = Blueprint(
-    "requests",
-    __name__,
-    url_prefix="/request",
-    template_folder="templates"
-)
+bp = Blueprint("requests", __name__, url_prefix="/request", template_folder="templates")
 
 
 @bp.route("/<int:entity_id>", methods=["POST"])
@@ -36,7 +28,7 @@ def add(entity_id: int):
 
     else:
         print(form.errors)
-        return err2message(form.errors), 400
+        return errors2messages(form.errors), 400
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -55,7 +47,7 @@ def edit(id_: int):
         else:
             return f"Successfully edited request {id_}!", 200
     else:
-        return err2message(form.errors), 400
+        return errors2messages(form.errors), 400
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])

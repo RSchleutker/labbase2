@@ -1,15 +1,11 @@
-from labbase2.models import db
+import math
+from pathlib import Path
 
 from flask import current_app
-from sqlalchemy import func
-from pathlib import Path
-from datetime import date
-
-from skimage import io
-from skimage import util
+from labbase2.models import db
+from skimage import io, util
 from skimage.transform import resize
-import math
-
+from sqlalchemy import func
 
 __all__ = ["BaseFile", "EntityFile"]
 
@@ -23,29 +19,32 @@ class BaseFile(db.Model):
     Attributes
     ----------
     id : int
-        The id of the filepath for internal identification.
-    entity_id : int
-        The id of the entity to which this filepath belongs.
+        The ID of the filepath for internal identification.
     user_id : int
         The id of the person that has uploaded the filepath.
-    filename : str
-        The token of the filepath. The extension will be used to automatically
-        set the type.
+    filename_internal : str
+        The name of the file as it was used to save it to the filesystem.
+    filename_exposed : str
+        The original filename of the file or the filename provided by the user during
+        upload.
     note : str
         A short note about the filepath.
-    type : str
-        The type of the filepath. Currently supported is 'image', 'document', 'plasmid'. Everything else is
-        miscellaneous.
-    timestamp : date
-        The date at which the filepath was uploaded.
+    file_type : str
+        The type of the file. This is used for proper mapping and setting up
+        inheritance.
+    timestamp_uploaded : DateTime
+        The time at which the filepath was uploaded. Automatically set by the database.
+    timestamp_edited : DateTime
+        The time the file entry was last edited.
 
     Notes
     -----
-    There can be different kinds of files (PDFs, images, plasmid files, etc.). Since these filepath types sometimes
-    differ in the way they are shown on the website (especially images and PDFs) they are modelled through different
-    child classes that inherit from this class. Inheritance is implemented as single-table inheritance, i.e.,
-    all children are represented by a single table/relation in the database. They are differentiated by the 'type'
-    attribute.
+    There can be different kinds of files (PDFs, images, plasmid files, etc.). Since
+    these filepath types sometimes differ in the way they are shown on the website (
+    especially images and PDFs) they are modelled through different child classes
+    that inherit from this class. Inheritance is implemented as single-table
+    inheritance, i.e., all children are represented by a single table/relation in the
+    database. They are differentiated by the 'type' attribute.
     """
 
     __tablename__: str = "base_file"
@@ -56,20 +55,21 @@ class BaseFile(db.Model):
     filename_exposed = db.Column(db.String(512), nullable=False)
     note = db.Column(db.String(2048))
     file_type = db.Column(db.String(32), nullable=False)
-    timestamp_uploaded = db.Column(db.DateTime, nullable=False, server_default=func.now())
-    timestamp_edited = db.Column(db.DateTime(timezone=True), nullable=True, onupdate=func.now())
+    timestamp_uploaded = db.Column(
+        db.DateTime, nullable=False, server_default=func.now()
+    )
+    timestamp_edited = db.Column(
+        db.DateTime(timezone=True), nullable=True, onupdate=func.now()
+    )
 
-    __mapper_args__ = {
-        "polymorphic_on": file_type,
-        "polymorphic_identity": "base_file"
-    }
+    __mapper_args__ = {"polymorphic_on": file_type, "polymorphic_identity": "base_file"}
 
     @property
     def path(self) -> Path:
         return Path(
             current_app.instance_path,
             current_app.config["UPLOAD_FOLDER"],
-            self.filename_internal
+            self.filename_internal,
         )
 
     @property
@@ -126,14 +126,19 @@ class BaseFile(db.Model):
 
 
 class EntityFile(BaseFile):
+    """A file that is attached to an entity.
+
+    Attributes
+    ----------
+    id : int
+        The internal database ID of this file.
+    entity_id : int
+        The id of the entity to which this filepath belongs.
+    """
 
     __tablename__ = "entity_file"
 
     id = db.Column(db.Integer, db.ForeignKey("base_file.id"), primary_key=True)
-    entity_id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        nullable=False
-    )
+    entity_id = db.Column(db.Integer, db.ForeignKey("base_entity.id"), nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": "entity_file"}

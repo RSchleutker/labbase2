@@ -1,69 +1,24 @@
-from .forms import FilterPlasmids
-from .forms import EditPlasmid
-from . import bacteria
-from . import preparations
-
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, render_template, request
+from flask_login import current_user, login_required
+from labbase2.models import Plasmid, db
 from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.requests.forms import EditRequest
-from .preparations.forms import EditPreparation
+
+from . import bacteria, preparations
 from .bacteria.forms import EditBacterium
-from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Plasmid
-
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask import current_app as app
-from flask_login import login_required
-from flask_login import current_user
-
-# from dna_features_viewer import BiopythonTranslator
-
+from .forms import EditPlasmid, FilterPlasmids
+from .preparations.forms import EditPreparation
 
 __all__ = ["bp"]
 
 
-# class MyCustomTranslator(BiopythonTranslator):
-#     """Custom translator implementing the following theme:
-#
-#     - Color terminators in green, CDS in blue, all other features in gold.
-#     - Do not display features that are restriction sites unless they are BamHI
-#     - Do not display labels for restriction sites
-#     - For CDS labels just write "CDS here" instead of the name of the gene.
-#
-#     """
-#
-#     def compute_feature_color(self, feature):
-#         match feature.type:
-#             case "CDS":
-#                 return "#118ab2"
-#             case "rep_origin":
-#                 return "#ef476f"
-#             case _:
-#                 return "#ffd166"
-#
-#     def compute_filtered_features(self, features):
-#         filtered = []
-#
-#         for ftr in features:
-#             label, = ftr.qualifiers.get("label", [None])
-#             if label != "source" and label is not None:
-#                 filtered.append(ftr)
-#
-#         return filtered
-
-
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "plasmids",
-    __name__,
-    url_prefix="/plasmid",
-    template_folder="templates"
-)
+bp = Blueprint("plasmids", __name__, url_prefix="/plasmid", template_folder="templates")
 
 bp.register_blueprint(bacteria.bp)
 bp.register_blueprint(preparations.bp)
@@ -92,7 +47,7 @@ def index():
         add_form=EditPlasmid(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         total=Plasmid.query.count(),
-        title="Plasmids"
+        title="Plasmids",
     )
 
 
@@ -177,7 +132,7 @@ def details(id_: int):
         comment_form=EditComment,
         request_form=EditRequest,
         preparation_form=EditPreparation,
-        bacteria_form=EditBacterium
+        bacteria_form=EditBacterium,
     )
 
 

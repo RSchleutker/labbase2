@@ -1,24 +1,15 @@
-from .forms import EditComment
-
-from labbase2.models import db
-from labbase2.models import Comment
+from flask import Blueprint
+from flask_login import current_user, login_required
+from labbase2.models import Comment, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 
-from flask import Blueprint
-from flask_login import login_required
-from flask_login import current_user
-
+from .forms import EditComment
 
 __all__ = ["bp"]
 
 
-bp = Blueprint(
-    "comments",
-    __name__,
-    url_prefix="/comment",
-    template_folder="templates"
-)
+bp = Blueprint("comments", __name__, url_prefix="/comment", template_folder="templates")
 
 
 @bp.route("/attach/<int:entity_id>", methods=["POST"])

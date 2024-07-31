@@ -29,8 +29,8 @@ def intercept_deleted_to_detached(session, obj) -> None:
         obj.path.unlink(missing_ok=True)
 
 
-# TODO: There must be a better option than writing an event for every single child table of
-#  BaseEntity.
+# TODO: There must be a better option than writing an event for every single child
+#  table of BaseEntity.
 @event.listens_for(Oligonucleotide, "before_update")
 def update_parent(mapper, connection, target) -> None:
     target.timestamp_edited = func.now()

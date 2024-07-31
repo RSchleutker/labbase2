@@ -1,35 +1,26 @@
-from .forms import EditAntibody
-from .forms import FilterAntibodies
-from . import dilutions
-from .dilutions.forms import EditDilution
-
-from labbase2.utils.message import Message
-from labbase2.views.requests.forms import EditRequest
-from labbase2.views.batches.forms import EditBatch
-from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Antibody
-from labbase2.views.files.forms import UploadFile
-from labbase2.views.comments.forms import EditComment
-
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask import current_app as app
-from flask_login import login_required
-from flask_login import current_user
 from sqlite3 import IntegrityError
 
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, render_template, request
+from flask_login import current_user, login_required
+from labbase2.models import Antibody, db
+from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
+from labbase2.views.batches.forms import EditBatch
+from labbase2.views.comments.forms import EditComment
+from labbase2.views.files.forms import UploadFile
+from labbase2.views.requests.forms import EditRequest
+
+from . import dilutions
+from .dilutions.forms import EditDilution
+from .forms import EditAntibody, FilterAntibodies
 
 __all__ = ["bp"]
 
 
 bp = Blueprint(
-    "antibodies",
-    __name__,
-    url_prefix="/antibody",
-    template_folder="templates"
+    "antibodies", __name__, url_prefix="/antibody", template_folder="templates"
 )
 
 bp.register_blueprint(dilutions.bp)
@@ -58,7 +49,7 @@ def index():
         add_form=EditAntibody(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         total=Antibody.query.count(),
-        title="Antibodies"
+        title="Antibodies",
     )
 
 
@@ -76,7 +67,7 @@ def details(id_: int):
         request_form=EditRequest,
         file_form=UploadFile,
         batch_form=EditBatch,
-        dilution_form=EditDilution
+        dilution_form=EditDilution,
     )
 
 

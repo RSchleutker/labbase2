@@ -1,14 +1,11 @@
-from labbase2.models import db
-from labbase2.models.mixins.filter import Filter
-from labbase2.models.mixins.export import Export
-from labbase2.models.base_entity import BaseEntity
-
-from sqlalchemy import asc
-from sqlalchemy import desc
-from sqlalchemy import not_
-from sqlalchemy.orm import column_property
 from datetime import date
 
+from labbase2.models import db
+from labbase2.models.base_entity import BaseEntity
+from labbase2.models.mixins.export import Export
+from labbase2.models.mixins.filter import Filter
+from sqlalchemy import asc, desc, not_
+from sqlalchemy.orm import column_property
 
 __all__ = ["Batch", "Consumable"]
 
@@ -19,19 +16,23 @@ class Batch(db.Model, Filter, Export):
     Attributes
     ----------
     id : int
-        The internal identifier of this batch.
+        The internal database identifier of this batch.
     consumable_id : int
         The identifier of the consumable to which this batch belongs.
     supplier : str
-        The company (or whatever) where this batch was ordered (again, the same chemical might be ordered at
-        different companies due to discounts, for instance).
+        The company (or whatever) where this batch was ordered (again, the same
+        chemical might be ordered at different companies due to discounts,
+        for instance).
     article_number : str
-        The article number of the ordered consumable. This serves as a unambiguous identifier of the ordered
-        chemical. This is important for different quality grades of the same chemical, for instance.
+        The article number of the ordered consumable. This serves as a unambiguous
+        identifier of the ordered chemical. This is important for different quality
+        grades of the same chemical, for instance.
     amount : str
-        The amoint that was ordered. For some companies this is already indicated by the article number but for some
-        is not. The information is straightforward for chemicals. For enzymes this might be the number of reactions
-        or the total activity in U. For antibodies the total volume along with the concentration would suffice.
+        The amoint that was ordered. For some companies this is already indicated by
+        the article number but for some is not. The information is straightforward
+        for chemicals. For enzymes this might be the number of reactions or the total
+        activity in U. For antibodies the total volume along with the concentration
+        would suffice.
     date_ordered : date
         The date at which this batch was ordered.
     date_opened : date
@@ -45,21 +46,29 @@ class Batch(db.Model, Filter, Export):
     storage_place : str
         The location where this batch can be found. This should be clear and
         unambiguous.
+    lot : str
+        The lot number of this batch.
+    in_use : bool
+        A flag indicating if this batch is currently in use. At best, only ever one
+        batch for each consumable is in use at a time.
+    is_open : bool
+        A flag indicating if this batch was opened already.
+    is_empty : bool
+        A flag indicating if this batch is empty.
 
     Notes
     -----
-    While a consumable is just a description a batch is the actual thing available in the lab. For instance,
-    an entry for the chemical 'SDS' only gives general informations about the chemical and that it is or was
-    available in the lab at some point in time. However, a batch is the actual order of that consumable along with
-    additional informations that might be of interest like article number and source (the same chemical might be
-    bought from different manufacturers).
+    While a consumable is just a description a batch is the actual thing available in
+    the lab. For instance, an entry for the chemical 'SDS' only gives general
+    informations about the chemical and that it is or was available in the lab at
+    some point in time. However, a batch is the actual order of that consumable
+    along with additional informations that might be of interest like article number
+    and source (the same chemical might be bought from different manufacturers).
     """
 
     id = db.Column(db.Integer, primary_key=True)
     consumable_id = db.Column(
-        db.Integer,
-        db.ForeignKey("consumable.id"),
-        nullable=False
+        db.Integer, db.ForeignKey("consumable.id"), nullable=False
     )
     supplier = db.Column(db.String(64), nullable=False)
     article_number = db.Column(db.String(32), nullable=False)
@@ -74,25 +83,27 @@ class Batch(db.Model, Filter, Export):
     in_use = db.Column(db.Boolean, nullable=False, default=False)
 
     is_open = column_property(date_opened.isnot(None).label("is_open"), deferred=True)
-    is_empty = column_property(date_emptied.isnot(None).label("is_empty"), deferred=True)
+    is_empty = column_property(
+        date_emptied.isnot(None).label("is_empty"), deferred=True
+    )
 
     @classmethod
     def _filters(cls, **fields) -> list:
         filters = []
 
-        if type_ := fields.pop('consumable_type', None):
+        if type_ := fields.pop("consumable_type", None):
             filters.append(Consumable.entity_type.is_(type_))
-        if label := fields.pop('label', None):
-            filters.append(Consumable.label.ilike(f'%{label}%'))
+        if label := fields.pop("label", None):
+            filters.append(Consumable.label.ilike(f"%{label}%"))
 
-        if (empty := fields.pop('empty', 'all')) == 'empty':
+        if (empty := fields.pop("empty", "all")) == "empty":
             filters.append(cls.is_empty)
-        elif empty != 'all':
+        elif empty != "all":
             filters.append(not_(cls.is_empty))
 
-        if (in_use := fields.pop('in_use', 'all')) == 'in_use':
+        if (in_use := fields.pop("in_use", "all")) == "in_use":
             filters.append(cls.in_use)
-        elif in_use != 'all':
+        elif in_use != "all":
             filters.append(not_(cls.in_use))
 
         return super()._filters(**fields) + filters
@@ -115,7 +126,7 @@ class Batch(db.Model, Filter, Export):
 
         fnc = asc if ascending else desc
 
-        return fnc(field),
+        return (fnc(field),)
 
     @classmethod
     def _entities(cls) -> tuple:
@@ -123,13 +134,16 @@ class Batch(db.Model, Filter, Export):
 
     @classmethod
     def _joins(cls) -> tuple:
-        return Consumable,
+        return (Consumable,)
 
 
 class Consumable(BaseEntity, Export):
-    """A consumable is a general class for all kind of stuff in the lab that can be used up. The thing about
-    consumables is that they can have batches attached to them. Please note that a consumable is just a description
-    of the respective enzyme, chemical, etc. It does give no information about availability in the lab. For this
+    """A consumable is a general class for all kind of stuff in the lab that can be
+    used up.
+
+    The thing about consumables is that they can have batches attached to them.
+    Please note that a consumable is just a description of the respective enzyme,
+    chemical, etc. It does give no information about availability in the lab. For this
     information one has to consult the batches.
 
     Attributes
@@ -146,7 +160,7 @@ class Consumable(BaseEntity, Export):
         db.Integer,
         db.ForeignKey("base_entity.id"),
         primary_key=True,
-        info={"importable": False}
+        info={"importable": False},
     )
     storage_info = db.Column(db.String(64), info={"importable": True})
 
@@ -155,7 +169,7 @@ class Consumable(BaseEntity, Export):
         "Batch",
         backref="consumable",
         lazy=True,
-        order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered"
+        order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered",
     )
 
     # Proper setup for joined table inheritance.
@@ -173,6 +187,8 @@ class Consumable(BaseEntity, Export):
 
     @classmethod
     def _subquery(cls):
-        return db.session.query(Batch.consumable_id, Batch.storage_place) \
-            .filter(Batch.in_use) \
+        return (
+            db.session.query(Batch.consumable_id, Batch.storage_place)
+            .filter(Batch.in_use)
             .subquery(name="batch")
+        )

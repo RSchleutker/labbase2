@@ -1,23 +1,15 @@
 import io
+from typing import Optional
+from zipfile import ZIP_DEFLATED, ZipFile
 
-from labbase2.models.mixins import Sequence
-from labbase2.models.mixins import Filter
-from labbase2.models import BaseEntity
-from labbase2.models import db
-from labbase2.models.fields import CustomDate
-
-from flask import send_file
-from flask_login import current_user
-from sqlalchemy import asc
-from sqlalchemy import desc
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from datetime import date
-from Bio import SeqIO
-
-from zipfile import ZipFile
-from zipfile import ZIP_DEFLATED
-
+from flask import send_file
+from flask_login import current_user
+from labbase2.models import BaseEntity, db
+from labbase2.models.fields import CustomDate
+from labbase2.models.mixins import Filter, Sequence
+from sqlalchemy import asc, desc
 
 __all__ = ["Plasmid", "Preparation", "GlycerolStock"]
 
@@ -30,54 +22,39 @@ class Plasmid(BaseEntity, Sequence):
     id : int
         The internal ID of this plasmis. The ID is unique among ALL entities
         in the datbase.
-    vector : str
-        The vector that was used for cloning. Usually, cloning means
-        transferring an insert into a specific vector. By giving both the
-        vector and the insert the plasmid should be fully defined.
-    constructed_by : str
-        The token of the person(s) that constructed and created the plasmid.
-    created : date
-        The date the plasmid was first created. This usually corresponds to
-        the day of ligation.
-    description : str
-        A precise definition of the plasmid: What is it and what is it for.
-        You may also give further information on how the plasmid was made.
-    reference : str
-        If the plasmid is published or was used somewhere it is possible to
-        enter the DOI here.
     insert : str
-        The token of the insert. As explained for 'vector' a plasmid should be
-        fully defined by the vector and the insert.
-    preps : list of Preparation
-        A list of all preps that were done of this plasmid.
-    bacteria : list of Bacteria
+        The name of the insert. As explained for 'vector' a plasmid should be fully
+        defined by the vector and the insert.
+    vector : str
+        The vector that was used for cloning. Usually, cloning means transferring an
+        insert into a specific vector. By giving both the vector and the insert the
+        plasmid should be fully defined.
+    cloning_date : Date
+        The date the plasmid was first created. This usually corresponds to the day
+        of ligation.
+    description : str
+        A precise definition of the plasmid: What is it and what is it for. You may
+        also give further information on how the plasmid was made.
+    reference : str
+        If the plasmid is published or was used somewhere it is possible to enter the
+        DOI here.
+    preparations : list[Preparation]
+        A list of all preparations that were done of this plasmid.
+    glycerol_stocks : list[GlycerolStock
         A list of bacterial stocks that carry this plasmid.
-    features : list of Feature
-        A list of all features that this plasmid has like ampicillin
-        resistance etc.
-    sequence : Seq
-        The sequence of the plasmid. The sequence is only available if a
-        plasmid filepath was uploaded for the plasmid. This plasmid filepath
-        is then read out and the sequence returned as a biopython Seq object.
-        This attribute is generated with the @property decorator and accordingly
-        can not be set manually.
-    risk : int
-        The risk potential of this plasmid. It is determined as the highest
-        risk of any feature. This attribute is generated with the @property
-        decorator and accordingly can not be set manually.
 
     Notes
     -----
     As most other classes Plasmid inherits from Entity and therefor has three
-    additional attributes: 'comments', 'files', and 'requests'. See 'Entity'
-    for further explanations.
+    additional attributes: 'comments', 'files', and 'requests'. See 'Entity' for
+    further explanations.
     """
 
     id = db.Column(db.Integer, db.ForeignKey("base_entity.id"), primary_key=True)
     insert = db.Column(db.String(128), nullable=False, info={"importable": True})
     vector = db.Column(db.String(256), info={"importable": True})
     cloning_date = db.Column(CustomDate, info={"importable": True})
-    description = db.Column(db.String(1024), info={"importable": True})
+    description = db.Column(db.String(2048), info={"importable": True})
     reference = db.Column(db.String(512), info={"importable": True})
 
     # One-to-many relationships.
@@ -85,13 +62,13 @@ class Plasmid(BaseEntity, Sequence):
         "Preparation",
         backref="plasmid",
         lazy=True,
-        order_by="Preparation.emptied_date, Preparation.preparation_date"
+        order_by="Preparation.emptied_date, Preparation.preparation_date",
     )
     glycerol_stocks = db.relationship(
         "GlycerolStock",
         backref="plasmid",
         lazy=True,
-        order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()"
+        order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()",
     )
 
     __mapper_args__ = {"polymorphic_identity": "plasmid"}
@@ -103,10 +80,12 @@ class Plasmid(BaseEntity, Sequence):
             return 0
 
     @property
-    def storage_place(self) -> str:
+    def storage_place(self) -> Optional[str]:
         for preparation in self.preparations:
-            if (preparation.date_emptied is not None
-                    and preparation.owner_id == current_user.id):
+            if (
+                preparation.date_emptied is not None
+                and preparation.owner_id == current_user.id
+            ):
                 return preparation.restricted_storage_place
 
         return None
@@ -176,27 +155,26 @@ class Preparation(db.Model):
     Attributes
     ----------
     id : int
-        The internal identifier of this preparation. This identifier is an
-        integer that is not continuous with the identifiers of entities (
-        antibodies, flies, plasmids, ...).
+        The internal identifier of this preparation. This identifier is an integer
+        that is not continuous with the identifiers of entities (antibodies, flies,
+        plasmids, ...).
     plasmid_id : int
         The identifier of the plasmid that was prepared.
-    by : str
-        The person who did this preparation.
-    timestamp : date
+    owner_id : int
+        The ID of the user who made this preparation.
+    preparation_date : Date
         The date at which the preparation was done.
     method : str
-        A short description of the method that was used for preparation. Most
-        likely, this will be the token of the kit used.
+        A short description of the method that was used for preparation. Most likely,
+        this will be the name of the kit used.
     eluent : str
-        The eluent. This will probably be either ddH2O or the elution buffer
-        of the kit.
+        The eluent. This will probably be either ddH2O or the elution buffer of the kit.
     concentration : float
         The concentration of this preparation. This should be in ng/ul or an
         appropriate concentration (ug/ml, ...).
-    location : str
+    storage_place : str
         The location of this preparation.
-    empty_timestamp : date
+    emptied_date : Date
         The date at which this preparation was used up.
 
     """
@@ -226,30 +204,24 @@ class GlycerolStock(db.Model, Filter):
     ----------
     id : int
         The internal identifier of this bacterial stock. This identifier is an
-        integer that is not continuous with the identifiers of entities (
-        antibodies, flies, plasmids, ...).
+        integer that is not continuous with the identifiers of entities (antibodies,
+        flies, plasmids, ...).
     plasmid_id : int
         The internal identifier of the plasmid that was transformed into the
         bacteria.
+    owner_id : int
+        The ID of the person that transformed the plasmid into the bacteria. Maximum
+        number of chars is 64. This might be changed in the future to an integer that
+        refers to a person that is represented in the database.
     strain : str
         The token of the bacterial strain that was used for transformation,
         for instance 'DH10B'. Maximum number of chars is 64.
-    risk_group : str
-        The risk group of thr bacterial strain. Is must not be set manually
-        but should be automatically determined by the application in order to
-        the strain and the features of the transformed plasmid. Maximum
-        number of chars is 8.
-    created : date
+    transformation_date : Date
         The date the stock was created. This is the date of transformation.
-    created_by : str
-        The token of the person that transformed the plasmid into the
-        bacteria. Maximum number of chars is 64. This might be changed in the
-        future to an integer that refers to a person that is represented in
-        the database.
-    location : str
+    storage_place : str
         The storage place of the stock. This should include the -80°C freezer
         and the exact shelf in that freezer. Maximum number of chars is 128.
-    disposed : date
+    disposal_date : Date
         The date the stock was disposed.
     """
 
@@ -264,18 +236,18 @@ class GlycerolStock(db.Model, Filter):
     disposal_date = db.Column(db.Date)
 
     @classmethod
-    def filter_(cls, order_by: str = 'label', ascending: bool = True, **fields):
+    def filter_(cls, order_by: str = "label", ascending: bool = True, **fields):
         return super().filter_(order_by, ascending, **fields)
 
     @classmethod
     def _order_by(cls, order_by: str, ascending: bool) -> tuple:
         fnc = asc if ascending else desc
-        if order_by == 'label':
+        if order_by == "label":
             field = Plasmid.label
         else:
             field = getattr(cls, order_by.strip())
 
-        return fnc(field),
+        return (fnc(field),)
 
     @classmethod
     def _entities(cls) -> tuple:
@@ -283,4 +255,4 @@ class GlycerolStock(db.Model, Filter):
 
     @classmethod
     def _joins(cls) -> tuple:
-        return Plasmid,
+        return (Plasmid,)

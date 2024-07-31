@@ -1,15 +1,13 @@
-# from app.forms.misc import ImportEntity
 import pandas as pd
 from sqlalchemy import inspect
-
 
 __all__ = ["Importer"]
 
 
 class Importer:
 
-    import_attr: tuple = ('id', 'ID'),
-    not_updatable: tuple = 'id',
+    import_attr: tuple = (("id", "ID"),)
+    not_updatable: tuple = ("id",)
 
     def update(self, **kwargs) -> None:
         """Update attributes of an entity.
@@ -48,9 +46,9 @@ class Importer:
         rec = cls.process_record(rec=rec)
 
         if update:
-            if id_ := rec.pop('id', None):
+            if id_ := rec.pop("id", None):
                 entity = cls.query.get(id_)
-            elif label := rec.pop('label', None):
+            elif label := rec.pop("label", None):
                 entity = cls.query.filter(cls.label == label).first()
             else:
                 entity = None
@@ -65,8 +63,8 @@ class Importer:
             entity.update(**rec)
 
         else:
-            if 'id' in rec:
-                del rec['id']
+            if "id" in rec:
+                del rec["id"]
 
             entity = cls(**rec)
 

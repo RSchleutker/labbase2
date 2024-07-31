@@ -21,8 +21,8 @@ class Message(Enum):
         Parameters
         ----------
         msg : Any
-            The message that should be wrapped into an alert DIV. This must be a str or must be
-            convertible to a str.
+            The message that should be wrapped into an alert DIV. This must be a str or
+            must be convertible to a str.
 
         Returns
         -------

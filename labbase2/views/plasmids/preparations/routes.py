@@ -1,25 +1,17 @@
-from .forms import EditPreparation
-
-from labbase2.models import db
-from labbase2.models import Preparation
+from flask import Blueprint
+from flask_login import current_user, login_required
+from labbase2.models import Plasmid, Preparation, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from labbase2.models import Plasmid
 
-from flask import Blueprint
-from flask_login import login_required
-from flask_login import current_user
-
+from .forms import EditPreparation
 
 __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
 bp = Blueprint(
-    "preparations",
-    __name__,
-    url_prefix="/preparations",
-    template_folder="templates"
+    "preparations", __name__, url_prefix="/preparations", template_folder="templates"
 )
 
 
@@ -45,7 +37,9 @@ def add(plasmid_id: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully added preparation to '{preparation.plasmid.label}'!")
+    return Message.SUCCESS(
+        f"Successfully added preparation to '{preparation.plasmid.label}'!"
+    )
 
 
 @bp.route("/<int:id_>", methods=["PUT"])

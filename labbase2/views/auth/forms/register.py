@@ -1,29 +1,18 @@
-from labbase2.forms.utils import RENDER_KW
-from labbase2.forms.validators import AllASCII
-from labbase2.forms.validators import ContainsNumber
-from labbase2.forms.validators import ContainsLower
-from labbase2.forms.validators import ContainsUpper
-from labbase2.forms.validators import ContainsSpecial
-from labbase2.forms.validators import ContainsNotSpace
-
-from labbase2.models import Permission
+import zoneinfo
 
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms.fields import StringField
-from wtforms.fields import PasswordField
-from wtforms.fields import SubmitField
-from wtforms.fields import SelectField
-from wtforms.fields import SelectMultipleField
-from wtforms.widgets import Select
-from wtforms.validators import DataRequired
-from wtforms.validators import Email
-from wtforms.validators import EqualTo
-from wtforms.validators import Length
-from wtforms.validators import Optional
-
-import zoneinfo
-
+from labbase2.forms import render
+from labbase2.forms.validators import (
+    AllASCII,
+    ContainsLower,
+    ContainsNotSpace,
+    ContainsNumber,
+    ContainsSpecial,
+    ContainsUpper,
+)
+from wtforms.fields import PasswordField, SelectField, StringField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 __all__ = ["RegisterForm"]
 
@@ -49,49 +38,52 @@ class RegisterForm(FlaskForm):
     first_name = StringField(
         label="First name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=RENDER_KW | {"placeholder": "First name"},
-        description="You given name. You may use initials for middle names."
+        render_kw=render.custom_field | {"placeholder": "First name"},
+        description="You given name. You may use initials for middle names.",
     )
     last_name = StringField(
         label="Last name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=RENDER_KW | {"placeholder": "First name"}
+        render_kw=render.custom_field | {"placeholder": "Last name"},
     )
     email = StringField(
         label="E-Mail Address",
         validators=[DataRequired(), Email(), Length(max=128)],
-        render_kw=RENDER_KW | {"id": "register-form-email",
-                               "placeholder": "Email Address"},
-        description="The university email address."
+        render_kw=render.custom_field | {"placeholder": "Email Address"},
+        description="The university email address.",
     )
     timezone = SelectField(
         "Timezone",
         choices=[(tz, tz) for tz in sorted(zoneinfo.available_timezones())],
         default=lambda: current_app.config["DEFAULT_TIMEZONE"],
         validators=[DataRequired()],
-        render_kw={"class": "form-select form-select-sm"},
-        description="Select the timezone in which dates and times shall be displayed for you."
+        render_kw=render.select_field,
+        description="""
+        Select the timezone in which dates and times shall be displayed for you.
+        """,
     )
     password = PasswordField(
         "Password",
-        validators=[DataRequired(), Length(min=12), ContainsLower(),
-                    ContainsUpper(), ContainsNumber(), ContainsSpecial(),
-                    ContainsNotSpace(), AllASCII()],
-        render_kw=RENDER_KW | {"id": "register-form-password",
-                               "placeholder": "Password"},
+        validators=[
+            DataRequired(),
+            Length(min=12),
+            ContainsLower(),
+            ContainsUpper(),
+            ContainsNumber(),
+            ContainsSpecial(),
+            ContainsNotSpace(),
+            AllASCII(),
+        ],
+        render_kw=render.custom_field | {"placeholder": "Password"},
         description="""
-        Minimum 12 characters. Contains lower- and uppercase characters. Contains at least 1 
-        number. Contains a special character. Does not contain spaces. Only ASCII characters.
-        """
+        Minimum 12 characters. Contains lower- and uppercase characters. Contains at 
+        least 1 number. Contains a special character. Does not contain spaces. Only 
+        ASCII characters.
+        """,
     )
     password2 = PasswordField(
         "Repeat Password",
         validators=[DataRequired(), EqualTo("password")],
-        render_kw=RENDER_KW | {"id": "register-form-password2",
-                               "placeholder": "Repeat Password"}
+        render_kw=render.custom_field | {"placeholder": "Repeat Password"},
     )
-    submit = SubmitField(
-        "Submit",
-        render_kw=RENDER_KW | {"id": "register-form-submit",
-                               "class": "btn btn-primary btn-block btn-sm"}
-    )
+    submit = SubmitField("Submit", render_kw=render.submit_field)

@@ -1,10 +1,36 @@
-from wtforms.form import Form
 from wtforms.fields import Field
+from wtforms.form import Form
 from wtforms.validators import ValidationError
 
+__all__ = [
+    "ContainsSpecial",
+    "ContainsNot",
+    "ContainsNumber",
+    "AllowCharacters",
+    "ContainsLower",
+    "ContainsUpper",
+    "ContainsNotSpace",
+    "AllASCII",
+]
 
-__all__ = ["ContainsSpecial", "ContainsNot", "ContainsNumber",
-           "ContainsLower", "ContainsUpper", "ContainsNotSpace", "AllASCII"]
+
+class RemoveCharacters:
+
+    def __init__(self, chars: str):
+
+        self.chars = chars
+
+    def __call__(self, x) -> str:
+        return "".join([c for c in x if c not in self.chars])
+
+
+class AllowCharacters:
+
+    def __init__(self, chars: str):
+        self.chars = chars
+
+    def __call__(self, x: str) -> str:
+        return "".join([c for c in x if c in self.chars])
 
 
 class ContainsNot:
@@ -53,9 +79,7 @@ class ContainsNot:
 
 
 class ContainsLower:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 
@@ -92,9 +116,7 @@ class ContainsLower:
 
 
 class ContainsUpper:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 
@@ -131,9 +153,7 @@ class ContainsUpper:
 
 
 class ContainsNumber:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 
@@ -170,9 +190,7 @@ class ContainsNumber:
 
 
 class ContainsSpecial:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 
@@ -209,9 +227,7 @@ class ContainsSpecial:
 
 
 class ContainsNotSpace:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 
@@ -246,9 +262,7 @@ class ContainsNotSpace:
 
 
 class AllASCII:
-    """
-
-    """
+    """ """
 
     def __init__(self, message: str = None):
 

@@ -1,19 +1,13 @@
-from labbase2.forms.forms import EditForm
-from labbase2.forms.utils import RENDER_KW
+from labbase2.forms import render
 from labbase2.forms.filters import strip_input
+from labbase2.forms.forms import BaseForm
+from wtforms.fields import DateField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
 
-from wtforms.fields import TextAreaField
-from wtforms.fields import StringField
-from wtforms.fields import DateField
-from wtforms.validators import Optional
-from wtforms.validators import DataRequired
-from wtforms.validators import Length
+__all__ = ["EditRequest"]
 
 
-__all__: list = ["EditRequest"]
-
-
-class EditRequest(EditForm):
+class EditRequest(BaseForm):
     """Form to add or edit a request.
 
     Attributes
@@ -25,23 +19,21 @@ class EditRequest(EditForm):
         label="Requested by",
         validators=[DataRequired(), Length(max=128)],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-request-requested-by",
-                               "placeholder": "Requested by"}
+        render_kw=render.custom_field | {"placeholder": "Requested by"},
     )
     timestamp = DateField(
         label="Date of request",
         validators=[DataRequired()],
-        render_kw=RENDER_KW | {"id": "edit-form-request-timestamp",
-                               "type": "date"}
+        render_kw=render.custom_field | {"type": "date"},
     )
     timestamp_sent = DateField(
         label="Sent",
         validators=[Optional()],
-        render_kw=RENDER_KW | {"id": "edit-form-request-sent", "type": "date"}
+        render_kw=render.custom_field | {"type": "date"},
     )
     note = TextAreaField(
         label="Note",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-request-note", "rows": 4}
+        render_kw=render.custom_field | {"rows": 4},
     )

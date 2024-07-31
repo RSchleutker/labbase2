@@ -1,40 +1,29 @@
-from labbase2.models import Permission
-
-from flask import flash
-from flask import redirect
-from flask import url_for
-from flask_login import current_user
 from functools import wraps
-
 from typing import Callable
 
+from flask import flash, redirect, url_for
+from flask_login import current_user
+from labbase2.models import Permission
 
 __all__ = ["permission_required"]
 
 
 def permission_required(*allowed) -> Callable:
-    """Check whether the current user has sufficient role to access a ressource.
+    """Check whether the current user has sufficient role to access a resource.
 
     This is a very simple decorator op to add user role system to the
     website.
 
     Parameters
     ----------
-    *allowed : list of str
-        A list of roles that are allowe to access the page. Available roles
-        are currently 'guest', 'viewer', 'editor', and 'admin'.
+    *allowed : *str
+        A list of permissions. If the user has any of these permissions, he will be
+        granted access to the view.
 
     Returns
     -------
     function
-        The decorate route op.
-
-    Notes
-    -----
-    The user roles are not hierachical. This means that if a guest is allowed to
-    view a ressource it does not follow that an editor is allowed to do so as
-    well. Instead, you have to explicitly state all roles that are allowed to
-    view the resource.
+        The decorate route function.
     """
 
     def decorator(func: Callable):
@@ -47,8 +36,11 @@ def permission_required(*allowed) -> Callable:
             for permission in allowed:
                 permission_db = Permission.query.get(permission)
                 if permission_db is None:
-                    flash(f"Permission '{permission}' not found. Please inform the developer!",
-                        "warning")
+                    flash(
+                        f"Permission '{permission}' not found."
+                        f"Please inform the developer!",
+                        "warning",
+                    )
                 else:
                     verified.append(permission_db)
 

@@ -1,32 +1,20 @@
 import datetime
 
-from .forms import EditBatch
-from .forms import FilterBatch
-
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, render_template, request
+from flask_login import login_required
+from labbase2.models import Batch, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Batch
 
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask import current_app as app
-from flask_login import login_required
-from flask_login import current_user
-
+from .forms import EditBatch, FilterBatch
 
 __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "batches",
-    __name__,
-    url_prefix="/batch",
-    template_folder="templates"
-)
+bp = Blueprint("batches", __name__, url_prefix="/batch", template_folder="templates")
 
 
 @bp.route("/", methods=["GET"])
@@ -51,7 +39,7 @@ def index():
         add_form=EditBatch(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         total=Batch.query.count(),
-        title="Batches"
+        title="Batches",
     )
 
 

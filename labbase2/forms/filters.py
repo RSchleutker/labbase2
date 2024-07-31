@@ -1,88 +1,103 @@
-__all__ = ["strip_input", "make_lower", "make_upper", "upper_seq_input"]
+from typing import Optional
 
 
-def strip_input(x: str) -> str:
-    """A simple wrapper for the strip-method of strings apllicable for use as a filter for form fields.
+__all__ = ["remove_whitespaces", "strip_input", "make_lower", "make_upper"]
+
+
+def remove_whitespaces(x: Optional[str]) -> Optional[str]:
+    """Remove whitespaces from a string
 
     Parameters
     ----------
-    x : str
-    A string that is to be stripped.
+    x : Optional[str], optional
+        A string from which all whitespaces shall be removed or `None`. Defaults to
+        `None`.
 
     Returns
     -------
-    str
-        The original string 'x' but stripped at both ends.
+    Optional[str]
+        The original string `x` but with whitespaces removed or `None` if `x` was
+        `None`.
     """
 
+    if x is None:
+        return None
+
     if not isinstance(x, str):
-        raise ValueError('x has to be a string!')
+        raise ValueError("`x` has to be a string!")
 
-    return x.strip()
+    return "".join(x.split())
 
 
-def make_lower(x: str) -> str:
-    """A simple wrapper for the lower-method of strings apllicable for use as a
+def strip_input(x: Optional[str] = None) -> Optional[str]:
+    """A simple wrapper for the strip-method of strings applicable for use as a
     filter for form fields.
 
     Parameters
     ----------
-    x : str
-        A string that is to be converted to lowercase.
+    x : Optional[str], optional
+        A string that is to be stripped or `None`. Defaults to `None`.
 
     Returns
     -------
-    str
-        The original string 'x' but with all characters being replaced by
-        their lowercase equivalents.
+    Optional[str]
+        The original string `x` but stripped at both ends or `None` if `x` was `None`.
     """
 
+    if x is None:
+        return
+
     if not isinstance(x, str):
-        raise ValueError('x has to be a string!')
+        raise ValueError("`x` has to be a string!")
+
+    return x.strip()
+
+
+def make_lower(x: Optional[str] = None) -> Optional[str]:
+    """A simple wrapper for the lower-method of strings applicable for use as a
+    filter for form fields.
+
+    Parameters
+    ----------
+    x : Optional[str], optional
+        A string that is to be stripped or `None`. Defaults to `None`.
+
+    Returns
+    -------
+    Optional[str]
+        The original string 'x' but with all characters being replaced by their
+        lowercase equivalents or `None` if `x` was `None`.
+    """
+
+    if x is None:
+        return None
+
+    if not isinstance(x, str):
+        raise ValueError("`x` has to be a string!")
 
     return x.lower()
 
 
-def make_upper(x: str) -> str:
+def make_upper(x: Optional[str] = None) -> Optional[str]:
     """A simple wrapper for the upper-method of strings for use as a filter
     for form fields.
 
     Parameters
     ----------
-    x : str
-        A string that is to be converted to uppercase.
+    x : Optional[str], optional
+        A string that is to be converted to uppercase or `None`. Defaults to `None`.
 
     Returns
     -------
-    str
-        The original string 'x' but with all characters being replace by
-        their uppercase equivalents.
+    Optional[str]
+        The original string 'x' but with all characters being replaced by their
+        uppercase equivalents or `None` if `x` was `None`.
     """
 
+    if x is None:
+        return None
+
     if not isinstance(x, str):
-        raise ValueError("Must be a string: x")
+        raise ValueError("`x` has to be a string!")
 
     return x.upper()
-
-
-def upper_seq_input(x: str) -> str:
-    """A simple wrapper for the lower-method of strings apllicable for use as a
-    filter for form fields.
-
-    Parameters
-    ----------
-    x : str
-    A string that is to be converted to lowercase.
-
-    Returns
-    -------
-    str
-        The original string 'x' but with all characters beeing replaced by
-        their uppercase equivalents but only when ALL characters were
-        lowercase.
-    """
-
-    if not isinstance(x, str):
-        raise ValueError("Must be a string: x")
-
-    return x.upper() if x.islower() else x

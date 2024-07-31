@@ -1,31 +1,18 @@
-from .forms import FilterBacteria
-from .forms import EditBacterium
-from labbase2.views.plasmids.forms import EditPlasmid
-
+from flask import Blueprint, flash, render_template, request
+from flask_login import current_user, login_required
+from labbase2.models import GlycerolStock, Plasmid, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
+from labbase2.views.plasmids.forms import EditPlasmid
 
-from labbase2.models import db
-from labbase2.models import Plasmid
-from labbase2.models import GlycerolStock
-
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask_login import login_required
-from flask_login import current_user
-
+from .forms import EditBacterium, FilterBacteria
 
 __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
 bp = Blueprint(
-    "bacteria",
-    __name__,
-    url_prefix="/glycerol-stocks",
-    template_folder="templates"
+    "bacteria", __name__, url_prefix="/glycerol-stocks", template_folder="templates"
 )
 
 
@@ -51,7 +38,7 @@ def index():
         add_form=EditBacterium(formdata=None),
         entities=entities.paginate(page=page, per_page=100),
         total=GlycerolStock.query.count(),
-        title="Glycerol stocks"
+        title="Glycerol stocks",
     )
 
 
@@ -126,7 +113,7 @@ def details(id_: int, format_: str):
         template,
         stock=stock,
         form=edit_form,
-        plasmid_form=EditPlasmid(None, obj=stock.plasmid)
+        plasmid_form=EditPlasmid(None, obj=stock.plasmid),
     )
 
 

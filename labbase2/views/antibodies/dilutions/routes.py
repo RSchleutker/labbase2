@@ -1,23 +1,16 @@
-from .forms import EditDilution
-
+from flask import Blueprint
+from flask_login import current_user, login_required
+from labbase2.models import Dilution, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Dilution
 
-from flask import Blueprint
-from flask_login import current_user
-from flask_login import login_required
-
+from .forms import EditDilution
 
 __all__ = ["bp"]
 
 
 bp = Blueprint(
-    "dilutions",
-    __name__,
-    url_prefix="/dilution",
-    template_folder="templates"
+    "dilutions", __name__, url_prefix="/dilution", template_folder="templates"
 )
 
 
@@ -39,7 +32,9 @@ def add(antibody_id: int):
     except Exception as error:
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully added dilution to '{dilution.antibody.label}'!")
+    return Message.SUCCESS(
+        f"Successfully added dilution to '{dilution.antibody.label}'!"
+    )
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -56,7 +51,8 @@ def edit(id_: int):
 
     if dilution.user_id != current_user.id:
         return Message.ERROR(
-            "Dilutions can only be edited by owner! Consider adding a new dilution instead."
+            "Dilutions can only be edited by owner! Consider adding a new dilution "
+            "instead."
         )
 
     form.populate_obj(dilution)

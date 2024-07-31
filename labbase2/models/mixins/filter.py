@@ -1,8 +1,5 @@
 from labbase2.models import db
-
-from sqlalchemy import asc
-from sqlalchemy import desc
-
+from sqlalchemy import asc, desc
 
 __all__ = ["Filter"]
 
@@ -12,10 +9,12 @@ class Filter:
 
     Notes
     -----
-    The mixin is inspired by the template design pattern. The basics method to be used is `filter_`. `filter_` uses
-    additional methods to customize the filtering process like `_filters` to add filters or `_order_by` to sort the
-    results. The mixin provides basic implementations for this. Each model class inheriting from this mixin can
-    override one or several of these methods to customize the filter process.
+    The mixin is inspired by the template design pattern. The basics method to be
+    used is `filter_`. `filter_` uses additional methods to customize the filtering
+    process like `_filters` to add filters or `_order_by` to sort the results. The
+    mixin provides basic implementations for this. Each model class inheriting from
+    this mixin can override one or several of these methods to customize the filter
+    process.
     """
 
     @classmethod
@@ -27,20 +26,19 @@ class Filter:
         order_by : str
             The column name, by which the result shall be ordered.
         ascending : bool
-            Order results either ascending or descending. Defaults to `True`
-            (ascending).
+            Order results either ascending or descending. Defaults to `True` (
+            ascending).
         fields : **dict
-            A list of key-value pairs. The key is a field in the database and
-            the value is some constraint which should be applied to this
-            field. See `_filters` for details.
-
+            A list of key-value pairs. The key is a field in the database and the
+            value is some constraint which should be applied to this field. See
+            `_filters` for details.
 
         Returns
         -------
         query
-            An SQLAlchemy query object. Can be either further customized by
-            adding additional query parameters or be used to retrieve
-            matching instances from the database.
+            An SQLAlchemy query object. Can be either further customized by adding
+            additional query parameters or be used to retrieve matching instances
+            from the database.
         """
 
         query = db.session.query(*cls._entities())
@@ -51,10 +49,11 @@ class Filter:
             else:
                 query = query.join(join, isouter=True)
 
-        return query \
-            .options(*cls._options()) \
-            .filter(*cls._filters(**fields)) \
+        return (
+            query.options(*cls._options())
+            .filter(*cls._filters(**fields))
             .order_by(*cls._order_by(order_by, ascending))
+        )
 
     @classmethod
     def _filters(cls, **fields) -> list:
@@ -69,20 +68,20 @@ class Filter:
             if not attr or not value:
                 continue
 
-            if value == 'none':
+            if value == "none":
                 filters.append(attr.is_(None))
-            elif value == 'any':
+            elif value == "any":
                 filters.append(attr.isnot(None))
-            elif value == 'all' or value == 0:
+            elif value == "all" or value == 0:
                 continue
             # TODO: Improve full-text search (FTS5?)
-            elif field == 'description':
-                value = [f'%{v.strip()}%' for v in value.split()]
+            elif field == "description":
+                value = [f"%{v.strip()}%" for v in value.split()]
                 filters += [attr.ilike(v) for v in value]
             elif isinstance(value, int) or field == "entity_type":
                 filters.append(attr.is_(value))
             elif isinstance(value, str):
-                filters.append(attr.ilike(f'%{value}%'))
+                filters.append(attr.ilike(f"%{value}%"))
 
         return filters
 
@@ -91,7 +90,7 @@ class Filter:
         fnc = asc if ascending else desc
         field = getattr(cls, order_by.strip(), cls.id)
 
-        return fnc(field),
+        return (fnc(field),)
 
     @classmethod
     def _options(cls) -> tuple:
@@ -99,7 +98,7 @@ class Filter:
 
     @classmethod
     def _entities(cls) -> tuple:
-        return cls,
+        return (cls,)
 
     @classmethod
     def _joins(cls) -> tuple:

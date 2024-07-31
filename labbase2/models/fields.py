@@ -1,7 +1,7 @@
-from sqlalchemy.types import TypeDecorator
-from labbase2.models import db
-
 from datetime import date
+
+from labbase2.models import db
+from sqlalchemy.types import TypeDecorator
 
 
 class CustomDate(TypeDecorator):

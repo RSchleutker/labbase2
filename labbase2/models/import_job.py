@@ -1,7 +1,5 @@
 from labbase2.models import db
-
 from sqlalchemy import func
-
 
 __all__ = ["ImportJob", "ColumnMapping"]
 
@@ -20,10 +18,7 @@ class ImportJob(db.Model):
 
     # One-to-many relationships.
     mappings = db.relationship(
-        "ColumnMapping",
-        backref="job",
-        cascade="all, delete-orphan",
-        lazy=True
+        "ColumnMapping", backref="job", cascade="all, delete-orphan", lazy=True
     )
 
     file = db.relationship(
@@ -31,7 +26,7 @@ class ImportJob(db.Model):
         backref="import_job",
         lazy=True,
         cascade="all, delete",
-        single_parent=True
+        single_parent=True,
     )
 
     def get_file(self):
@@ -42,10 +37,6 @@ class ColumnMapping(db.Model):
 
     __tablename__ = "column_mapping"
 
-    job_id = db.Column(
-        db.Integer,
-        db.ForeignKey("import_job.id"),
-        primary_key=True
-    )
+    job_id = db.Column(db.Integer, db.ForeignKey("import_job.id"), primary_key=True)
     mapped_field = db.Column(db.String, primary_key=True)
     input_column = db.Column(db.String)

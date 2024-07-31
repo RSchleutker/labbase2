@@ -1,27 +1,17 @@
-from labbase2.forms.forms import EditForm
-from labbase2.forms.utils import RENDER_KW
+from labbase2.forms import render
 from labbase2.forms.filters import strip_input
+from labbase2.forms.forms import BaseForm
+from wtforms.fields import SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length
 
-from wtforms.fields import StringField
-from wtforms.fields import SelectField
-from wtforms.fields import IntegerField
-from wtforms.fields import TextAreaField
-from wtforms.validators import DataRequired
-from wtforms.validators import Length
+__all__ = ["EditDilution"]
 
 
-__all__: list[str] = ["EditDilution"]
-
-
-class EditDilution(EditForm):
+class EditDilution(BaseForm):
     """Form to edit an antibody dilution.
 
     Attributes
     ----------
-    id : IntegerField
-        The internal ID of the dilution. This can never be edited.
-    antibody_id : IntegerField
-        The internal ID of the antibody, to which this dilution belongs.
     application : SelectField
         The application this dilution was determined for,
         e.g. 'immunostaining' or 'western blot'.
@@ -38,24 +28,20 @@ class EditDilution(EditForm):
         choices=[
             ("immunostaining", "Immunostaining"),
             ("western blot", "Western blot"),
-            ("immunoprecipitation", "Immunoprecipitation")
+            ("immunoprecipitation", "Immunoprecipitation"),
         ],
-        render_kw=RENDER_KW | {"id": "edit-form-dilution-application",
-                               "size": 1}
+        render_kw=render.select_field,
     )
     dilution = StringField(
         label="Dilution",
         validators=[DataRequired(), Length(max=32)],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-dilution-dilution",
-                               "placeholder": "Dilution"}
+        render_kw=render.custom_field | {"placeholder": "Dilution"},
     )
     reference = TextAreaField(
         label="Reference",
         validators=[DataRequired(), Length(max=2048)],
         filters=[strip_input],
-        render_kw=RENDER_KW | {"id": "edit-form-dilution-reference",
-                               "placeholder": "Give a short description of the sample and "
-                                              "condition you used.",
-                               "rows": 8}
+        render_kw=render.custom_field | {"rows": 8},
+        description="Give a short description of the sample and condition you used.",
     )

@@ -1,28 +1,18 @@
 from flask_sqlalchemy import SQLAlchemy
 
-
+# Is used in model classes, so has to be specified before model import.
 db = SQLAlchemy()
 
 
-from .user import User
-from .user import Permission
-from .comment import Comment
-from .file import BaseFile
-from .file import EntityFile
+from .antibody import Antibody, Dilution
 from .base_entity import BaseEntity
-from .antibody import Antibody
-from .antibody import Dilution
-from .consumable import Consumable
-from .consumable import Batch
-from .chemical import Chemical
-from .chemical import StockSolution
-from .fly_stock import FlyStock
-from .fly_stock import Modification
-from .plasmid import Plasmid
-from .plasmid import Preparation
-from .plasmid import GlycerolStock
+from .chemical import Chemical, StockSolution
+from .comment import Comment
+from .consumable import Batch, Consumable
+from .file import BaseFile, EntityFile
+from .fly_stock import FlyStock, Modification
+from .import_job import ColumnMapping, ImportJob
 from .oligonucleotide import Oligonucleotide
+from .plasmid import GlycerolStock, Plasmid, Preparation
 from .request import Request
-from .import_job import ImportJob
-from .import_job import ColumnMapping
-from .events import *
+from .user import Permission, User

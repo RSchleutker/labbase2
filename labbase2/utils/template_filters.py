@@ -1,35 +1,23 @@
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 from flask_login import current_user
 
+__all__ = ["format_date", "format_datetime"]
 
-__all__ = ["format_datetime", "user_has_permission"]
 
-
-def format_date(x: date) -> str:
+def format_date(x: Optional[date] = None) -> str:
     if not x:
         return ""
 
     return x.strftime("%B %d, %Y")
 
 
-def format_datetime(x: datetime) -> str:
+def format_datetime(x: Optional[datetime] = None) -> str:
     if not x:
         return ""
 
     tz = getattr(current_user, "timezone", "Europe/Berlin")
 
     return x.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
-
-
-def user_has_permission(*allowed) -> bool:
-    if current_user.is_admin:
-        return False
-
-    for permission in allowed:
-        if current_user.user_has_permission(permission):
-            return True
-
-    return False

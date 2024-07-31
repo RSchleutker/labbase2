@@ -1,107 +1,35 @@
+from typing import Optional
 
 from labbase2.utils.message import Message
-from wtforms.validators import ValidationError
+
+__all__ = ["errors2messages"]
 
 
-RENDER_KW: dict = {'class': 'form-control form-control-sm'}
+def errors2messages(field_errors: Optional[dict[str, str]]) -> list[str]:
+    """Turns field errors of forms into a list of error messages.
 
-RENDER_KW_ID: dict = {
-    **RENDER_KW,
-    'readonly': 'true',
-    'placeholder': 'Internal ID'
-}
-
-RENDER_KW_BTN: dict = {
-    **RENDER_KW,
-    'class': 'btn btn-primary mb-2'
-}
-
-RENDER_KW_FILE: dict = {
-    **RENDER_KW,
-    'type': 'file'
-}
-
-# Certain characters are not allowed in genotypes. Most of them if not all
-# because they are used internally (e.g. as special strings in search queries).
-FORBIDDEN_CHARS: list = [
-    '/',
-    '==',
-    '((',
-    '))'
-]
-
-
-class ContainsNot:
-    """A validator that checks that certain characters do not appear in the
-    input.
-
-    Attributes
+    Parameters
     ----------
-    forbidden: list of str
-        A list of strings that are not allowed in the input field.
-    message: str
-        A message that is returned when validation fails.
+    field_errors : Optional[dict[str, str]]
+        A dictionary of errors as produced by the `errors` property of forms. If the
+        form was not validated yet, this property will be `None`, in which case this
+        function will return an empty list.
+
+    Returns
+    -------
+    list[str]
+        A list of HTML-formatted error messages produced by successive calls to
+        `Message.ERROR`. A list entry is created for each error in each form field.
+        If the form was not validated yet, the list will be empty.
     """
 
-    def __init__(self, forbidden: list = None, message: str = None):
-        """Initialization code.
+    messages: list[str] = []
 
-        Parameters
-        ----------
-        forbidden: list of str
-            A list of strings that are not allowed in the input field.
-        message: str
-            A message that is returned when validation fails.
-        """
+    if field_errors is None:
+        return messages
 
-        self.forbidden = forbidden
-        if not message:
-            message = 'Forbidden characters: ' + ', '.join(self.forbidden)
-        self.message = message
+    for field, errors in field_errors.items():
+        for error in errors:
+            messages.append(Message.ERROR(f"{field}: {error}"))
 
-    def __call__(self, form, field) -> None:
-        """Test if a field is valid.
-
-        Parameters
-        ----------
-        form
-        field
-
-        Returns
-        -------
-        None
-            If the field does not fulfil the criteria an error is risen.
-        """
-
-        data = field.data
-
-        for char in self.forbidden:
-            if char in data:
-                raise ValidationError(self.message)
-
-
-class RemoveCharacters:
-
-    def __init__(self, chars: str):
-
-        self.chars = chars
-
-    def __call__(self, x) -> str:
-        return ''.join([c for c in x if c not in self.chars])
-
-
-class AllowCharacters:
-
-    def __init__(self, chars: str):
-        self.chars = chars
-
-    def __call__(self, x: str) -> str:
-        return ''.join([c for c in x if c in self.chars])
-
-
-def err2message(errors: dict) -> str:
-    messages = []
-    for field, error in errors.items():
-        messages.append(Message.ERROR(f"<b>{field}</b> {error}"))
-
-    return "<br>".join(messages)
+    return messages

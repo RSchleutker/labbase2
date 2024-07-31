@@ -1,9 +1,9 @@
 import io
 from datetime import date
-from flask import send_file
+
 from Bio import SeqIO
 from Bio.Restriction import CommOnly
-
+from flask import send_file
 
 __all__ = ["Sequence"]
 
@@ -44,19 +44,16 @@ class Sequence:
         sites = [(e, n) for e, n in self.restriction_sites().items()]
         sites.sort(key=lambda x: (x[1], x[0]))
 
-        return ', '.join(['{} <b>({})</b>'.format(e, n) for e, n in sites])
+        return ", ".join(["{} <b>({})</b>".format(e, n) for e, n in sites])
 
     @classmethod
     def to_fasta(cls, instances):
         with io.StringIO() as proxy:
-            SeqIO.write([i.seqrecord for i in instances], proxy, 'fasta')
-            mem = io.BytesIO(proxy.getvalue().encode('utf-8'))
+            SeqIO.write([i.seqrecord for i in instances], proxy, "fasta")
+            mem = io.BytesIO(proxy.getvalue().encode("utf-8"))
 
-        filename = cls.__name__ + '_' + date.today().isoformat() + '.fasta'
+        filename = cls.__name__ + "_" + date.today().isoformat() + ".fasta"
 
         return send_file(
-            mem,
-            as_attachment=True,
-            download_name=filename,
-            mimetype='text/fasta'
+            mem, as_attachment=True, download_name=filename, mimetype="text/fasta"
         )

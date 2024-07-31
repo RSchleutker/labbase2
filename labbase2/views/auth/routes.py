@@ -1,44 +1,33 @@
-from flask import Blueprint
-from flask import Response
-from flask import flash
-from flask import render_template
-from flask import request
-from flask import redirect
-from flask import url_for
-from flask_login import login_required
-from flask_login import login_user
-from flask_login import logout_user
-from flask_login import current_user
-from sqlalchemy import func
-from sqlalchemy.exc import DataError
-from email_validator import validate_email
 from zoneinfo import ZoneInfo
 
-from .forms.login import LoginForm
-from .forms.register import RegisterForm
-from .forms.edit import EditUserForm
-from .forms.password import ChangePassword
-from .forms.edit_permissions import EditPermissions
-from labbase2.models import db
-from labbase2.models import User
-from labbase2.models import Permission
-from labbase2.models import BaseFile
+from email_validator import validate_email
+from flask import (
+    Blueprint,
+    Response,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import current_user, login_required, login_user, logout_user
+from labbase2.models import BaseFile, Permission, User, db
 from labbase2.utils.permission_required import permission_required
-from labbase2.utils.message import Message
 from labbase2.views.files.routes import upload_file
-from wtforms import BooleanField
+from sqlalchemy import func
+from sqlalchemy.exc import DataError
 
+from .forms.edit import EditUserForm
+from .forms.edit_permissions import EditPermissions
+from .forms.login import LoginForm
+from .forms.password import ChangePassword
+from .forms.register import RegisterForm
 
 __all__ = ["bp", "login"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "auth",
-    __name__,
-    url_prefix="/auth",
-    template_folder="templates"
-)
+bp = Blueprint("auth", __name__, url_prefix="/auth", template_folder="templates")
 
 
 # @bp.route("/", methods=["GET"])
@@ -76,7 +65,9 @@ def login() -> str | Response:
                 flash("This is your first log in!", "info")
             else:
                 tz = current_user.timezone
-                formatted = last_login.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
+                formatted = last_login.astimezone(ZoneInfo(tz)).strftime(
+                    "%B %d, %Y %I:%M %p"
+                )
                 flash(f"Last login was on {formatted}!", "info")
 
             user.timestamp_last_login = func.now()
@@ -84,7 +75,7 @@ def login() -> str | Response:
 
             next_page = request.args.get("next")
 
-            if not next_page: # or url_parse(next_page).netloc:
+            if not next_page:  # or url_parse(next_page).netloc:
                 next_page = url_for("base.index")
 
             return redirect(next_page)
@@ -113,8 +104,9 @@ def register():
         if User.query.filter(User.email.ilike(email)).count() > 0:
             flash("Email address already exists!", "danger")
         else:
-            user = User(email=email)
+            user = User()
             form.populate_obj(user)
+            user.email = email
             user.set_password(form.password.data)
 
             try:
@@ -185,10 +177,7 @@ def change_password():
         else:
             flash("Old password incorrect!", "danger")
 
-    return render_template(
-        "auth/change-password.html",
-        form=form
-    )
+    return render_template("auth/change-password.html", form=form)
 
 
 @bp.route("/change-permissions", methods=["GET"], defaults={"id_": None})
@@ -221,7 +210,7 @@ def change_permissions(id_: int = None):
         "auth/edit-permissions.html",
         form=form,
         selected_user=user,
-        users=User.query.filter(User.is_active).order_by(User.last_name).all()
+        users=User.query.filter(User.is_active).order_by(User.last_name).all(),
     )
 
 

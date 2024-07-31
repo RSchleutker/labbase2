@@ -1,18 +1,15 @@
-from labbase2.forms.utils import RENDER_KW
 from flask_wtf import FlaskForm
-from wtforms.fields import PasswordField
-from wtforms.fields import SubmitField
-from wtforms.validators import DataRequired
-from wtforms.validators import EqualTo
-from wtforms.validators import Length
-
-from labbase2.forms.validators import AllASCII
-from labbase2.forms.validators import ContainsNumber
-from labbase2.forms.validators import ContainsLower
-from labbase2.forms.validators import ContainsUpper
-from labbase2.forms.validators import ContainsSpecial
-from labbase2.forms.validators import ContainsNotSpace
-
+from labbase2.forms import render
+from labbase2.forms.validators import (
+    AllASCII,
+    ContainsLower,
+    ContainsNotSpace,
+    ContainsNumber,
+    ContainsSpecial,
+    ContainsUpper,
+)
+from wtforms.fields import PasswordField, SubmitField
+from wtforms.validators import DataRequired, EqualTo, Length
 
 __all__ = ["ChangePassword"]
 
@@ -21,26 +18,31 @@ class ChangePassword(FlaskForm):
 
     new_password = PasswordField(
         "New password",
-        validators=[DataRequired(), Length(min=12), ContainsLower(),
-                    ContainsUpper(), ContainsNumber(), ContainsSpecial(),
-                    ContainsNotSpace(), AllASCII()],
-        render_kw=RENDER_KW | {"placeholder": "new password"},
+        validators=[
+            DataRequired(),
+            Length(min=12),
+            ContainsLower(),
+            ContainsUpper(),
+            ContainsNumber(),
+            ContainsSpecial(),
+            ContainsNotSpace(),
+            AllASCII(),
+        ],
+        render_kw=render.custom_field | {"placeholder": "new password"},
         description="""
-        Minimum 12 characters. Contains lower- and uppercase characters. Contains at least 1 
-        number. Contains a special character. Does not contain spaces. Only ASCII characters.
-        """
+        Minimum 12 characters. Contains lower- and uppercase characters. Contains at 
+        least 1 number. Contains a special character. Does not contain spaces. Only 
+        ASCII characters.
+        """,
     )
     new_password2 = PasswordField(
         "Repeat new password",
         validators=[DataRequired(), EqualTo("new_password")],
-        render_kw=RENDER_KW | {"placeholder": "repeat new password"}
+        render_kw=render.custom_field | {"placeholder": "repeat new password"},
     )
     old_password = PasswordField(
         "Old password",
         validators=[DataRequired()],
-        render_kw=RENDER_KW | {"placeholder": "old password"}
+        render_kw=render.custom_field | {"placeholder": "old password"},
     )
-    submit = SubmitField(
-        "Submit",
-        render_kw=RENDER_KW | {"class": "btn btn-primary btn-block btn-sm"}
-    )
+    submit = SubmitField("Submit", render_kw=render.submit_field)

@@ -1,42 +1,23 @@
-from .forms import UploadFile
-from .forms import EditFile
+from typing import Optional, Union
 
-from labbase2.models import db
-from labbase2.models import BaseEntity
-from labbase2.models import BaseFile
-from labbase2.models import EntityFile
+from flask import Blueprint, flash, redirect, request, send_file
+from flask_login import current_user, login_required
+from labbase2.models import BaseEntity, BaseFile, EntityFile, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-
-from flask import Blueprint
-from flask import flash
-from flask import request
-from flask import redirect
-from flask import send_file
-from flask_login import login_required
-from flask_login import current_user
 from werkzeug.utils import secure_filename
-from pathlib import Path
 
-from typing import Optional
-from typing import Union
+from .forms import EditFile, UploadFile
 
-
-__all__ = ["bp"]
+__all__ = ["bp", "upload_file"]
 
 
 # The blueprint to register all coming routes with.
-bp = Blueprint(
-    "files",
-    __name__,
-    url_prefix="/files",
-    template_folder="templates"
-)
+bp = Blueprint("files", __name__, url_prefix="/files", template_folder="templates")
 
 
-def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFile]:
+def upload_file(form, class_, **kwargs) -> Union[BaseFile, EntityFile]:
     file = form.file.data
-    print(file)
 
     if hasattr(form, "filename") and form.filename.data:
         filename = secure_filename(form.filename.data)
@@ -47,7 +28,7 @@ def upload_file(form: UploadFile, class_, **kwargs) -> Union[BaseFile, EntityFil
         user_id=current_user.id,
         filename_exposed=filename,
         note=form.note.data if hasattr(form, "note") else None,
-        **kwargs
+        **kwargs,
     )
 
     db.session.add(db_file)
@@ -124,7 +105,7 @@ def download(id_: int):
         file.path,
         download_name=file.filename_exposed,
         as_attachment=as_attachment,
-        mimetype=file.mimetype
+        mimetype=file.mimetype,
     )
 
 

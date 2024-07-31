@@ -1,28 +1,18 @@
-from .forms import EditOligonucleotide
-from .forms import FilterOligonucleotide
-from .forms import FindOligonucleotide
-from .lcsfinder import LCSFinder
-
-from labbase2.forms.utils import err2message
-
+from Bio.Seq import Seq
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, render_template, request
+from flask_login import current_user, login_required
+from labbase2.models import Oligonucleotide, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Oligonucleotide
-from labbase2.views.files.forms import UploadFile
 from labbase2.views.comments.forms import EditComment
-
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask import current_app as app
-from flask_login import login_required
-from flask_login import current_user
+from labbase2.views.files.forms import UploadFile
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from Bio.Seq import Seq
 
+from .forms import EditOligonucleotide, FilterOligonucleotide, FindOligonucleotide
+from .lcsfinder import LCSFinder
 
 __all__ = ["bp"]
 
@@ -32,7 +22,7 @@ bp = Blueprint(
     "oligonucleotides",
     __name__,
     url_prefix="/oligonucleotide",
-    template_folder="templates"
+    template_folder="templates",
 )
 
 
@@ -59,7 +49,7 @@ def index():
         add_form=EditOligonucleotide(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         total=Oligonucleotide.query.count(),
-        title="Oligonucleotides"
+        title="Oligonucleotides",
     )
 
 
@@ -74,7 +64,7 @@ def details(id_: int):
         oligonucleotide=oligonucleotide,
         form=EditOligonucleotide(None, obj=oligonucleotide),
         comment_form=EditComment,
-        file_form=UploadFile
+        file_form=UploadFile,
     )
 
 
@@ -99,7 +89,9 @@ def add():
     except Exception as error:
         return Message.ERROR(error)
     else:
-        return Message.SUCCESS(f"Successfully added oligonucleotide '{oligonucleotide.label}'!")
+        return Message.SUCCESS(
+            f"Successfully added oligonucleotide '{oligonucleotide.label}'!"
+        )
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -124,7 +116,9 @@ def edit(id_: int):
     except Exception as error:
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully edited oligonucleotide {oligonucleotide.label}!")
+    return Message.SUCCESS(
+        f"Successfully edited oligonucleotide {oligonucleotide.label}!"
+    )
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
@@ -144,7 +138,9 @@ def delete(id_):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully deleted oligonucleotide '{oligonucleotide.label}'!")
+    return Message.SUCCESS(
+        f"Successfully deleted oligonucleotide '{oligonucleotide.label}'!"
+    )
 
 
 @bp.route("/find", methods=["GET", "POST"])
@@ -188,7 +184,7 @@ def find():
         filter_form=form,
         entities=results,
         length=length,
-        title="Find oligonucleotides"
+        title="Find oligonucleotides",
     )
 
 

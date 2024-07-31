@@ -1,61 +1,36 @@
-import datetime
-
-from .forms import MappingForm
-
-from labbase2.forms.utils import err2message
-
-from labbase2.utils.message import Message
-from labbase2.utils.permission_required import permission_required
-from labbase2.models import db
-from labbase2.models import Antibody
-from labbase2.models import Plasmid
-from labbase2.models import Oligonucleotide
-from labbase2.models import BaseFile
-from labbase2.models import ImportJob
-from labbase2.models import ColumnMapping
-from labbase2.views.files.routes import upload_file
-from labbase2.views.files.forms import UploadFile
-
-from flask import Blueprint
-from flask import render_template
-from flask import request
-from flask import flash
-from flask import redirect
-from flask import url_for
-from flask import send_file
-from flask import current_app as app
-from flask_login import login_required
-from flask_login import current_user
-from sqlalchemy import func
-from sqlalchemy import inspect
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.exc import IntegrityError
-from werkzeug.utils import secure_filename
-from Bio.Seq import Seq
-
-import pandas as pd
-from pathlib import Path
 from functools import partial
 
+import pandas as pd
+from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from labbase2.models import (
+    Antibody,
+    BaseFile,
+    ColumnMapping,
+    ImportJob,
+    Oligonucleotide,
+    Plasmid,
+    db,
+)
+from labbase2.utils.message import Message
+from labbase2.utils.permission_required import permission_required
+from labbase2.views.files.forms import UploadFile
+from labbase2.views.files.routes import upload_file
+from sqlalchemy.exc import IntegrityError
+
+from .forms import MappingForm
 
 __all__ = ["bp"]
 
 
-bp = Blueprint(
-    "imports",
-    __name__,
-    url_prefix="/imports",
-    template_folder="templates"
-)
+bp = Blueprint("imports", __name__, url_prefix="/imports", template_folder="templates")
 
 
 @bp.route("/", methods=["GET"])
 @login_required
 def index():
     return render_template(
-        "imports/main.html",
-        title="Pending imports",
-        jobs=current_user.import_jobs
+        "imports/main.html", title="Pending imports", jobs=current_user.import_jobs
     )
 
 
@@ -110,11 +85,7 @@ def upload(type_: str):
         return redirect(request.referrer)
 
     # Now create the ImportJob.
-    import_job = ImportJob(
-        user_id=current_user.id,
-        file_id=file.id,
-        entity_type=type_
-    )
+    import_job = ImportJob(user_id=current_user.id, file_id=file.id, entity_type=type_)
 
     for field in entity_cls.importable_fields():
         column_mapping = ColumnMapping(mapped_field=field)
@@ -164,7 +135,7 @@ def edit(id_: int):
         title="Import Oligonucleotides",
         job=import_job,
         table=table,
-        form=form
+        form=form,
     )
 
 
@@ -189,8 +160,7 @@ def execute(id_: int):
             return redirect(request.referrer)
 
     mappings = ColumnMapping.query.filter(
-        ColumnMapping.job_id == job.id,
-        ColumnMapping.input_column.isnot(None)
+        ColumnMapping.job_id == job.id, ColumnMapping.input_column.isnot(None)
     )
     fields = [mapping.mapped_field for mapping in mappings]
     colmns = [mapping.input_column for mapping in mappings]
@@ -220,7 +190,9 @@ def execute(id_: int):
             if isinstance(value, str):
                 row[key] = value.strip()
 
-        origin = f"Created from file {file.filename_exposed} by {current_user.username}."
+        origin = (
+            f"Created from file {file.filename_exposed} by {current_user.username}."
+        )
         entity = entity_cls(origin=origin, **row)
 
         try:
@@ -257,4 +229,3 @@ def delete(id_: int):
         return Message.ERROR(str(err))
     else:
         return Message.SUCCESS(f"Successfully deleted import {id_}!")
-
