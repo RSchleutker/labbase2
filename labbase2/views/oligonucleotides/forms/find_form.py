@@ -12,8 +12,8 @@ __all__ = ["FindOligonucleotide"]
 class FindOligonucleotide(FlaskForm):
     sequence = TextAreaField(
         "Target sequence",
-        validators=[DataRequired(), Length(max=20_000)],
-        filters=[strip_input, make_upper, AllowCharacters("ACTGactg")],
+        validators=[DataRequired(), Length(max=20_000), AllowCharacters("ACTGactg")],
+        filters=[strip_input, make_upper],
         render_kw=render.custom_field
         | {"size": 4, "Placeholder": "Target sequence..."},
         description="""

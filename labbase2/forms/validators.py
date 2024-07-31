@@ -29,8 +29,12 @@ class AllowCharacters:
     def __init__(self, chars: str):
         self.chars = chars
 
-    def __call__(self, x: str) -> str:
-        return "".join([c for c in x if c in self.chars])
+    def __call__(self, form: Form, field: Field) -> None:
+        data = field.data
+
+        for char in data:
+            if char not in self.chars:
+                raise ValidationError(f"'{char}' is not a valid character.")
 
 
 class ContainsNot:
