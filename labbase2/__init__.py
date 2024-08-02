@@ -1,4 +1,4 @@
-import tomllib
+import json
 from pathlib import Path
 from typing import Optional, Union
 
@@ -30,7 +30,8 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
     """
 
     app: Flask = Flask("labbase2", instance_relative_config=True, **kwargs)
-    app.config.from_file(config, load=tomllib.load, text=False)
+    app.config.from_object("labbase2.config.DefaultConfig")
+    app.config.from_file(config, load=json.load, text=False)
 
     # Check if upload folder exists and create if necessary.
     upload_folder: Path = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
