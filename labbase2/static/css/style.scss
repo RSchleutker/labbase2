@@ -559,3 +559,9 @@ b, strong {
   border        : 1px solid #CCC;
   font-family   : monospace;
 }
+
+.mfp-figure {
+  &::after {
+    background: $background-color;
+  }
+}

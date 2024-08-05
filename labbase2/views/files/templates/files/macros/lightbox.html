@@ -1,0 +1,15 @@
+{% macro lightbox(file) %}
+
+    {% set class_ = random_string(8) %}
+
+    <a id="{{ class_ }}" href="{{ url_for('files.download', id_=file.id) }}">
+        {{ file.filename_exposed }}
+    </a>
+
+    <script>
+        $('#{{ class_ }}').magnificPopup(
+            {type: 'image', image: {verticalFit: true}
+        });
+    </script>
+
+{% endmacro %}

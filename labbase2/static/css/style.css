@@ -455,4 +455,8 @@ b, strong {
   font-family: monospace;
 }
 
+.mfp-figure::after {
+  background: #F9F9FA;
+}
+
 /*# sourceMappingURL=style.css.map */
