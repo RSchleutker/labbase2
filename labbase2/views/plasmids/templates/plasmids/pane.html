@@ -61,7 +61,7 @@
                 <td>{{ plasmid.vector }}</td>
             </tr>
             <tr>
-                <td>File</td>
+                <td><i class="fa-regular fa-circle pe-2"></i>File</td>
                 <td class="d-flex">
                     {% if plasmid.file_plasmid_id %}
                     <a class="link-primary flex-shrink-0"
@@ -77,7 +77,7 @@
                 </td>
             </tr>
             <tr>
-                <td>Map</td>
+                <td><i class="fa-regular fa-map pe-2"></i>Map</td>
                 <td class="d-flex">
                     {% if plasmid.file_map_id %}
                     {{ lightbox(plasmid.map) }}

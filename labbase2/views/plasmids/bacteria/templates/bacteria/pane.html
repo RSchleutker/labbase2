@@ -3,7 +3,11 @@
 
 {% macro pane_details(stock, form) %}
 
-    <div class="rounded border p-3 mb-3">
+    {% if stock.disposal_date %}
+        <div class="rounded border p-3 mb-3 opacity-50">
+    {% else %}
+        <div class="rounded border p-3 mb-3">
+    {% endif %}
 
         <div class="d-flex align-items-start mb-3">
 
@@ -72,7 +76,7 @@
     <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="flex-grow-1 mb-0">Glycerol stocks</h2>
+            <h2 class="flex-grow-1 mb-0">Bacterial stocks</h2>
             <div class="flex-shrink-0">
                 {% if current_user.has_permission('Add glycerol stocks') %}
                     <button
@@ -90,7 +94,8 @@
         {% for stock in plasmid.glycerol_stocks %}
             {{ pane_details(stock, form) }}
         {% else %}
-            <div class="fw-bold text-center mb-3">No glycerol stocks for this plasmid!</div>
+            <div class="fw-bold text-center mb-3">No bacterial stocks for this
+                plasmid!</div>
         {% endfor %}
 
         {{ bacteria_add_form(form(), "plasmids.bacteria.add", "POST", -1, plasmid.id) }}

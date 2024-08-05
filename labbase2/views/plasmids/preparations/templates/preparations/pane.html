@@ -4,7 +4,7 @@
 {% macro pane_details(preparation, form) %}
 
     {% if preparation.emptied_date %}
-        <div class="rounded border p-3 mb-3 opacity-40">
+        <div class="rounded border p-3 mb-3 opacity-50">
     {% else %}
         <div class="rounded border p-3 mb-3">
     {% endif %}
@@ -48,8 +48,8 @@
         <p class="fw-bold text-center">{{ preparation.eluent }}</p>
     </div>
     <div class="flex-fill ps-2">
-        <p class="mb-0 text-center">Method</p>
-        <p class="fw-bold text-center">{{ preparation.method }}</p>
+        <p class="mb-0 text-center">Strain</p>
+        <p class="fw-bold text-center">{{ preparation.stock.strain }}</p>
     </div>
 </div>
 

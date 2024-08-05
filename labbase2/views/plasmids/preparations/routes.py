@@ -1,6 +1,8 @@
+from datetime import date, timedelta
+
 from flask import Blueprint
 from flask_login import current_user, login_required
-from labbase2.models import Plasmid, Preparation, db
+from labbase2.models import GlycerolStock, Plasmid, Preparation, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 
@@ -29,6 +31,17 @@ def add(plasmid_id: int):
 
     preparation = Preparation(owner_id=current_user.id, plasmid_id=plasmid_id)
     form.populate_obj(preparation)
+
+    stock = GlycerolStock(
+        plasmid_id=plasmid_id,
+        owner_id=current_user.id,
+        strain=form.strain.data,
+        transformation_date=form.preparation_date.data - timedelta(days=1),
+        disposal_date=form.preparation_date.data,
+        storage_place="Immediately disposed.",
+    )
+
+    preparation.stock = stock
 
     try:
         db.session.add(preparation)

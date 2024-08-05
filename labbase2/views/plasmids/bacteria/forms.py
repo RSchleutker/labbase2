@@ -1,3 +1,4 @@
+from flask import current_app
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import BaseForm, FilterForm
@@ -51,14 +52,7 @@ class EditBacterium(BaseForm):
     strain = SelectField(
         label="Strain",
         validators=[DataRequired()],
-        choices=[
-            ("DB3.1", "DB3.1"),
-            ("DH10B", "DH10B"),
-            ("DH5-Alpha", "DH5-Alpha"),
-            ("XL1 Blue", "XL1 Blue"),
-            ("XL10 Gold", "XL10 Gold"),
-            ("ccdB Survival 2 T1R", "ccdB Survival 2 T1R"),
-        ],
+        choices=[],
         default="DH10B",
         render_kw=render.select_field,
     )
@@ -78,3 +72,9 @@ class EditBacterium(BaseForm):
         validators=[Optional()],
         render_kw=render.custom_field | {"type": "date"},
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.strain.choices = [
+            (strain, strain) for strain in current_app.config["STRAINS"]
+        ]

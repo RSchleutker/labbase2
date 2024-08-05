@@ -1,7 +1,8 @@
+from flask import current_app
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import BaseForm
-from wtforms.fields import DateField, IntegerField, StringField
+from wtforms.fields import DateField, IntegerField, SelectField, StringField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 __all__ = ["EditPreparation"]
@@ -32,6 +33,13 @@ class EditPreparation(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"placeholder": "Eluent"},
     )
+    strain = SelectField(
+        label="Strain",
+        validators=[DataRequired()],
+        choices=[],
+        default="DH10B",
+        render_kw=render.select_field,
+    )
     concentration = IntegerField(
         label="Concentration",
         validators=[DataRequired(), NumberRange(min=1)],
@@ -49,3 +57,9 @@ class EditPreparation(BaseForm):
         validators=[Optional()],
         render_kw=render.custom_field | {"type": "date"},
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.strain.choices = [
+            (strain, strain) for strain in current_app.config["STRAINS"]
+        ]

@@ -205,6 +205,9 @@ class Preparation(db.Model):
     concentration = db.Column(db.Integer())
     storage_place = db.Column(db.String(64))
     emptied_date = db.Column(db.Date)
+    stock_id = db.Column(db.Integer, db.ForeignKey("glycerol_stock.id"), nullable=False)
+
+    stock = db.relationship("GlycerolStock", backref="preparation", lazy=True)
 
     @property
     def restricted_storage_place(self) -> str:
