@@ -2,6 +2,7 @@ import io
 from typing import Optional
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from flask import send_file
@@ -110,7 +111,7 @@ class Plasmid(BaseEntity, Sequence):
         return None
 
     @property
-    def seqrecord(self) -> SeqRecord | None:
+    def seqrecord(self) -> Optional[SeqRecord]:
         """The sequence of this plasmid.
 
         Returns
@@ -124,29 +125,26 @@ class Plasmid(BaseEntity, Sequence):
         available if such a filepath was uploaded.
         """
 
-        return None
-        #
-        # match file.path.suffix.lower():
-        #     case ".gb" | ".gbk":
-        #         format = "genbank"
-        #         reader = io.StringIO
-        #     case ".dna":
-        #         format = "snapgene"
-        #         reader = io.BytesIO
-        #     case ".xdna":
-        #         format = "xdna"
-        #         reader = io.BytesIO
-        #     case _:
-        #         return None
-        #
-        # with reader(file.data) as handle:
-        #     try:
-        #         record = SeqIO.read(handle, format=format)
-        #     except Exception as error:
-        #         print(error)
-        #         return None
-        #     else:
-        #         return record
+        if self.file_plasmid_id is None:
+            return
+
+        match self.file.path.suffix.lower():
+            case ".gb" | ".gbk":
+                format_ = "genbank"
+            case ".dna":
+                format_ = "snapgene"
+            case ".xdna":
+                format_ = "xdna"
+            case _:
+                return None
+
+        try:
+            record = SeqIO.read(self.file.path, format=format_)
+        except Exception as error:
+            print(error)
+            return None
+        else:
+            return record
 
     @classmethod
     def to_zip(cls, entities):
