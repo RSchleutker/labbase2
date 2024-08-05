@@ -1,4 +1,5 @@
 import math
+import mimetypes
 from pathlib import Path
 
 from flask import current_app
@@ -96,8 +97,8 @@ class BaseFile(db.Model):
 
     @property
     def mimetype(self) -> str:
-        _, ext = self.filename_internal.split(".", 1)
-        return f"image/{ext.lower()}"
+        ext = self.path.suffix.lower()
+        return mimetypes.types_map.get(ext, "application/octet-stream")
 
     def set_filename(self):
         _, ext = self.filename_exposed.split(".", 1)
