@@ -1,4 +1,6 @@
 {% from 'plasmids/form.html' import plasmid_add_form %}
+{% from 'plasmids/form.html' import upload_plasmid_form %}
+{% from 'files/macros/lightbox.html' import lightbox %}
 
 
 {% macro pane_details(status, pane_id, plasmid, form) %}
@@ -59,6 +61,35 @@
                 <td>{{ plasmid.vector }}</td>
             </tr>
             <tr>
+                <td>File</td>
+                <td class="d-flex">
+                    {% if plasmid.file_plasmid_id %}
+                    <a class="link-primary flex-shrink-0"
+                       href="{{ url_for('files.download', id_=plasmid.file_plasmid_id) }}">
+                    {{ plasmid.file.filename_exposed }}
+                    </a>
+                    {% endif %}
+                    <div class="flex-fill"></div>
+                    <a class="link-primary me-2 flex-shrink-0"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-upload-{{ plasmid.id }}-file">
+                        <i class="fa-solid fa-upload"></i></a>
+                </td>
+            </tr>
+            <tr>
+                <td>Map</td>
+                <td class="d-flex">
+                    {% if plasmid.file_map_id %}
+                    {{ lightbox(plasmid.map) }}
+                    {% endif %}
+                    <div class="flex-fill"></div>
+                    <a class="link-primary me-2 flex-shrink-0"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-upload-{{ plasmid.id }}-map">
+                        <i class="fa-solid fa-upload"></i></a>
+                </td>
+            </tr>
+            <tr>
                 <td>Storage place</td>
                 <td>{{ plasmid.storage_place }}</td>
             </tr>
@@ -93,5 +124,9 @@
     </div>
 
     {{ plasmid_add_form(form, "plasmids.edit", "PUT", plasmid.id) }}
+    {{ upload_plasmid_form(file_form(), 'plasmids.upload_plasmid_file', plasmid.id,
+    "file") }}
+    {{ upload_plasmid_form(file_form(), 'plasmids.upload_plasmid_file', plasmid.id,
+    "map") }}
 
 {% endmacro %}

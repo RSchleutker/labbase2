@@ -11,6 +11,8 @@
             <th scope="col">Insert</th>
             <th scope="col">Vector</th>
             <th scope="col">Cloning date</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
 
         </thead>
@@ -25,6 +27,15 @@
                 <td>{{ plasmid.insert }}</td>
                 <td>{{ plasmid.vector }}</td>
                 <td>{{ plasmid.cloning_date }}</td>
+                <td>
+                    {% if plasmid.file_plasmid_id %}
+                        <i class="fa-regular fa-circle"></i>
+                    {% endif %}</td>
+                <td>
+                    {% if plasmid.file_map_id %}
+                        <i class="fa-regular fa-map"></i>
+                    {% endif %}</td>
+                </td>
             </tr>
         {% endfor %}
 

@@ -56,6 +56,25 @@ class Plasmid(BaseEntity, Sequence):
     cloning_date = db.Column(CustomDate, info={"importable": True})
     description = db.Column(db.String(2048), info={"importable": True})
     reference = db.Column(db.String(512), info={"importable": True})
+    file_plasmid_id = db.Column(
+        db.Integer, db.ForeignKey("base_file.id"), nullable=True
+    )
+    file_map_id = db.Column(db.Integer, db.ForeignKey("base_file.id"), nullable=True)
+
+    file = db.relationship(
+        "BaseFile",
+        lazy=True,
+        foreign_keys=[file_plasmid_id],
+        single_parent=True,
+        cascade="all, delete-orphan",
+    )
+    map = db.relationship(
+        "BaseFile",
+        lazy=True,
+        foreign_keys=[file_map_id],
+        single_parent=True,
+        cascade="all, delete-orphan",
+    )
 
     # One-to-many relationships.
     preparations = db.relationship(

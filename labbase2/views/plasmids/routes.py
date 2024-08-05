@@ -1,12 +1,13 @@
 from flask import Blueprint
 from flask import current_app as app
-from flask import flash, render_template, request
+from flask import flash, redirect, render_template, request
 from flask_login import current_user, login_required
-from labbase2.models import Plasmid, db
+from labbase2.models import BaseFile, Plasmid, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
+from labbase2.views.files.routes import upload_file
 from labbase2.views.requests.forms import EditRequest
 
 from . import bacteria, preparations
@@ -134,6 +135,42 @@ def details(id_: int):
         preparation_form=EditPreparation,
         bacteria_form=EditBacterium,
     )
+
+
+@bp.route("/<int:id_>/upload/<string:type_>/", methods=["POST"])
+@login_required
+@permission_required("Upload files")
+def upload_plasmid_file(id_: int, type_: str):
+    form = UploadFile()
+
+    if (plasmid := Plasmid.query.get(id_)) is None:
+        flash(f"No plasmid with ID {id_}!", "danger")
+        return redirect(request.referrer)
+
+    if plasmid.owner_id != current_user.id:
+        flash(f"Only plasmid owner can upload files!", "danger")
+        return redirect(request.referrer)
+
+    if not form.validate():
+        flash("No file was uploaded!", "danger")
+        return redirect(request.referrer)
+
+    file = upload_file(form, BaseFile)
+
+    match type_:
+        case "file":
+            plasmid.file = file
+            flash("Successfully uploaded plasmid file!", "success")
+        case "map":
+            plasmid.map = file
+            flash("Successfully uploaded plasmid map!", "success")
+        case _:
+            flash(f"Unknown type {type_}!", "danger")
+            db.session.delete(file)
+
+    db.session.commit()
+
+    return redirect(request.referrer)
 
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
