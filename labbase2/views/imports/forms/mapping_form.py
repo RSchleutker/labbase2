@@ -49,7 +49,7 @@ class MappingForm(FlaskForm):
             render_kw={"class": "form-select form-select-sm"},
         )
     )
-    submit = SubmitField(label="Update mapping", render_kw=render.select_field)
+    submit = SubmitField(label="Update mapping", render_kw=render.submit_field)
 
     def __init__(
         self, fields: list[str], choices: list[tuple[str, str]], *args, **kwargs

@@ -1,4 +1,5 @@
 import json
+import secrets
 from pathlib import Path
 from typing import Optional, Union
 
@@ -133,5 +134,6 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
 
     app.jinja_env.filters["format_date"] = template_filters.format_date
     app.jinja_env.filters["format_datetime"] = template_filters.format_datetime
+    app.jinja_env.globals["random_string"] = secrets.token_hex
 
     return app
