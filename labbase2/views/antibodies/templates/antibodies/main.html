@@ -18,16 +18,16 @@
 
 {% block download %}
 
-    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="csv", **args) }}">
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("antibodies.export", format_="csv", **args) }}">
         <i class="bi bi-filetype-csv me-1"></i> Download CSV file
     </a>
-    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="json", **args) }}">
-        <i class="bi bi-filetype-json me-1"></i> Down JSON file
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("antibodies.export", format_="json", **args) }}">
+        <i class="bi bi-filetype-json me-1"></i> Download JSON file
     </a>
 
     <li><hr class="dropdown-divider"></li>
 
-    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("antibodies.export", format_="fasta", **args) }}">
         <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
     </a>
 
@@ -39,6 +39,6 @@
     {{ super() }}
 
     {{ upload_file_form(import_file_form, url_for("imports.upload", type_="antibody")) }}
-    {{ antibody_add_form(add_form, ".add", "POST", -1) }}
+    {{ antibody_add_form(add_form, "antibodies.add", "POST", -1) }}
 
 {% endblock %}

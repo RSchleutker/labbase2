@@ -93,9 +93,13 @@ def edit(id_: int):
     return Message.SUCCESS(f"Successfully edited file {file.filename_exposed}!")
 
 
+@bp.route("/", methods=["GET"], defaults={"id_": None})
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
-def download(id_: int):
+def download(id_: Optional[int] = None):
+    if id_ is None:
+        return None
+
     if (file := BaseFile.query.get(id_)) is None:
         return f"No file with ID {id_}!"
 

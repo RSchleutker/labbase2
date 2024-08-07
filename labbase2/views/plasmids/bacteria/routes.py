@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from labbase2.models import GlycerolStock, Plasmid, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
+from labbase2.views.files.forms import UploadFile
 from labbase2.views.plasmids.forms import EditPlasmid
 
 from .forms import EditBacterium, FilterBacteria
@@ -113,6 +114,7 @@ def details(id_: int, format_: str):
         template,
         stock=stock,
         form=edit_form,
+        file_form=UploadFile,
         plasmid_form=EditPlasmid(None, obj=stock.plasmid),
     )
 

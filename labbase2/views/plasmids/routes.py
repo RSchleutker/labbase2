@@ -159,9 +159,11 @@ def upload_plasmid_file(id_: int, type_: str):
 
     match type_:
         case "file":
+            db.session.delete(plasmid.file)
             plasmid.file = file
             flash("Successfully uploaded plasmid file!", "success")
         case "map":
+            db.session.delete(plasmid.map)
             plasmid.map = file
             flash("Successfully uploaded plasmid map!", "success")
         case _:

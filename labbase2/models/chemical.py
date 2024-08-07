@@ -1,11 +1,8 @@
 from labbase2.models import db
-from labbase2.models.mixins.filter import Filter
 from labbase2.models.consumable import Consumable
-
-from sqlalchemy import asc
-from sqlalchemy import desc
+from labbase2.models.mixins.filter import Filter
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import subqueryload
-
 
 __all__ = ["Chemical", "StockSolution"]
 
@@ -47,15 +44,12 @@ class Chemical(Consumable):
         db.Integer,
         db.ForeignKey("consumable.id"),
         primary_key=True,
-        info={"importable": False}
+        info={"importable": False},
     )
     cas_number = db.Column(db.String(16), info={"importable": True})
     pubchem_cid = db.Column(db.Integer, info={"importable": True})
     responsible_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False,
-        info={"importable": True}
+        db.Integer, db.ForeignKey("user.id"), nullable=False, info={"importable": True}
     )
     molecular_weight = db.Column(db.Float, info={"importable": True})
 
@@ -90,16 +84,8 @@ class StockSolution(db.Model, Filter):
     """
 
     id = db.Column(db.Integer, primary_key=True)
-    chemical_id = db.Column(
-        db.Integer,
-        db.ForeignKey("chemical.id"),
-        nullable=False
-    )
-    responsible_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False
-    )
+    chemical_id = db.Column(db.Integer, db.ForeignKey("chemical.id"), nullable=False)
+    responsible_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     solvent = db.Column(db.String(64), nullable=False)
     concentration = db.Column(db.String(32), nullable=False)
     storage_place = db.Column(db.String(64), nullable=False)
@@ -107,7 +93,7 @@ class StockSolution(db.Model, Filter):
 
     @classmethod
     def _filters(cls, **fields) -> list:
-        if lbl := fields.pop('label', None):
+        if lbl := fields.pop("label", None):
             f = super()._filters(**fields) + [Chemical.label.ilike(f"%{lbl}%")]
         else:
             f = super()._filters(**fields)
@@ -122,7 +108,7 @@ class StockSolution(db.Model, Filter):
         else:
             field = getattr(cls, order_by.strip())
 
-        return fnc(field),
+        return (fnc(field),)
 
     @classmethod
     def _entities(cls) -> tuple:
@@ -130,4 +116,4 @@ class StockSolution(db.Model, Filter):
 
     @classmethod
     def _joins(cls) -> tuple:
-        return (Chemical, cls.chemical_id == Chemical.id),
+        return ((Chemical, cls.chemical_id == Chemical.id),)

@@ -1,0 +1,85 @@
+{% extends 'base-site.html' %}
+
+{% from 'oligonucleotides/table.html' import table_pdf %}
+
+
+{% macro pdf_details(oligonucleotide) %}
+
+    <h2>{{ oligonucleotide.label }}</h2>
+
+    <div class="p-3 border rounded">
+
+        <div class="mb-4 text-break font-monospace fs-6 rounded border bg-light
+        py-1 px-2">
+            {{ oligonucleotide.formatted_seq()|safe }}
+        </div>
+
+        <table class="table table-sm">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ oligonucleotide.id }}</td>
+            </tr>
+            <tr>
+                <td>Entry created</td>
+                <td>{{ oligonucleotide.timestamp_created | format_datetime }}</td>
+            </tr>
+            <tr>
+                <td>Origin</td>
+                <td>{{ oligonucleotide.origin }}</td>
+            </tr>
+            <tr>
+                <td>Last update</td>
+                <td>{{ oligonucleotide.timestamp_edited | format_datetime }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ oligonucleotide.label }}</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ oligonucleotide.owner.username }}</td>
+            </tr>
+            <tr>
+                <td>Order date</td>
+                <td>{{ oligonucleotide.date_ordered | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Storage place</td>
+                <td>{{ oligonucleotide.storage_place }}</td>
+            </tr>
+            <tr>
+                <td>Length</td>
+                <td>{{ oligonucleotide|length }} bases</td>
+            </tr>
+            <tr>
+                <td>GC content</td>
+                <td>{{ oligonucleotide.gc_content | round(1) }}%</td>
+            </tr>
+            </tbody>
+        </table>
+
+        {% if oligonucleotide.description %}
+            <h3 class="mt-4">Description</h3>
+            <p class="text-justify">
+                {{ oligonucleotide.description }}
+            </p>
+        {% endif %}
+
+    </div>
+
+{% endmacro %}
+
+
+
+{% block body %}
+
+    <div class="container-fluid w-100 m-4">
+
+    <h1>Table</h1>
+
+        {{ table_pdf(oligonucleotides) }}
+
+    </div>
+
+{% endblock %}

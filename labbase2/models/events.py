@@ -1,9 +1,5 @@
-from sqlalchemy import event
-from sqlalchemy import func
-from labbase2.models import db
-from labbase2.models import file
-from labbase2.models import Oligonucleotide
-from labbase2.models import ColumnMapping
+from labbase2.models import ColumnMapping, Oligonucleotide, db, file
+from sqlalchemy import event, func
 
 
 @event.listens_for(db.session, "deleted_to_detached")
@@ -24,6 +20,8 @@ def intercept_deleted_to_detached(session, obj) -> None:
     -------
     None
     """
+
+    print("Deleting file.")
 
     if isinstance(obj, file.BaseFile):
         obj.path.unlink(missing_ok=True)

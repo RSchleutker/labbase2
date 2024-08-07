@@ -14,7 +14,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
     Parameters
     ----------
     config : Union[str, Path]
-        A filename pointing to the configuration file. File has to be in TOML format.
+        A filename pointing to the configuration file. File has to be in JSON format.
         Filename is supposed to be relative to the instance path.
     kwargs
         Additional parameters passed to the Flask class during instantiation.
@@ -110,6 +110,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
         auth,
         base,
         batches,
+        chemicals,
         comments,
         files,
         imports,
@@ -121,6 +122,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
     app.register_blueprint(base.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(imports.bp)
+    app.register_blueprint(chemicals.bp)
     app.register_blueprint(comments.bp)
     app.register_blueprint(files.bp)
     app.register_blueprint(requests.bp)
