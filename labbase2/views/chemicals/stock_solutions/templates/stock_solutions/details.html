@@ -1,0 +1,110 @@
+{% from "stock_solutions/form.html" import stock_solution_add_form %}
+{% from 'chemicals/pane.html' import pane_details with context %}
+
+
+<h1 class="mb-4">{{ stock.chemical.label }}</h1>
+
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
+
+    <ul class="nav nav-pills m-0" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-chemical"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Chemical
+            </button>
+        </li>
+
+    </ul>
+
+</div>
+
+<div class="tab-content bg-white rounded border my-3">
+
+    <div class="tab-pane container active" id="tab-info">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission('Add stock solutions') %}
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-solution-{{ stock.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td>{{ stock.id }}</td>
+            </tr>
+            <tr>
+                <td>Chemical</td>
+                <td>{{ stock.chemical.label }}</td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ stock.owner.username }}</td>
+            </tr>
+            <tr>
+                <td>Responsible for chemical</td>
+                <td>{{ stock.chemical.responsible.username }}</td>
+            </tr>
+            <tr>
+                <td>Solvent</td>
+                <td>{{ stock.solvent }}</td>
+            </tr>
+            <tr>
+                <td>Concentration</td>
+                <td>{{ stock.concentration }}</td>
+            </tr>
+            <tr>
+                <td>Storage place</td>
+                <td>{{ stock.storage_place }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        {% if stock.details %}
+            <h3 class="mt-4">Details</h3>
+            <p class="text-justify">
+                {{ stock.details }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {{ pane_details(
+            status='fade',
+            pane_id='tab-chemical',
+            chemical=stock.chemical,
+            form=chemical_form
+        ) }}
+
+</div>
+
+{{ stock_solution_add_form(form, "chemicals.solutions.edit", "PUT", stock.id, stock.chemical_id) }}

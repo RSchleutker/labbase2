@@ -165,7 +165,7 @@ class User(db.Model, UserMixin, Export):
         "Chemical",
         backref="responsible",
         lazy=True,
-        foreign_keys="Chemical.responsible_id",
+        foreign_keys="Chemical.owner_id",
     )
     stock_solutions = db.relationship("StockSolution", backref="owner", lazy=True)
     import_jobs = db.relationship(

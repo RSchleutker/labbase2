@@ -1,0 +1,66 @@
+{% import 'macros/forms.html' as forms %}
+{% import 'macros/modal.html' as modal %}
+
+{% macro stock_solution_add_form(form, endpoint, method, id, chemical_id) %}
+
+    {% if id == -1 %}
+        {% set action = url_for(endpoint, chemical_id=chemical_id) %}
+        {% set title = 'Add Stock Solution' %}
+    {% else %}
+        {% set action = url_for(endpoint, id_=id, chemical_id=chemical_id) %}
+        {% set title = 'Edit Stock Solution' %}
+    {% endif %}
+
+    {% set modal_id = 'modal-edit-solution-' ~ id %}
+    {% set form_id = 'form-edit-solution-' ~ id %}
+
+    {% call modal.modal(id=modal_id, title=title) %}
+
+        <form action="{{ action }}" method="get" id="{{ form_id }}">
+
+            {{ form.hidden_tag() }}
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.solvent, 'Solvent') }}
+            </div>
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.concentration, 'Concentration') }}
+            </div>
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.storage_place, 'Storage place') }}
+            </div>
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.date_created, 'Created') }}
+            </div>
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.date_emptied, 'Emptied') }}
+            </div>
+
+            <div class="row mb-3">
+                {{ forms.field_row(form.details, 'Details') }}
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-10">
+                    {{ form.submit() }}
+                </div>
+            </div>
+
+        </form>
+
+        <div id="{{ form_id }}-messages"></div>
+
+        {{ forms.script_send_form(
+            form=form,
+            form_name=form_id,
+            method=method,
+            message_field=form_id ~ '-messages'
+         ) }}
+
+    {% endcall %}
+
+{% endmacro %}

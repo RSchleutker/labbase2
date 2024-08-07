@@ -1,0 +1,44 @@
+{% extends "base-site-entities.html" %}
+
+{% from "chemicals/table.html" import table %}
+{% from "chemicals/form.html" import chemical_add_form %}
+
+
+{% block import %}
+
+    <button type="button"
+            class="btn btn-sm btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-chemical--1">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+{% endblock %}
+
+
+{% block download %}
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("chemicals.export", format_="csv", **args) }}">
+        <i class="bi bi-filetype-csv me-1"></i> Download CSV file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("chemicals.export", format_="json", **args) }}">
+        <i class="bi bi-filetype-json me-1"></i> Download JSON file
+    </a>
+
+    <li><hr class="dropdown-divider"></li>
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for("chemicals.export", format_="fasta", **args) }}">
+        <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
+    </a>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    {{ super() }}
+
+    {{ upload_file_form(import_file_form, url_for("imports.upload", type_="chemical")) }}
+    {{ chemical_add_form(add_form, "chemicals.add", "POST", -1) }}
+
+{% endblock %}
