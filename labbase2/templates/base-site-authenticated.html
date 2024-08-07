@@ -37,6 +37,19 @@
 
                     <li class="nav-item dropdown">
 
+                        {{ nav.dropdown('Chemicals') }}
+
+                        <ul class="dropdown-menu">
+                            <li>{{ nav.dropdown_link('chemicals.index', 'Chemicals') }}</li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>{{ nav.dropdown_link('chemicals.solutions.index', 'Stock solutions') }}</li>
+                            <li>{{ nav.dropdown_link('batches.index', 'Batches', consumable_type='chemical') }}</li>
+                        </ul>
+
+                    </li>
+
+                    <li class="nav-item dropdown">
+
                         {{ nav.dropdown('Plasmids') }}
 
                         <ul class="dropdown-menu">

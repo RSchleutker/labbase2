@@ -1,0 +1,118 @@
+{% from 'chemicals/pane.html' import pane_details with context %}
+{% from 'comments/pane.html' import comment_pane with context %}
+{% from 'files/pane.html' import files_pane with context %}
+{% from 'batches/pane.html' import batch_pane with context %}
+{% from 'stock_solutions/pane.html' import solution_pane with context %}
+{% from 'chemicals/form.html' import chemical_add_form %}
+{% from 'files/form.html' import file_upload_form %}
+
+
+{% set n_comments = chemical.comments | length %}
+
+
+<h1 class="mb-4">{{ chemical.label }}</h1>
+
+<div class="btn-group btn-group-sm bg-white rounded border w-100" role="group">
+
+    <ul class="nav nav-pills m-0" role="tablist">
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-info"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                Details
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-solutions"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Stocks
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-batches"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Batches
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-files"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Files
+            </button>
+        </li>
+
+        <li class="nav-item">
+            <button class="nav-link position-relative"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-comments"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                Comments
+                {% if n_comments %}{{ pill.top_right(n_comments, 'bg-primary') }}{% endif %}
+            </button>
+        </li>
+
+    </ul>
+
+</div>
+
+<div class="tab-content bg-white rounded border my-3">
+
+    {{ pane_details(
+        status='active',
+        pane_id='tab-info',
+        chemical=chemical,
+        form=form
+    ) }}
+
+    {{ solution_pane(
+        status='fade',
+        pane_id='tab-solutions',
+        chemical=chemical,
+        form=stock_form
+      ) }}
+
+    {{ batch_pane(
+        status='fade',
+        pane_id='tab-batches',
+        consumable=chemical,
+        form=batch_form
+      ) }}
+
+    {{ files_pane(
+        status='fade',
+        pane_id='tab-files',
+        entity=chemical,
+        form=file_form
+      ) }}
+
+    {{ comment_pane(
+        status='fade',
+        pane_id='tab-comments',
+        entity=chemical,
+        form=comment_form
+      ) }}
+
+</div>
+
+{{ chemical_add_form(form, "chemicals.edit", "PUT", chemical.id) }}

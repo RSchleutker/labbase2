@@ -1,0 +1,64 @@
+{% from 'chemicals/form.html' import chemical_add_form %}
+
+
+{% macro pane_details(status, pane_id, chemical, form) %}
+
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission("Add chemicals") %}
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-chemical-{{ chemical.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
+
+                    {% if chemical.deletable %}
+                        <a class="text-danger"
+                           onclick="delete_entity('{{ url_for("chemicals.delete", id_=chemical.id) }}')">
+                            <i class="fa-solid fa-trash"></i></a>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ chemical.id }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ chemical.label }}</td>
+            </tr>
+            <tr>
+                <td>Created</td>
+                <td>{{ chemical.timestamp_created }}</td>
+            </tr>
+            <tr>
+                <td>Last edited</td>
+                <td>{{ chemical.timestamp_edited }}</td>
+            </tr>
+            <tr>
+                <td>Responsible</td>
+                <td>{{ chemical.responsible.username }}</td>
+            </tr>
+            <tr>
+                <td>Molecular weight</td>
+                <td>{{ chemical.molecular_weight }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    {{ chemical_add_form(form, "chemicals.edit", "PUT", chemical.id) }}
+
+{% endmacro %}

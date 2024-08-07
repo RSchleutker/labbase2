@@ -1,0 +1,96 @@
+{% from 'stock_solutions/form.html' import stock_solution_add_form %}
+
+
+{% macro pane_details(stock, form) %}
+
+    {% if stock.date_emptied %}
+        <div class="rounded border p-3 mb-3 opacity-40">
+    {% else %}
+        <div class="rounded border p-3 mb-3">
+    {% endif %}
+
+
+<div class="d-flex align-items-start mb-2">
+
+    <div class="flex-fill">
+        <h5 class="mb-1">{{ stock.owner.username }}</h5>
+        <p>Prepared on {{ stock.date_created | format_date }}</p>
+    </div>
+
+    <div class="flex-shrink-0">
+
+        {% if current_user.has_permission('Add stock solutions') %}
+
+            <a class="text-primary me-2"
+               data-bs-toggle="modal"
+               data-bs-target="#modal-edit-solution-{{ stock.id }}">
+                <i class="fa-solid fa-pen"></i></a>
+
+            <a class="text-danger"
+               onclick="delete_entity('{{ url_for("chemicals.solutions.delete", id_=stock.id) }}')">
+                <i class="fa-solid fa-trash"></i></a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="d-flex align-items-stretch">
+    <div class="flex-fill pr-2 border-right">
+        <p class="mb-0 text-center">Storage place</p>
+        <p class="text-info fw-bold text-center">{{ stock.storage_place }}</p>
+    </div>
+    <div class="flex-fill pl-2 pr-2 border-right">
+        <p class="mb-0 text-center">Conc.</p>
+        <p class="fw-bold text-center">{{ stock.concentration }}</p>
+    </div>
+    <div class="flex-fill pl-2">
+        <p class="mb-0 text-center">Solvent</p>
+        <p class="fw-bold text-center">{{ stock.solvent }}</p>
+    </div>
+</div>
+
+    {% if stock.details %}
+        <p class="mb-0">{{ stock.details }}</p>
+    {% endif %}
+
+</div>
+
+    {{ stock_solution_add_form(form(None, obj=stock), "chemicals.solutions.edit", "PUT", stock.id) }}
+
+{% endmacro %}
+
+
+{% macro solution_pane(status, pane_id, chemical, form) %}
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="flex-grow-1 mb-0">Stock solutions</h2>
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission('Add stock solutions') %}
+                    <button
+                        type="button"
+                        class="btn btn-success btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-edit-solution--1">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                {% endif %}
+
+            </div>
+        </div>
+
+
+        {% for stock in chemical.stocks %}
+            {{ pane_details(stock, form) }}
+        {% else %}
+            <div class="fw-bold text-center mb-3">No stock solutions found!</div>
+        {% endfor %}
+
+        {{ stock_solution_add_form(form(), "chemicals.solutions.add", "POST", -1, chemical.id) }}
+
+    </div>
+{% endmacro %}

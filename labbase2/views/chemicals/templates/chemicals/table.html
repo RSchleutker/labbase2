@@ -1,0 +1,32 @@
+{% macro table(entities) %}
+
+    <table class="table table-results">
+
+        <thead>
+
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Batches</th>
+            <th scope="col">Stocks</th>
+            <th scope="col">Responsible</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for chemical in entities %}
+            <tr onclick="request_details('{{ url_for(".details", id_=chemical.id) }}')">
+                <td class="id">{{ chemical.id }}</td>
+                <td>{{ chemical.label }}</td>
+                <td>{{ chemical.batches | length }}</td>
+                <td>{{ chemical.stocks | length }}</td>
+                <td>{{ chemical.responsible.username }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}
