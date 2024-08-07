@@ -6,6 +6,7 @@ from flask_login import current_user, login_required
 from labbase2.models import (
     Antibody,
     BaseFile,
+    Chemical,
     ColumnMapping,
     ImportJob,
     Oligonucleotide,
@@ -43,6 +44,8 @@ def upload(type_: str):
     match type_.lower():
         case "antibody":
             entity_cls = Antibody
+        case "chemical":
+            entity_cls = Chemical
         case "oligonucleotide":
             entity_cls = Oligonucleotide
         case "plasmid":
