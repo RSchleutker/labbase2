@@ -48,6 +48,15 @@ class DefaultConfig(object):
             """Allows a user to add antibodies. Suggested level: Master/PhD student.""",
         ),
         (
+            "Add chemicals",
+            """Allows a user to add chemicals. Suggested level: PhD student.""",
+        ),
+        (
+            "Add stock solutions",
+            """Allows a user to create glycerol stocks. Suggested level: PhD 
+            student.""",
+        ),
+        (
             "Add plasmid",
             """Allows a user to add cloned plasmids. Suggested level: Bachelor 
             student.""",
