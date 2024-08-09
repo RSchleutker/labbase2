@@ -1,0 +1,14 @@
+{% extends 'auth/base-site-user.html' %}
+{% from 'auth/table.html' import table with context %}
+
+
+{% block content2 %}
+
+
+    <h1 class="mt3 mb-4">Users</h1>
+
+    {{ table(users) }}
+
+
+
+{% endblock %}

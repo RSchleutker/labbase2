@@ -1,0 +1,85 @@
+{% macro table(users) %}
+
+    <table class="table table-results">
+
+        <thead class="table-light">
+
+        <tr>
+            <th scope="col">Status</th>
+            <th scope="col">ID</th>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col"></th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for user in users %}
+            <tr>
+                <td class="text-center">
+                    {% if not user.is_active %}
+                        <strong>Inactive</strong>
+                    {% elif user.is_admin %}
+                        <strong>Admin</strong>
+                    {% endif %}
+                </td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.first_name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if not user.is_active %}
+                        <a type="button"
+                           href="{{ url_for('auth.change_active_status', id_=user.id) }}"
+                           class="btn btn-sm btn-secondary">
+                            Activate
+                        </a>
+                    {% elif current_user.is_admin or current_user.has_permission
+                        ('Manage users') %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-primary dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="{{ url_for('auth.change_permissions', id_=user.id) }}">
+                                        Manage permissions
+                                    </a>
+                                </li>
+                                <li>
+                                    {% if user.is_admin %}
+                                        <a class="dropdown-item"
+                                           href="{{ url_for('auth.change_admin_status', id_=user.id) }}">
+                                            Make normal user
+                                        </a>
+                                    {% else %}
+                                        <a class="dropdown-item"
+                                           href="{{ url_for('auth.change_admin_status', id_=user.id) }}">
+                                            Make admin
+                                        </a>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="{{ url_for('auth.change_active_status', id_=user.id) }}">
+                                        Inactivate user
+                                    </a>
+                                </li>
+                            </ul>
+
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}

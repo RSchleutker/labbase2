@@ -77,7 +77,8 @@
                         {{ nav.dropdown('<span class="fas fa-user"></span>&nbsp;' ~ current_user.username) }}
 
                         <ul class="dropdown-menu">
-                            <li>{{ nav.dropdown_link('auth.edit_user', 'Profile') }}</li>
+                            <li>{{ nav.dropdown_link('auth.edit_user', 'User section')
+                                }}</li>
                             <li>{{ nav.dropdown_link('imports.index', 'My imports') }}</li>
                             <li><hr class="dropdown-divider"></li>
                             <li>{{ nav.dropdown_link('auth.logout', '<span class="fas fa-sign-out-alt"></span>&nbsp;Logout') }}</li>

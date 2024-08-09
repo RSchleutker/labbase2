@@ -177,6 +177,11 @@ def change_password():
         else:
             flash("Old password incorrect!", "danger")
 
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(": ".join([field, error]), "danger")
+
     return render_template("auth/change-password.html", form=form)
 
 
@@ -185,6 +190,12 @@ def change_password():
 @login_required
 @permission_required("Manage users")
 def change_permissions(id_: int = None):
+    users = (
+        User.query.filter(User.is_active)
+        .order_by(User.last_name, User.first_name)
+        .all()
+    )
+
     if id_ is None:
         user = current_user
     else:
@@ -210,11 +221,73 @@ def change_permissions(id_: int = None):
         "auth/edit-permissions.html",
         form=form,
         selected_user=user,
-        users=User.query.filter(User.is_active).order_by(User.last_name).all(),
+        users=users,
     )
 
 
+@bp.route("/change-admin-status/<int:id_>", methods=["GET"])
+@login_required
+@permission_required("Manage users")
+def change_admin_status(id_: int):
+    user = User.query.get(id_)
+
+    if user is None:
+        flash(f"No user with ID {id_})!", "danger")
+    else:
+        user.is_admin = not user.is_admin
+
+        try:
+            db.session.commit()
+        except Exception as error:
+            db.session.rollback()
+            flash(str(error), "danger")
+        else:
+            flash(f"Successfully changed admin setting for {user.username}!", "success")
+
+    if User.query.filter(User.is_admin).count() == 0:
+        flash("No user with admin rights! Reverting previous change!", "warning")
+        user.is_admin = True
+        db.session.commit()
+
+    return redirect(request.referrer)
+
+
+@bp.route("/change-active-status/<int:id_>", methods=["GET"])
+@login_required
+@permission_required("Manage users")
+def change_active_status(id_: int):
+    user = User.query.get(id_)
+
+    if user is None:
+        flash(f"No user with ID {id_})!", "danger")
+    else:
+        user.is_active = not user.is_active
+
+        try:
+            db.session.commit()
+        except Exception as error:
+            db.session.rollback()
+            flash(str(error), "danger")
+        else:
+            flash(
+                f"Successfully changed active setting for {user.username}!", "success"
+            )
+
+    if User.query.filter(User.is_active).count() == 0:
+        flash("No active user! Reverting previous change!", "warning")
+        user.is_active = True
+        db.session.commit()
+
+    return redirect(request.referrer)
+
+
+@bp.route
 @bp.route("/users", methods=["GET"])
 @login_required
 def users():
-    return redirect(request.referrer)
+    users = (
+        User.query.order_by(
+            User.is_active.desc(), User.is_admin.desc(), User.last_name, User.first_name
+        )
+    ).all()
+    return render_template("auth/users.html", users=users, title="Users")

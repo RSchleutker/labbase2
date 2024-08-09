@@ -15,8 +15,8 @@
                     {{ nav.link('auth.edit_user', 'Edit profile') }}
                     {{ nav.link('auth.change_password', 'Change password') }}
                     {% if current_user.has_permission('Manage users') %}
+                        {{ nav.link('auth.users', 'Manage users') }}
                         {{ nav.link('auth.register', 'Register new user') }}
-                        {{ nav.link('auth.change_permissions', 'Change permissions') }}
                     {% endif %}
                 </ul>
 

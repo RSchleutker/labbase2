@@ -18,7 +18,7 @@
                 <ul class="dropdown-menu">
                     {% for user in users %}
                         <li><a class="dropdown-item" href="{{ url_for('auth.change_permissions', id_=user.id) }}">
-                            {{ user.username }}
+                            {{ user.last_name }}, {{ user.first_name }}
                         </a></li>
                     {% endfor %}
                 </ul>
