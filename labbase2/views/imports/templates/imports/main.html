@@ -14,7 +14,7 @@
                 <h5 class="mb-1">{{ job.entity_type | capitalize }}</h5>
                 <p class="mb-0">Generated on {{ job.timestamp | format_datetime }}</p>
             </div>
-            <div class="flex-fill align-self-stretch border-left border-right ml-4 pl-4 mr-4 pr-4">
+            <div class="flex-fill align-self-stretch border-start border-end ml-4 pl-4 mr-4 pr-4">
                 <p class="mb-0">Uploaded file: <em>{{ job.file.original_filename }}</em></p>
                 <p class="mb-0">Last edited on {{ job.timestamp_edited | format_datetime }}</p>
             </div>

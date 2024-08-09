@@ -184,6 +184,9 @@ def execute(id_: int):
     table = table[colmns]
     table.columns = fields
 
+    successfull = 0
+    unsuccessfull = 0
+
     for row in table.itertuples(index=False):
         row = row._asdict()
 
@@ -202,12 +205,15 @@ def execute(id_: int):
             db.session.add(entity)
             db.session.commit()
         except IntegrityError:
+            unsuccessfull += 1
             db.session.rollback()
             continue
         except Exception as error:
-            print(error)
+            unsuccessfull += 1
             db.session.rollback()
             return redirect(url_for(".index"))
+        else:
+            successfull += 1
 
     db.session.delete(job)
     db.session.commit()
