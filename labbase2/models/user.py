@@ -108,7 +108,7 @@ class User(db.Model, UserMixin, Export):
     first_name = db.Column(db.String(64), nullable=False)
     last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    password_hash = db.Column(db.String(512), nullable=False)
     file_picture_id = db.Column(
         db.Integer, db.ForeignKey("base_file.id"), nullable=True
     )

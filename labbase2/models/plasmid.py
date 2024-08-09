@@ -152,10 +152,10 @@ class Plasmid(BaseEntity, Sequence):
 
         with ZipFile(mem, "w", ZIP_DEFLATED, False) as archive:
             for plasmid in entities:
-                if not (file := plasmid.file):
-                    continue
-                else:
-                    archive.write(file.path, file.filename)
+                if plasmid.file_plasmid_id:
+                    archive.write(plasmid.file.path, plasmid.file.filename_exposed)
+                if plasmid.file_map_id:
+                    archive.write(plasmid.map.path, plasmid.map.filename_exposed)
 
         mem.seek(0)
 

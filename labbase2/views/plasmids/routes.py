@@ -159,11 +159,13 @@ def upload_plasmid_file(id_: int, type_: str):
 
     match type_:
         case "file":
-            db.session.delete(plasmid.file)
+            if plasmid.file:
+                db.session.delete(plasmid.file)
             plasmid.file = file
             flash("Successfully uploaded plasmid file!", "success")
         case "map":
-            db.session.delete(plasmid.map)
+            if plasmid.map:
+                db.session.delete(plasmid.map)
             plasmid.map = file
             flash("Successfully uploaded plasmid map!", "success")
         case _:
@@ -195,8 +197,8 @@ def export(format_: str):
             return Plasmid.export_to_json(entities)
         case "pdf":
             return Plasmid.to_pdf(entities)
-        case "fasta":
-            return Plasmid.to_fasta(entities)
+        # case "fasta":
+        #     return Plasmid.to_fasta(entities)
         case "zip":
             return Plasmid.to_zip(entities)
         case _:

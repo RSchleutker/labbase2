@@ -25,13 +25,13 @@
     <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="json", **args) }}">
         <i class="bi bi-filetype-json me-1"></i> Down JSON file
     </a>
-    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
-        <i class="bi bi-file-earmark me-1"></i> Download FASTA file
-    </a>
+{#    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">#}
+{#        <i class="bi bi-file-earmark me-1"></i> Download FASTA file#}
+{#    </a>#}
 
     <li><hr class="dropdown-divider"></li>
 
-    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="fasta", **args) }}">
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="zip", **args) }}">
         <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
     </a>
 
