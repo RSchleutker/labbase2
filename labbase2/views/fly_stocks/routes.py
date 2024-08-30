@@ -42,6 +42,7 @@ def index():
     return render_template(
         "fly_stocks/main.html",
         filter_form=form,
+        import_file_form=UploadFile(),
         add_form=EditFlyStock(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
         total=FlyStock.query.count(),

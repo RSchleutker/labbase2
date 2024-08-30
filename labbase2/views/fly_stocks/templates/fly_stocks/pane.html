@@ -25,6 +25,11 @@
 
         </div>
 
+        <div class="mb-4 user-select-all text-break fs-6 rounded border bg-light
+        py-1 px-2">
+            {{ flystock.short_genotype }}
+        </div>
+
         <table class="table table-details">
             <tbody>
             <tr>
@@ -34,10 +39,6 @@
             <tr>
                 <td>Label</td>
                 <td>{{ flystock.label }}</td>
-            </tr>
-            <tr>
-                <td>Short genotype</td>
-                <td>{{ flystock.short_genotype }}</td>
             </tr>
             <tr>
                 <td>X Chromosome</td>
@@ -89,11 +90,11 @@
             </tr>
             <tr>
                 <td>Created on</td>
-                <td>{{ flystock.created_date }}</td>
+                <td>{{ flystock.created_date | format_date }}</td>
             </tr>
             <tr>
                 <td>Discarded on</td>
-                <td>{{ flystock.discarded_date }}</td>
+                <td>{{ flystock.discarded_date | format_date }}</td>
             </tr>
             <tr>
                 <td>Location</td>

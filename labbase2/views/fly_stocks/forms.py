@@ -87,7 +87,7 @@ class FilterFlyStocks(FilterForm):
             .order_by(User.username)
             .all()
         )
-        self.owner_id.choices += users.all()
+        self.owner_id.choices += users
 
     def fields(self) -> list:
         return [

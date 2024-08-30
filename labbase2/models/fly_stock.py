@@ -8,13 +8,6 @@ from labbase2.models.mixins.importer import Importer
 __all__ = ["Modification", "FlyStock"]
 
 
-flystock_tags = db.Table(
-    "flystock_tags",
-    db.Column("fly_id", db.Integer, db.ForeignKey("fly_stock.id"), primary_key=True),
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
-)
-
-
 class Modification(db.Model, Importer):
     """
     Information about modification of fly stocks. This should be things
