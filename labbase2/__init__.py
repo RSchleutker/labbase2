@@ -113,6 +113,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
         chemicals,
         comments,
         files,
+        fly_stocks,
         imports,
         oligonucleotides,
         plasmids,
@@ -125,6 +126,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
     app.register_blueprint(chemicals.bp)
     app.register_blueprint(comments.bp)
     app.register_blueprint(files.bp)
+    app.register_blueprint(fly_stocks.bp)
     app.register_blueprint(requests.bp)
     app.register_blueprint(batches.bp)
     app.register_blueprint(antibodies.bp)
