@@ -1,3 +1,5 @@
+import secrets
+
 from flask_login import LoginManager, UserMixin
 from labbase2.models import db
 from labbase2.models.mixins import Export
@@ -171,7 +173,9 @@ class User(db.Model, UserMixin, Export):
     import_jobs = db.relationship(
         "ImportJob", backref="user", lazy=True, order_by="ImportJob.timestamp.asc()"
     )
-    resets = db.relationship("ResetPassword", backref="user", lazy=True)
+    resets = db.relationship(
+        "ResetPassword", backref="user", lazy=True, cascade="all, delete-orphan"
+    )
 
     # Many-to-many relationships.
     permissions = db.relationship(
@@ -252,6 +256,10 @@ class User(db.Model, UserMixin, Export):
 
         return permission_db in self.permissions
 
+    @classmethod
+    def generate_password(cls) -> str:
+        return secrets.token_hex(6)
+
 
 class Permission(db.Model, Export):
     """Roles a user could possibly have.
@@ -291,11 +299,10 @@ class ResetPassword(db.Model):
 
     __tablename__: str = "reset_password"
 
-    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(64), primary_key=True)
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True
     )
-    key = db.Column(db.String(64), nullable=False)
     timeout = db.Column(db.DateTime, nullable=False)
 
 

@@ -9,7 +9,7 @@ from labbase2.forms.validators import (
     ContainsUpper,
 )
 from wtforms.fields import PasswordField, SubmitField
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.validators import DataRequired, EqualTo, Length, Optional
 
 __all__ = ["ChangePassword"]
 
@@ -42,7 +42,7 @@ class ChangePassword(FlaskForm):
     )
     old_password = PasswordField(
         "Old password",
-        validators=[DataRequired()],
+        validators=[Optional()],
         render_kw=render.custom_field | {"placeholder": "old password"},
     )
     submit = SubmitField("Submit", render_kw=render.submit_field)
