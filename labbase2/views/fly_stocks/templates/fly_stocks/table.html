@@ -1,33 +1,38 @@
 {% macro table(entities) %}
 
-  <table class="table table-results">
-    <caption>Results table for filtered fly stocks.</caption>
-    <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Label</th>
-      <th scope="col">Owner</th>
-      <th scope="col">Short genotype</th>
-      <th scope="col">Location</th>
-      <th scope="col">Created</th>
-      <th scope="col">Discarded</th>
-    </tr>
-    </thead>
-    <tbody id="table-results-body">
+    <table class="table table-results">
 
-    {% for flystock in entities %}
-      <tr onclick="request_details('{{ url_for(".details", id=flystock.id) }}')">
-        <td class="id">{{ flystock.id }}</td>
-        <td>{{ flystock.label }}</td>
-        <td>{{ flystock.owner.username }}</td>
-        <td>{{ flystock.short_genotype }}</td>
-        <td>{{ flystock.location }}</td>
-        <td>{{ flystock.created_date }}</td>
-        <td>{{ flystock.discarded_date }}</td>
-      </tr>
-    {% endfor %}
+        <thead class="table-light">
 
-    </tbody>
-  </table>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Short genotype</th>
+            <th scope="col">Location</th>
+            <th scope="col">Created</th>
+            <th scope="col">Discarded</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for flystock in entities %}
+
+            <tr onclick="request_details('{{ url_for(".details", id=flystock.id) }}')">
+                <td class="id">{{ flystock.id }}</td>
+                <td>{{ flystock.label }}</td>
+                <td>{{ flystock.owner.username }}</td>
+                <td>{{ flystock.short_genotype }}</td>
+                <td>{{ flystock.location }}</td>
+                <td>{{ flystock.created_date }}</td>
+                <td>{{ flystock.discarded_date }}</td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
 
 {% endmacro %}
