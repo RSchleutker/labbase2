@@ -1,0 +1,186 @@
+{% from 'comments/pane.html' import comment_pane with context %}
+{% from 'files/pane.html' import files_pane with context %}
+{% from 'requests/pane.html' import request_pane with context %}
+{% from "modifications/pane.html" import modifications_pane with context %}
+{% from 'fly_stocks/form.html' import flystock_add_form %}
+{% from "files/form.html" import file_upload_form %}
+{% from "files/form.html" import file_edit_form %}
+
+
+<ul class="nav nav-tabs">
+
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#tab-info">Info</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-modifications">
+      Modifications
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-comments">
+      Comments
+    </a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-files">Files</a>
+  </li>
+
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#tab-requests">Requests</a>
+  </li>
+
+</ul>
+
+
+<div class="tab-content">
+
+  <div class="tab-pane container active" id="tab-info">
+
+    <h1 style="display: inline-block">{{ flystock.label }}</h1>
+
+    <span class="float-right">
+      {% if flystock.owner_id == current_user.id %}
+      <a class="text-primary"
+         data-toggle="modal"
+         data-target="#modal-edit-flystock-{{ flystock.id }}">
+        <i class="fa-solid fa-pen"></i>
+      </a>
+      {% endif %}
+    </span>
+
+  <br>
+
+    <table class="table table-details">
+      <tbody>
+        <tr>
+          <td>Database ID</td>
+          <td>{{ flystock.id }}</td>
+        </tr>
+        <tr>
+          <td>Label</td>
+          <td>{{ flystock.label }}</td>
+        </tr>
+        <tr>
+          <td>Short genotype</td>
+          <td>{{ flystock.short_genotype }}</td>
+        </tr>
+        <tr>
+          <td>X Chromosome</td>
+          <td>
+            {% if flystock.chr_xa == flystock.chr_xb %}
+              {{ flystock.chr_xa }}
+            {% else %}
+              {{ flystock.chr_xa }} / {{ flystock.chr_xb }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td>Y Chromosome</td>
+          <td>{{ flystock.chr_y }}</td>
+        </tr>
+        <tr>
+          <td>2nd Chromosome</td>
+          <td>
+            {% if flystock.chr_2a == flystock.chr_2b %}
+              {{ flystock.chr_2a }}
+            {% else %}
+              {{ flystock.chr_2a }} / {{ flystock.chr_2b }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td>3rd Chromosome</td>
+          <td>
+            {% if flystock.chr_3a == flystock.chr_3b %}
+              {{ flystock.chr_3a }}
+            {% else %}
+              {{ flystock.chr_3a }} / {{ flystock.chr_3b }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td>4th Chromosome</td>
+          <td>
+            {% if flystock.chr_4a == flystock.chr_4b %}
+              {{ flystock.chr_4a }}
+            {% else %}
+              {{ flystock.chr_4a }} / {{ flystock.chr_4b }}
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td>Owner</td>
+          <td>{{ flystock.owner.username }}</td>
+        </tr>
+        <tr>
+          <td>Created on</td>
+          <td>{{ flystock.created_date }}</td>
+        </tr>
+        <tr>
+          <td>Discarded on</td>
+          <td>{{ flystock.discarded_date }}</td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td>{{ flystock.location }}</td>
+        </tr>
+        <tr>
+          <td>Source</td>
+          <td>{{ flystock.source }}</td>
+        </tr>
+        <tr>
+          <td>Reference</td>
+          <td>{{ flystock.reference }}</td>
+        </tr>
+        <tr>
+          <td>Complements</td>
+          <td>{{ flystock.complements }}</td>
+        </tr>
+        <tr>
+          <td>Documentation</td>
+          <td>{{ flystock.doc }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br>
+
+  </div>
+
+  {{ modifications_pane(
+    status='fade',
+    pane_id='tab-modifications',
+    flystock=flystock,
+    form=modification_form
+  ) }}
+
+  {{ files_pane(
+    status='fade',
+    pane_id='tab-files',
+    entity=flystock,
+    form=file_form,
+    form2=file_edit
+  ) }}
+
+  {{ comment_pane(
+    status='fade',
+    pane_id='tab-comments',
+    entity=flystock,
+    form=comment_form
+  ) }}
+
+  {{ request_pane(
+    status='fade',
+    pane_id='tab-requests',
+    entity=flystock,
+    form=request_form
+  ) }}
+
+</div>
+
+
+{{ flystock_add_form(form, ".edit", "PUT", flystock.id) }}
