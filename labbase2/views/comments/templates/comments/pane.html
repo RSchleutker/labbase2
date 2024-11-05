@@ -3,12 +3,18 @@
 
 {% macro pane_details(comment, form) %}
 
+    {% if comment.user.file_picture_id %}
+        {% set avatar_url = url_for("files.download", id_=comment.user.file_picture_id) %}
+    {% else %}
+        {% set avatar_url = url_for("static", filename="images/avatar-f.webp") %}
+    {% endif %}
+
     <div class="rounded border p-3 mb-3">
 
         <div class="d-flex flex-start align-items-center mb-3">
 
             <img class="rounded-circle shadow-1-strong me-3"
-                 src="{{ url_for("files.download", id_=comment.user.file_picture_id) }}"
+                 src="{{ avatar_url }}"
                  alt="avatar"
                  style="object-fit: cover"
                  width="60" height="60">
