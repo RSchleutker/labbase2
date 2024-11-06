@@ -122,3 +122,13 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
             "comments": [c.to_dict() for c in self.comments],
             "requests": [r.to_dict() for r in self.requests],
         }
+
+    @classmethod
+    def _filters(cls, **fields) -> list:
+        filters = []
+
+        owner_id = fields.pop("owner_id", 0)
+        if owner_id != 0:
+            filters.append(cls.owner_id == owner_id)
+
+        return super()._filters(**fields) + filters

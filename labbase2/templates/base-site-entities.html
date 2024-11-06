@@ -153,8 +153,7 @@
         function delete_entity(url) {
             if (confirm("Are you sure? This will delete the resource and ALL associated data like comments etc. This action cannot be undone!")) {
                 let request = $.ajax({url: url, method: "DELETE"});
-                request.always(function (data) {$("#sidebar-right-messages").html(data)
-                ;});
+                request.always(function (data) {$("#sidebar-right-messages").html(data);});
             }
         }
     </script>

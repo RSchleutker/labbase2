@@ -81,7 +81,13 @@ class FilterFlyStocks(FilterForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.order_by.choices += [("label", "Label")]
+        self.order_by.choices += [
+            ("label", "Label"),
+            ("owner_id", "Owner"),
+            ("short_genotype", "Short Genotype"),
+            ("source", "Source"),
+            ("discarded", "Discarded"),
+        ]
         users = (
             User.query.with_entities(User.id, User.username)
             .order_by(User.username)

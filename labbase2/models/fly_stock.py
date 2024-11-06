@@ -131,10 +131,12 @@ class FlyStock(BaseEntity):
     def _filters(cls, **fields) -> list:
         filters = []
 
-        if not fields.pop("discarded", None):
-            filters.append(cls.discarded_date.is_(None))
-
-        if genotype := fields.pop("genotype", None):
-            filters.append(cls.filemaker_genotype.ilike(genotype))
+        match fields.pop("discarded", "all"):
+            case "discarded":
+                filters.append(cls.discarded_date.isnot(None))
+            case "recent":
+                filters.append(cls.discarded_date.is_(None))
+            case _:
+                pass
 
         return super()._filters(**fields) + filters

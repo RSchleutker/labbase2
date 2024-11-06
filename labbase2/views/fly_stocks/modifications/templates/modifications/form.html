@@ -1,0 +1,77 @@
+{% import '_macros/forms.html' as forms %}
+
+
+{% macro modifications_add_form(form, endpoint, method, id, flystock_id) %}
+
+  {% if id == -1 %}
+    {% set action = url_for(endpoint, flystock_id=flystock_id) %}
+  {% else %}
+    {% set action = url_for(endpoint, id=id) %}
+  {% endif %}
+
+  <div id="modal-edit-modification-{{ id }}"
+       class="modal fade"
+       role="dialog">
+    <div class="modal-dialog modal-lg">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Edit Modification</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;
+          </button>
+        </div>
+        <div class="modal-body" id="modal-edit-modification-{{ id }}-body">
+
+          <div>
+
+            <div class="row">
+              <div class="col-12">
+
+                <form action="{{ action }}"
+                      method="post"
+                      id="form-edit-modification-{{ id }}">
+                  {{ form.hidden_tag() }}
+                  <div class="row">
+                    <div class="col-4">
+                      {{ forms.field(form.date, "Date") }}
+                    </div>
+                    <div class="col-8"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-12">
+                      {{ forms.field_no_label(form.description) }}
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    {{ form.submit() }}
+                  </div>
+                </form>
+
+                <div id="form-edit-modification-{{ id }}-messages">
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  {{ forms.script_send_form(
+      form,
+      'form-edit-modification-' + id|string,
+      method,
+      'form-edit-modification-' + id|string + '-messages'
+      ) }}
+
+{% endmacro %}
