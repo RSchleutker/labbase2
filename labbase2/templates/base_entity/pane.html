@@ -1,0 +1,53 @@
+{% from 'macros/modal.html' import modal %}
+
+
+{% macro pane_details(reference) %}
+
+    {% if reference.entity_type == 'plasmid' %}
+        {% set blueprint = 'plasmids' %}
+    {% elif reference.entity_type == 'oligonucleotide' %}
+        {% set blueprint = 'oligonucleotides' %}
+    {% endif %}
+
+    {% set url = url_for(blueprint ~ '.index', id=reference.id) %}
+
+    <div class="rounded border p-1 mb-3 bg-light">
+
+        <div class="d-flex flex-start align-items-center mb-0">
+
+            <div class="flex-shrink-0 me-3">
+                <b><a href="{{ url }}">{{ reference.label }}</a></b>
+            </div>
+
+            <div class="flex-fill">
+                {{ reference.entity_type | capitalize }}
+            </div>
+
+        </div>
+
+    </div>
+
+{% endmacro %}
+
+
+{% macro self_reference_pane(status, pane_id, entity) %}
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Referenced entities</h2>
+
+            <div class="flex-shrink-0">
+
+            </div>
+
+        </div>
+
+        {% for file in entity.self_references %}
+            {{ pane_details(file) }}
+        {% else %}
+            <div class="fw-bold text-center mb-3">No references added yet!</div>
+        {% endfor %}
+
+    </div>
+{% endmacro %}
