@@ -15,4 +15,4 @@ from .import_job import ColumnMapping, ImportJob
 from .oligonucleotide import Oligonucleotide
 from .plasmid import GlycerolStock, Plasmid, Preparation
 from .request import Request
-from .user import Permission, User
+from .user import Permission, ResetPassword, User

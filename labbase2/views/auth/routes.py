@@ -1,17 +1,14 @@
+import secrets
+from datetime import datetime, timedelta
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 from email_validator import validate_email
-from flask import (
-    Blueprint,
-    Response,
-    flash,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Blueprint, Response
+from flask import current_app as app
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from labbase2.models import BaseFile, Permission, User, db
+from labbase2.models import BaseFile, Permission, ResetPassword, User, db
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.routes import upload_file
 from sqlalchemy import func
@@ -157,22 +154,38 @@ def edit_user():
     return render_template("auth/edit-user.html", form=form)
 
 
-@bp.route("/change-password", methods=["GET", "POST"])
+@bp.route("/change-password", methods=["GET", "POST"], defaults={"key": None})
+@bp.route("/change-password/<string:key>", methods=["GET", "POST"])
 @login_required
-def change_password():
+def change_password(key: Optional[str] = None):
+    reset = ResetPassword.query.get(key)
+
+    if reset is not None:
+        if datetime.now() - reset.timeout > 0:
+            db.session.delete(reset)
+        else:
+            user = reset.user
+            logout_user()
+            login_user(user)
+
     form = ChangePassword()
 
     if form.validate_on_submit():
 
-        if current_user.verify_password(form.old_password.data):
+        if current_user.verify_password(form.old_password.data) or reset is not None:
 
             try:
+                current_user.resets.clear()
                 current_user.set_password(form.new_password.data)
                 db.session.commit()
             except Exception as error:
                 flash(str(error), "danger")
             else:
                 flash("Your password has been updated!", "success")
+
+            if reset is not None:
+                logout_user()
+                login_user(User.query.get(prev_user_id))
 
         else:
             flash("Old password incorrect!", "danger")
@@ -281,7 +294,34 @@ def change_active_status(id_: int):
     return redirect(request.referrer)
 
 
-@bp.route
+@bp.route("/reset-password/<int:id_>", methods=["GET"])
+@login_required
+@permission_required("Manage users")
+def create_password_reset(id_: int):
+    user = User.query.get(id_)
+
+    if user is None:
+        flash(f"No user with ID {id_})!", "danger")
+        return redirect(request.referrer)
+
+    user.resets.clear()
+
+    db.session.commit()
+
+    reset = ResetPassword(
+        token=secrets.token_urlsafe(32),
+        user_id=id_,
+        timeout=datetime.now() + timedelta(minutes=10),
+    )
+
+    db.session.add(reset)
+    db.session.commit()
+
+    flash(f"Generated a password reset with key '{reset.token}'!", "success")
+
+    return redirect(request.referrer)
+
+
 @bp.route("/users", methods=["GET"])
 @login_required
 def users():

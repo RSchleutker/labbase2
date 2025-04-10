@@ -1,0 +1,125 @@
+{% macro pane_details(status, pane_id, flystock, form) %}
+
+    <div class="tab-pane container {{ status }}" id="{{ pane_id }}">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h2 class="flex-grow-1 mb-0">Details</h2>
+
+            <div class="flex-shrink-0">
+
+                {% if current_user.has_permission('Add Fly Stock') %}
+                    <a class="text-primary me-2"
+                       data-bs-toggle="modal"
+                       data-bs-target="#modal-edit-flystock-{{ flystock.id }}">
+                        <i class="fa-solid fa-pen"></i></a>
+
+                    {% if flystock.deletable %}
+                        <a class="text-danger"
+                           onclick="delete_entity('{{ url_for("flystocks.delete", id_=flystock.id) }}')">
+                            <i class="fa-solid fa-trash"></i></a>
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="mb-4 user-select-all text-break fs-6 rounded border bg-light
+        py-1 px-2">
+            {{ flystock.short_genotype }}
+        </div>
+
+        <table class="table table-details">
+            <tbody>
+            <tr>
+                <td>Database ID</td>
+                <td>{{ flystock.id }}</td>
+            </tr>
+            <tr>
+                <td>Label</td>
+                <td>{{ flystock.label }}</td>
+            </tr>
+            <tr>
+                <td>X Chromosome</td>
+                <td>
+                    {% if flystock.chromosome_xa == flystock.chromosome_xb %}
+                        {{ flystock.chromosome_xa }}
+                    {% else %}
+                        {{ flystock.chromosome_xa }} / {{ flystock.chromosome_xb }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Y Chromosome</td>
+                <td>{{ flystock.chromosome_y }}</td>
+            </tr>
+            <tr>
+                <td>2nd Chromosome</td>
+                <td>
+                    {% if flystock.chromosome_2a == flystock.chromosome_2b %}
+                        {{ flystock.chromosome_2a }}
+                    {% else %}
+                        {{ flystock.chromosome_2a }} / {{ flystock.chromosome_2b }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>3rd Chromosome</td>
+                <td>
+                    {% if flystock.chromosome_3a == flystock.chromosome_3b %}
+                        {{ flystock.chromosome_3a }}
+                    {% else %}
+                        {{ flystock.chromosome_3a }} / {{ flystock.chromosome_3b }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>4th Chromosome</td>
+                <td>
+                    {% if flystock.chromosome_4a == flystock.chromosome_4b %}
+                        {{ flystock.chromosome_4a }}
+                    {% else %}
+                        {{ flystock.chromosome_4a }} / {{ flystock.chromosome_4b }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td>Owner</td>
+                <td>{{ flystock.owner.username }}</td>
+            </tr>
+            <tr>
+                <td>Created on</td>
+                <td>{{ flystock.created_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Discarded on</td>
+                <td>{{ flystock.discarded_date | format_date }}</td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td>{{ flystock.location }}</td>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td>{{ flystock.source }}</td>
+            </tr>
+            <tr>
+                <td>Reference</td>
+                <td>{{ flystock.reference }}</td>
+            </tr>
+            </tbody>
+        </table>
+    
+    {% if flystock.documentation %}
+            <h3 class="mt-4">Documentation</h3>
+            <p class="text-justify">
+                {{ flystock.documentation }}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {{ flystock_add_form(form, "flystocks.edit", "PUT", flystock.id) }}
+
+{% endmacro %}

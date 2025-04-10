@@ -1,0 +1,45 @@
+<!-- EXTENSION DECLARATION -->
+{% extends 'base-site-entities.html' %}
+
+{% from 'fly_stocks/form.html' import flystock_add_form %}
+{% from 'fly_stocks/table.html' import table %}
+
+
+{% block import %}
+
+    <button type="button"
+            class="btn btn-sm btn-success"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-edit-flystock--1">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+{% endblock %}
+
+
+{% block download %}
+
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="csv", **args) }}">
+        <i class="bi bi-filetype-csv me-1"></i> Download CSV file
+    </a>
+    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="json", **args) }}">
+        <i class="bi bi-filetype-json me-1"></i> Down JSON file
+    </a>
+
+    <li><hr class="dropdown-divider"></li>
+
+{#    <a class="dropdown-item small fw-lighter" href="{{ url_for(".export", format_="zip", **args) }}">
+        <i class="bi bi-file-earmark-zip me-1"></i> Download ZIP archive
+    </a>#}
+
+{% endblock %}
+
+
+{% block scripts %}
+
+    {{ super() }}
+
+    {{ upload_file_form(import_file_form, url_for("imports.upload", type_="fly_stock")) }}
+    {{ flystock_add_form(add_form, ".add", "POST", -1) }}
+
+{% endblock %}

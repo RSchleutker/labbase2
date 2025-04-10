@@ -56,6 +56,7 @@ class FilterPlasmids(FilterForm):
         label="Owner",
         validators=[Optional()],
         choices=[(0, "All")],
+        default=0,
         coerce=int,
         render_kw=render.select_field,
         description="The owner of the primer.",

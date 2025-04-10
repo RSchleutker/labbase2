@@ -80,7 +80,7 @@ def edit(id_: int):
     form = EditPlasmid()
 
     if not form.validate():
-        return Message.ERROR(f"No antibody found with ID {id_}!")
+        return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     if (plasmid := Plasmid.query.get(id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")

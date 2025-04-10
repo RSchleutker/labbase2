@@ -71,6 +71,12 @@
                                         Inactivate user
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="{{ url_for('auth.create_password_reset', id_=user.id) }}">
+                                        Reset password
+                                    </a>
+                                </li>
                             </ul>
 
                         </div>

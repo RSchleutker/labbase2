@@ -43,6 +43,7 @@ class FilterChemical(FilterForm):
     owner_id = SelectField(
         "Responsible",
         choices=[(0, "All")],
+        default=0,
         coerce=int,
         render_kw=render.select_field,
     )

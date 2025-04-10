@@ -17,8 +17,8 @@ class FilterOligonucleotide(FilterForm):
     )
     owner_id = SelectField(
         label="Owner",
-        validators=[Optional()],
         choices=[(0, "All")],
+        default=0,
         coerce=int,
         render_kw=render.select_field,
         description="The owner of the primer.",

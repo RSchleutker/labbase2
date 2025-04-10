@@ -41,7 +41,7 @@ class Plasmid(BaseEntity, Sequence):
         DOI here.
     preparations : list[Preparation]
         A list of all preparations that were done of this plasmid.
-    glycerol_stocks : list[GlycerolStock
+    glycerol_stocks : list[GlycerolStock]
         A list of bacterial stocks that carry this plasmid.
 
     Notes

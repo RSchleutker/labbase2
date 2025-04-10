@@ -4,7 +4,7 @@ from itertools import chain, zip_longest
 
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.SeqUtils import GC
+from Bio.SeqUtils import gc_fraction
 from labbase2.models import BaseEntity, db
 from labbase2.models.fields import SequenceString
 from labbase2.models.mixins import Sequence
@@ -52,7 +52,7 @@ class Oligonucleotide(BaseEntity, Sequence):
 
     @property
     def gc_content(self) -> float:
-        return GC(self.sequence)
+        return gc_fraction(self.sequence)
 
     def formatted_seq(self, max_len: int = None) -> str:
         """Creates a formatted string for the sequence attribute by placing HTML

@@ -57,6 +57,10 @@ class DefaultConfig(object):
             student.""",
         ),
         (
+            "Add Fly Stock",
+            """Allows a user to create fly stocks. Suggested level: PhD""",
+        ),
+        (
             "Add plasmid",
             """Allows a user to add cloned plasmids. Suggested level: Bachelor 
             student.""",

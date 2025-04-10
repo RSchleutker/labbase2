@@ -3,9 +3,16 @@ from datetime import datetime, timedelta
 from flask import current_app
 from flask_login import current_user
 from labbase2.models import db, mixins
-from sqlalchemy import func
+from sqlalchemy import func, Table
 
 __all__ = ["BaseEntity"]
+
+
+base_to_base = db.Table(
+    "base_to_base",
+    db.Column("left_base_id", db.Integer, db.ForeignKey("base_entity.id"), primary_key=True),
+    db.Column("right_base_id", db.Integer, db.ForeignKey("base_entity.id"), primary_key=True),
+)
 
 
 class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
@@ -105,6 +112,15 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
         cascade="all, delete-orphan",
     )
 
+    # Self-referencing
+    self_references = db.relationship(
+        "BaseEntity",
+        secondary=base_to_base,
+        primaryjoin=id == base_to_base.c.left_base_id,
+        secondaryjoin=id == base_to_base.c.right_base_id,
+        backref="self_referenced_by",
+    )
+
     # Proper setup for joined table inheritance.
     __mapper_args__ = {"polymorphic_identity": "base", "polymorphic_on": entity_type}
 
@@ -122,3 +138,13 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
             "comments": [c.to_dict() for c in self.comments],
             "requests": [r.to_dict() for r in self.requests],
         }
+
+    @classmethod
+    def _filters(cls, **fields) -> list:
+        filters = []
+
+        owner_id = fields.pop("owner_id", 0)
+        if owner_id != 0:
+            filters.append(cls.owner_id == owner_id)
+
+        return super()._filters(**fields) + filters

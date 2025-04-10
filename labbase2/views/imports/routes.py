@@ -8,6 +8,7 @@ from labbase2.models import (
     BaseFile,
     Chemical,
     ColumnMapping,
+    FlyStock,
     ImportJob,
     Oligonucleotide,
     Plasmid,
@@ -46,6 +47,8 @@ def upload(type_: str):
             entity_cls = Antibody
         case "chemical":
             entity_cls = Chemical
+        case "fly_stock":
+            entity_cls = FlyStock
         case "oligonucleotide":
             entity_cls = Oligonucleotide
         case "plasmid":
@@ -154,6 +157,10 @@ def execute(id_: int):
     match job.entity_type:
         case "antibody":
             entity_cls = Antibody
+        case "chemical":
+            entity_cls = Chemical
+        case "fly_stock":
+            entity_cls = FlyStock
         case "oligonucleotide":
             entity_cls = Oligonucleotide
         case "plasmid":

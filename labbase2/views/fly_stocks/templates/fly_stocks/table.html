@@ -1,0 +1,37 @@
+{% macro table(entities) %}
+
+    <table class="table table-results">
+
+        <thead class="table-light">
+
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Label</th>
+            <th scope="col">Owner</th>
+            <th scope="col">Location</th>
+            <th scope="col">Discarded</th>
+            <th scope="col">Short genotype</th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for flystock in entities %}
+
+            <tr onclick="request_details('{{ url_for(".details", id_=flystock.id)
+                }}')" {% if flystock.discarded_date %}class="opacity-50"{% endif %}>
+                <td class="id">{{ flystock.id }}</td>
+                <td>{{ flystock.label }}</td>
+                <td>{{ flystock.owner.username }}</td>
+                <td>{{ flystock.location }}</td>
+                <td>{{ flystock.discarded_date | format_date }}</td>
+                <td>{{ flystock.short_genotype }}</td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}
