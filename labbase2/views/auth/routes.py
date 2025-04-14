@@ -178,7 +178,10 @@ def edit_user():
 @bp.route("/change-password/<string:key>", methods=["GET", "POST"])
 @login_required
 def change_password(key: Optional[str] = None):
-    reset = ResetPassword.query.get(key)
+    if key:
+        reset = ResetPassword.query.get(key)
+    else:
+        reset = None
 
     if reset is not None:
         if datetime.now() - reset.timeout > 0:
