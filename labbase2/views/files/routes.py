@@ -134,6 +134,10 @@ def delete(id_: int):
 @bp.route("/delete-orphans", methods=["GET"])
 @login_required
 def delete_orphans():
+    if not current_user.is_admin:
+        flash("Only admins can delete orphan files!", "danger")
+        return redirect(request.referrer)
+
     # Get all absolute file paths from the database.
     files_db = [file.path for file in BaseFile.query.all()]
 
@@ -156,5 +160,6 @@ def delete_orphans():
             file.unlink()
 
     app.logger.info("Deleted %d orphan files.", deleted)
+    flash(f"Deleted {deleted} orphan files.", "success")
 
-    return redirect(url_for("base.index"))
+    return redirect(request.referrer)
