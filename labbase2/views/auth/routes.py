@@ -47,14 +47,17 @@ def login() -> str | Response:
         user = User.query.filter_by(email=form.email.data).first()
 
         if not user:
+            app.logger.warning("Login attempt with invalid credentials")
             flash("Invalid email address or username!", "danger")
         elif not user.is_active:
+            app.logger.info("Deactivate user tried to log in: %s", user.username)
             flash("Your account is inactive! Get in touch with an admin!", "warning")
         elif not user.verify_password(form.password.data):
+            app.logger.warning("Login attempt with invalid password: %s", user.username)
             flash("Wrong password!", "danger")
         else:
             login_user(user, remember=form.remember_me.data)
-
+            app.logger.info("Logged in: %s", user.username)
             flash("Successfully logged in!", "success")
 
             last_login = current_user.timestamp_last_login
@@ -62,13 +65,14 @@ def login() -> str | Response:
                 flash("This is your first log in!", "info")
             else:
                 tz = current_user.timezone
-                formatted = last_login.astimezone(ZoneInfo(tz)).strftime(
-                    "%B %d, %Y %I:%M %p"
-                )
+                formatted = last_login.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
                 flash(f"Last login was on {formatted}!", "info")
 
             user.timestamp_last_login = func.now()
-            db.session.commit()
+            try:
+                db.session.commit()
+            except Exception as error:
+                db.error("Unable to save login time due to unknown database error: %s", error)
 
             next_page = request.args.get("next")
 
@@ -84,7 +88,11 @@ def login() -> str | Response:
 @bp.route("/logout", methods=["GET"])
 @login_required
 def logout() -> str | Response:
+    app.logger.info("Logged out.")
+    flash("Successfully logged out!", "success")
+
     logout_user()
+
     return redirect(url_for(".login"))
 
 
@@ -96,9 +104,10 @@ def register():
 
     # POST fork of view.
     if form.validate_on_submit():
-        email = validate_email(form.email.data).email
+        email = validate_email(form.email.data).normalized
 
         if User.query.filter(User.email.ilike(email)).count() > 0:
+            app.logger.warning("Tried to register new user with existing email address: %s", email)
             flash("Email address already exists!", "danger")
         else:
             user = User()
@@ -110,12 +119,15 @@ def register():
                 db.session.add(user)
                 db.session.commit()
             except DataError as error:
+                app.logger.warning("Could not write new user to database: %s", error)
                 flash(str(error), "danger")
                 db.session.rollback()
             else:
+                app.logger.info("Registered new user: %s", user.username)
                 flash("Successfully registered new user!", "success")
 
     elif form.submit():
+        app.logger.warning("Could not register new user due to invalid input: %s", form.data)
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f"{field}: {error}", "danger")
@@ -128,16 +140,18 @@ def register():
 def edit_user():
     if request.method == "GET":
         form = EditUserForm(None, obj=current_user)
-        return render_template("auth/edit-user.html", form=form)
+        return render_template("auth/edit-user.html", title="Edit profile", form=form)
 
     form = EditUserForm()
 
     if not form.validate():
+        app.logger.warning("Could not edit user due to invalid input.")
         for error in form.errors:
             flash(str(error), "danger")
-        return render_template("auth/edit-user.html", form=form)
+        return render_template("auth/edit-user.html", title="Edit profile", form=form)
 
     if not current_user.verify_password(form.password.data):
+        app.logger.warning("Entered incorrect password.")
         flash("Password is incorrect!", "danger")
     else:
         form.populate_obj(current_user)
@@ -147,11 +161,17 @@ def edit_user():
             current_user.picture = file
             file.resize(512)
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as error:
+            app.logger.warning("Could not update user: %s", error)
+            flash(str(error), "error")
+            db.session.rollback()
+        else:
+            app.logger.info("Updated user profile.")
+            flash("Successfully edited user profile!", "success")
 
-    flash("Successfully edited user profile!", "success")
-
-    return render_template("auth/edit-user.html", form=form)
+    return render_template("auth/edit-user.html", title="Edit profile", form=form)
 
 
 @bp.route("/change-password", methods=["GET", "POST"], defaults={"key": None})
@@ -203,11 +223,7 @@ def change_password(key: Optional[str] = None):
 @login_required
 @permission_required("Manage users")
 def change_permissions(id_: int = None):
-    users = (
-        User.query.filter(User.is_active)
-        .order_by(User.last_name, User.first_name)
-        .all()
-    )
+    users = User.query.filter(User.is_active).order_by(User.last_name, User.first_name).all()
 
     if id_ is None:
         user = current_user
@@ -228,6 +244,7 @@ def change_permissions(id_: int = None):
             user.permissions.append(permission)
 
         db.session.commit()
+        app.logger.info("Updated permissions for user: %s", user.username)
         flash(f"Successfully updated permissions for {user.username}!", "success")
 
     return render_template(
@@ -282,9 +299,7 @@ def change_active_status(id_: int):
             db.session.rollback()
             flash(str(error), "danger")
         else:
-            flash(
-                f"Successfully changed active setting for {user.username}!", "success"
-            )
+            flash(f"Successfully changed active setting for {user.username}!", "success")
 
     if User.query.filter(User.is_active).count() == 0:
         flash("No active user! Reverting previous change!", "warning")

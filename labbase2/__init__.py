@@ -3,7 +3,9 @@ import secrets
 from pathlib import Path
 from typing import Optional, Union
 
-from flask import Flask
+from flask import Flask, request
+from flask_login import current_user as user, current_user
+
 
 __all__ = ["create_app"]
 
@@ -40,7 +42,7 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
         try:
             upload_folder.mkdir(parents=True)
         except PermissionError as error:
-            print("Could not create upload folder. No write permission to directory!")
+            app.logger.error("Could not create upload folder due to insufficient permissions!")
             raise error
 
     # Initiate the database.
@@ -72,26 +74,25 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
         first, last, email = app.config.get("USER")
 
         if User.query.count() == 0:
-            print("No user in database.")
-            print("Create an initial admin from config.")
+            app.logger.info("No user in database; create admin as specified in config.")
             admin = User(first_name=first, last_name=last, email=email, is_admin=True)
             admin.set_password("admin")
             admin.permissions = Permission.query.all()
             db.session.add(admin)
         elif User.query.filter(User.is_active, User.is_admin).count() == 0:
-            print("No active user with admin rights.")
+            app.logger.info(
+                "No active user with admin rights; trying to re-activate admin specified in config."
+            )
             admin = User.query.filter(User.email == email).first()
             if admin is not None:
-                print(f"Re-activated initial admin '{admin.username}' from config.")
+                app.logger.info("Re-activated initial admin '%s' from config.", admin.username)
                 admin.is_admin = True
                 admin.is_active = True
             else:
-                print("Did not find admin user specified in config.")
-                print("Create an initial admin from config.")
-
-                admin = User(
-                    first_name=first, last_name=last, email=email, is_admin=True
+                app.logger.info(
+                    "Did not find admin user specified in config; create an initial admin from config."
                 )
+                admin = User(first_name=first, last_name=last, email=email, is_admin=True)
                 admin.set_password("admin")
                 admin.permissions = Permission.query.all()
                 db.session.add(admin)
@@ -139,5 +140,14 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
     app.jinja_env.filters["format_date"] = template_filters.format_date
     app.jinja_env.filters["format_datetime"] = template_filters.format_datetime
     app.jinja_env.globals["random_string"] = secrets.token_hex
+
+    # Logs every `top-level`request, i.e., every request that was done by the user himself and not
+    # requests to static resources.
+    @app.before_request
+    def log_request():
+        if not request.path.startswith("/static"):
+            app.logger.info(
+                "%(method)-6s %(path)s", {"method": request.method, "path": request.url}
+            )
 
     return app

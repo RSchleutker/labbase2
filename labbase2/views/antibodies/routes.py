@@ -16,12 +16,11 @@ from . import dilutions
 from .dilutions.forms import EditDilution
 from .forms import EditAntibody, FilterAntibodies
 
+
 __all__ = ["bp"]
 
 
-bp = Blueprint(
-    "antibodies", __name__, url_prefix="/antibody", template_folder="templates"
-)
+bp = Blueprint("antibodies", __name__, url_prefix="/antibody", template_folder="templates")
 
 bp.register_blueprint(dilutions.bp)
 
@@ -40,7 +39,10 @@ def index():
         entities = Antibody.filter_(**data)
     except Exception as error:
         flash(str(error), "danger")
+        app.logger.error("Couldn't filter antibodies: %s", error)
         entities = Antibody.filter_(order_by="label")
+    else:
+        app.logger.debug("Found %d antibodies.", entities.count())
 
     return render_template(
         "antibodies/main.html",
@@ -57,6 +59,7 @@ def index():
 @login_required
 def details(id_: int):
     if (antibody := Antibody.query.get(id_)) is None:
+        app.logger.warning("Couldn't find antibody with ID %s.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
     return render_template(
@@ -78,6 +81,7 @@ def add():
     form = EditAntibody()
 
     if not form.validate():
+        app.logger.info("Couldn't add antibody due to invalid input.")
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     antibody = Antibody()
@@ -88,9 +92,17 @@ def add():
         db.session.add(antibody)
         db.session.commit()
     except IntegrityError as error:
+        db.session.rollback()
+        app.logger.info("Couldn't add antibody due to integrity error.")
         return Message.ERROR(error)
     except Exception as error:
+        db.session.rollback()
+        app.logger.warning(
+            "Couldn't add antibody to database due to unknown database error: %s", error
+        )
         return Message.ERROR(error)
+    else:
+        app.logger.info("Added new antibody with ID %5d.", antibody.id)
 
     return Message.SUCCESS(f"Successfully added antibody '{antibody.label}'!")
 
@@ -102,9 +114,11 @@ def edit(id_: int):
     form = EditAntibody()
 
     if not form.validate():
+        app.logger.info("Couldn't edit antibody with ID %d due to invalid user input.", id_)
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     if not (antibody := Antibody.query.get(id_)):
+        app.logger.warning("Couldn't find antibody with ID %d.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
     form.populate_obj(antibody)
@@ -112,7 +126,11 @@ def edit(id_: int):
     try:
         db.session.commit()
     except Exception as error:
+        db.session.rollback()
+        app.logger.warning("Couldn't edit antibody with ID %d due to unknown database error.", id_)
         return Message.ERROR(error)
+    else:
+        app.logger.info("Edited antibody with ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully edited antibody '{antibody.label}'!")
 
@@ -122,6 +140,7 @@ def edit(id_: int):
 @permission_required("Add antibodies")
 def delete(id_):
     if (antibody := Antibody.query.get(id_)) is None:
+        app.logger.warning("Couldn't find antibody with ID %d.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
     try:
@@ -129,7 +148,12 @@ def delete(id_):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
+        app.logger.warning(
+            "Couldn't delete antibody with ID %d due to unknown database error.", id_
+        )
         return Message.ERROR(error)
+    else:
+        app.logger.info("Deleted antibody with ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully deleted antibody '{antibody.label}'!")
 
@@ -145,6 +169,7 @@ def export(format_: str):
     try:
         entities = Antibody.filter_(**data)
     except Exception as error:
+        app.logger.warning("Couldn't export antibodies: %s.", error)
         return Message.ERROR(error)
 
     match format_:
@@ -153,4 +178,5 @@ def export(format_: str):
         case "json":
             return Antibody.export_to_json(entities)
         case _:
+            app.logger.warning("Tried to export antibodies with unsupported format: %s.", format_)
             return Message.ERROR(f"Unsupported format '{format_}'!")
