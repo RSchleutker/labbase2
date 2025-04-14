@@ -178,13 +178,9 @@ def edit_user():
 @bp.route("/change-password/<string:key>", methods=["GET", "POST"])
 @login_required
 def change_password(key: Optional[str] = None):
-    if key:
-        reset = ResetPassword.query.get(key)
-    else:
-        reset = None
-
-    if reset is not None:
-        if datetime.now() - reset.timeout > 0:
+    if key and (reset := ResetPassword.query.get(key)) is not None:
+        if datetime.now() > reset.timeout:
+            flash("Token to reset password has expired!")
             db.session.delete(reset)
         else:
             user = reset.user
@@ -195,23 +191,27 @@ def change_password(key: Optional[str] = None):
 
     if form.validate_on_submit():
 
-        if current_user.verify_password(form.old_password.data) or reset is not None:
+        if reset is not None:
+            reset.user.set_password(form.new_password.data)
+            reset.user.resets.clear()
+            updated = True
 
-            try:
-                current_user.resets.clear()
-                current_user.set_password(form.new_password.data)
-                db.session.commit()
-            except Exception as error:
-                flash(str(error), "danger")
-            else:
-                flash("Your password has been updated!", "success")
-
-            if reset is not None:
-                logout_user()
-                login_user(User.query.get(prev_user_id))
+        elif current_user.verify_password(form.old_password.data):
+            current_user.set_password(form.new_password.data)
+            updated = True
 
         else:
             flash("Old password incorrect!", "danger")
+            updated = False
+
+        if updated:
+            try:
+                db.session.commit()
+            except Exception as error:
+                db.session.rollback()
+                flash(str(error), "danger")
+            else:
+                flash("Your password has been updated!", "success")
 
     else:
         for field, errors in form.errors.items():
@@ -336,6 +336,7 @@ def create_password_reset(id_: int):
     db.session.commit()
 
     flash(f"Generated a password reset with key '{reset.token}'!", "success")
+    flash(f"Visit: {url_for('auth.change_password', key=reset.token)}")
 
     return redirect(request.referrer)
 
