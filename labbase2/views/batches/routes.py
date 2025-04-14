@@ -31,7 +31,10 @@ def index():
         entities = Batch.filter_(**data)
     except Exception as error:
         flash(str(error), "danger")
+        app.logger.error("Couldn't filter batches: %s", error)
         entities = Batch.filter_(order_by="label")
+    else:
+        app.logger.debug("Found %d batches.", entities.count())
 
     return render_template(
         "batches/main.html",
@@ -50,6 +53,7 @@ def add(consumable_id: int):
     form = EditBatch()
 
     if not form.validate():
+        app.logger.info("Couldn't add batch due to invalid input.")
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     batch = Batch(consumable_id=consumable_id)
@@ -58,8 +62,12 @@ def add(consumable_id: int):
     try:
         db.session.add(batch)
         db.session.commit()
-    except Exception as err:
-        return Message.ERROR(err)
+    except Exception as error:
+        db.session.rollback()
+        app.logger.warning("Couldn't add batch due to unknown database error: %s", error)
+        return Message.ERROR(error)
+    else:
+        app.logger.info("Added new batch with ID %5d.", batch.id)
 
     return Message.SUCCESS(f"Successfully added batch to '{batch.consumable.label}'!")
 
@@ -71,9 +79,11 @@ def edit(id_: int):
     form = EditBatch()
 
     if not form.validate():
+        app.logger.info("Couldn't edit batch with ID %d due to invalid user input.", id_)
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
     if (batch := Batch.query.get(id_)) is None:
+        app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
     form.populate_obj(batch)
@@ -81,7 +91,11 @@ def edit(id_: int):
     try:
         db.session.commit()
     except Exception as error:
+        db.session.rollback()
+        app.logger.warning("Couldn't edit batch with ID %d due to unknown database error: %s", id_, error)
         return Message.ERROR(error)
+    else:
+        app.logger.info("Edited batch eith ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully edited batch {id_}!")
 
@@ -90,9 +104,11 @@ def edit(id_: int):
 @login_required
 def in_use(id_: int):
     if (batch := Batch.query.get(id_)) is None:
+        app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
     if batch.date_opened:
+        app.logger.warning("Batch with ID %d already marked open.", id_)
         return Message.WARNING(f"Batch {batch.id_} already marked open!")
 
     batch.date_opened = datetime.date.today()
@@ -102,7 +118,10 @@ def in_use(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
+        app.logger.warning("Couldn't mark batch with ID %d as open: %s", id_, error)
         return Message.ERROR(error)
+    else:
+        app.logger.info("Marked batch with ID %d as open.", id_)
 
     return Message.SUCCESS(f"Marked batch {id_} as open!")
 
@@ -111,9 +130,11 @@ def in_use(id_: int):
 @login_required
 def emptied(id_: int):
     if (batch := Batch.query.get(id_)) is None:
+        app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
     if batch.date_emptied:
+        app.logger.warning("Batch with ID %d already marked empty.", id_)
         return f"Batch {id_} already marked empty!", 200
 
     batch.date_emptied = datetime.date.today()
@@ -123,7 +144,10 @@ def emptied(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
+        app.logger.warning("Couldn't mark batch with ID %d empty due to unknown database error: %s", id_, error)
         return Message.ERROR(error)
+    else:
+        app.logger.info("Marked batch with ID %d as empty.", id_)
 
     return Message.SUCCESS(f"Marked batch {id_} as empty!")
 
@@ -133,6 +157,7 @@ def emptied(id_: int):
 @permission_required("Add consumable batches")
 def delete(id_: int):
     if (batch := Batch.query.get(id_)) is None:
+        app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
     try:
@@ -140,7 +165,10 @@ def delete(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
+        app.logger.warning("Couldn't delete batch with ID %d due to unknown database error: %s", id_, error)
         return Message.ERROR(error)
+    else:
+        app.logger.info("Deleted batch with ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully deleted batch {id_}!")
 
@@ -149,6 +177,7 @@ def delete(id_: int):
 @login_required
 def details(id_: int, format_: str):
     if (batch := Batch.query.get(id_)) is None:
+        app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
     match format_:
