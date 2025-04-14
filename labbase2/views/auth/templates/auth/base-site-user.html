@@ -18,6 +18,9 @@
                         {{ nav.link('auth.users', 'Manage users') }}
                         {{ nav.link('auth.register', 'Register new user') }}
                     {% endif %}
+                    {% if current_user.is_admin %}
+                        {{ nav.link('files.delete_orphans', 'Delete orphan files') }}
+                    {% endif %}
                 </ul>
 
             </div>
