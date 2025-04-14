@@ -13,6 +13,7 @@ class DefaultConfig(object):
     # User.
     DEFAULT_TIMEZONE: str = "Europe/Berlin"
     UPLOAD_FOLDER: str = "upload"
+    RESET_EXPIRES: int = 1
     PERMISSIONS: list[tuple[str, str]] = [
         (
             "Write comment",

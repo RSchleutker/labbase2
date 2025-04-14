@@ -326,16 +326,17 @@ def create_password_reset(id_: int):
 
     db.session.commit()
 
+    expires_after = app.config.get("RESET_EXPIRES", 10)
     reset = ResetPassword(
         token=secrets.token_urlsafe(32),
         user_id=id_,
-        timeout=datetime.now() + timedelta(minutes=10),
+        timeout=datetime.now() + timedelta(minutes=expires_after),
     )
 
     db.session.add(reset)
     db.session.commit()
 
-    flash(f"Generated a password reset with key '{reset.token}'!", "success")
+    flash(f"Generated a password reset . Expires: {reset.timeout.isoformat()}!", "success")
     flash(f"Visit: {url_for('auth.change_password', key=reset.token)}")
 
     return redirect(request.referrer)
