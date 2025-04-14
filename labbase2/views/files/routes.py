@@ -1,11 +1,12 @@
 from typing import Optional, Union
 
-from flask import Blueprint, flash, redirect, request, send_file
+from flask import Blueprint, flash, redirect, request, send_file, url_for, current_app as app
 from flask_login import current_user, login_required
 from labbase2.models import BaseEntity, BaseFile, EntityFile, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from werkzeug.utils import secure_filename
+from pathlib import Path
 
 from .forms import EditFile, UploadFile
 
@@ -128,3 +129,32 @@ def delete(id_: int):
         return Message.ERROR(error)
 
     return Message.SUCCESS(f"Successfully deleted file {id_}!")
+
+
+@bp.route("/delete-orphans", methods=["GET"])
+@login_required
+def delete_orphans():
+    # Get all absolute file paths from the database.
+    files_db = [file.path for file in BaseFile.query.all()]
+
+    # Get all files from the upload folder.
+    dir = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
+
+    deleted = 0
+
+    for file in dir.iterdir():
+        if not file.is_file():
+            continue
+
+        for i, file_db in enumerate(files_db):
+            if file.samefile(file_db):
+                files_db.pop(i)
+                break
+        else:
+            app.logger.debug("Delete file %s", file.name)
+            deleted += 1
+            file.unlink()
+
+    app.logger.info("Deleted %d orphan files.", deleted)
+
+    return redirect(url_for("base.index"))
