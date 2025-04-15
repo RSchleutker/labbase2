@@ -12,7 +12,7 @@ maintainability.
 You can install the `labbase2` package to your local Python environment by running the following line of code.
 
 ````commandline
-pip install pybioimage@git+https://github.com/RSchleutker/pybioimage.git
+pip install pybioimage@git+https://github.com/RSchleutker/labbase2.git
 ````
 
 Labbase2 is an installable Flask application. After installation, you can create a folder for an instance of the app. That folder contains a python file to run the app, a config file, the SQLite file, a log file, and a sub-folder for files uploaded through the app. So a basic scheme might look like this.
