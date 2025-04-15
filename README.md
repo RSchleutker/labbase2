@@ -78,7 +78,7 @@ if __name__ == "__main__":
     logger_werkz.level = logging.ERROR
 
     # Configure the app.
-    config_filename = Path(Path.cwd(), "instance", "config.json")
+    config_filename = Path(Path.cwd(), "config.json")
     app = create_app(config=config_filename)
 
     app.run()
