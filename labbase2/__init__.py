@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from flask import Flask, request
+from labbase2 import logging
 
 
 __all__ = ["create_app"]
@@ -38,6 +39,9 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
         app.config.from_file(config, load=json.load, text=False)
     if config_dict is not None:
         app.config |= config_dict
+
+    # Initialize logging.
+    logging.init_app(app)
 
     # Create upload folder if necessary.
     try:
@@ -140,14 +144,5 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     app.jinja_env.filters["format_date"] = template_filters.format_date
     app.jinja_env.filters["format_datetime"] = template_filters.format_datetime
     app.jinja_env.globals["random_string"] = secrets.token_hex
-
-    # Logs every `top-level`request, i.e., every request that was done by the user himself and not
-    # requests to static resources.
-    @app.before_request
-    def log_request():
-        if not request.path.startswith("/static"):
-            app.logger.info(
-                "%(method)-6s %(path)s", {"method": request.method, "path": request.url}
-            )
 
     return app
