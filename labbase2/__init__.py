@@ -10,7 +10,7 @@ from flask_login import current_user as user, current_user
 __all__ = ["create_app"]
 
 
-def create_app(config: Optional[Union[str, Path]] = None, **kwargs) -> Flask:
+def create_app(config: Optional[Union[str, Path]] = None, config_dict: dict = None, **kwargs) -> Flask:
     """Create an app instance of the labbase2 application.
 
     Parameters
@@ -37,6 +37,8 @@ def create_app(config: Optional[Union[str, Path]] = None, **kwargs) -> Flask:
 
     if config is not None:
         app.config.from_file(config, load=json.load, text=False)
+    if config_dict is not None:
+        app.config |= config_dict
 
     # Check if upload folder exists and create if necessary.
     upload_folder: Path = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
