@@ -10,12 +10,12 @@ from flask_login import current_user as user, current_user
 __all__ = ["create_app"]
 
 
-def create_app(config: Union[str, Path], **kwargs) -> Flask:
+def create_app(config: Optional[Union[str, Path]] = None, config_dict: dict = None, **kwargs) -> Flask:
     """Create an app instance of the labbase2 application.
 
     Parameters
     ----------
-    config : Union[str, Path]
+    config : Optional[Union[str, Path]]
         A filename pointing to the configuration file. File has to be in JSON format.
         Filename is supposed to be relative to the instance path.
     kwargs
@@ -34,7 +34,11 @@ def create_app(config: Union[str, Path], **kwargs) -> Flask:
 
     app: Flask = Flask("labbase2", instance_relative_config=True, **kwargs)
     app.config.from_object("labbase2.config.DefaultConfig")
-    app.config.from_file(config, load=json.load, text=False)
+
+    if config is not None:
+        app.config.from_file(config, load=json.load, text=False)
+    if config_dict is not None:
+        app.config |= config_dict
 
     # Check if upload folder exists and create if necessary.
     upload_folder: Path = Path(app.instance_path, app.config["UPLOAD_FOLDER"])

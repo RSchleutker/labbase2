@@ -2,6 +2,8 @@ __all__ = ["DefaultConfig"]
 
 
 class DefaultConfig(object):
+    SECRET_KEY: str ="verysecretkey"
+
     # Database.
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///labbase2.db"
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
@@ -11,6 +13,7 @@ class DefaultConfig(object):
     PER_PAGE: int = 100
 
     # User.
+    USER: tuple = "Max", "Mustermann", "test@test.de"
     DEFAULT_TIMEZONE: str = "Europe/Berlin"
     UPLOAD_FOLDER: str = "upload"
     RESET_EXPIRES: int = 1
