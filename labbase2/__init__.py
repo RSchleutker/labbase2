@@ -4,13 +4,12 @@ from pathlib import Path
 from typing import Optional, Union
 
 from flask import Flask, request
-from flask_login import current_user as user, current_user
 
 
 __all__ = ["create_app"]
 
 
-def create_app(config: Optional[Union[str, Path]] = None, config_dict: dict = None, **kwargs) -> Flask:
+def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[dict] = None, **kwargs) -> Flask:
     """Create an app instance of the labbase2 application.
 
     Parameters
@@ -40,14 +39,12 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: dict = No
     if config_dict is not None:
         app.config |= config_dict
 
-    # Check if upload folder exists and create if necessary.
-    upload_folder: Path = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
-    if not upload_folder.exists():
-        try:
-            upload_folder.mkdir(parents=True)
-        except PermissionError as error:
-            app.logger.error("Could not create upload folder due to insufficient permissions!")
-            raise error
+    # Create upload folder if necessary.
+    try:
+        Path(app.instance_path, app.config["UPLOAD_FOLDER"]).mkdir(parents=True, exist_ok=True)
+    except PermissionError as error:
+        app.logger.error("Could not create upload folder due to insufficient permissions!")
+        raise error
 
     # Initiate the database.
     from labbase2.models import db
@@ -64,8 +61,7 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: dict = No
     with app.app_context():
         # Add permissions to database.
         for name, description in app.config.get("PERMISSIONS"):
-            permission: Optional[Permission] = Permission.query.get(name)
-            if permission is None:
+            if (permission := Permission.query.get(name)) is None:
                 db.session.add(Permission(name=name, description=description))
             else:
                 permission.description = description
