@@ -3,7 +3,7 @@ import secrets
 from pathlib import Path
 from typing import Optional, Union
 
-from flask import Flask, request
+from flask import Flask
 from labbase2 import logging
 
 
@@ -18,6 +18,9 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     config : Optional[Union[str, Path]]
         A filename pointing to the configuration file. File has to be in JSON format.
         Filename is supposed to be relative to the instance path.
+    config_dict : Optional[dict]
+        Additional config parameters for the app. If `config` und `config_dict` contain the same keys, settings from
+        `config_dict` will be applied.
     kwargs
         Additional parameters passed to the Flask class during instantiation.
         Supports all parameters of the Flask class except `import_name` and
@@ -106,37 +109,23 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     # Register login_manager with application.
     from labbase2.models.user import login_manager
 
-    # Register extensions with app.
     login_manager.init_app(app)
 
     # Register blueprints with application.
-    from labbase2.views import (
-        antibodies,
-        auth,
-        base,
-        batches,
-        chemicals,
-        comments,
-        files,
-        fly_stocks,
-        imports,
-        oligonucleotides,
-        plasmids,
-        requests,
-    )
+    from labbase2 import views
 
-    app.register_blueprint(base.bp)
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(imports.bp)
-    app.register_blueprint(chemicals.bp)
-    app.register_blueprint(comments.bp)
-    app.register_blueprint(files.bp)
-    app.register_blueprint(fly_stocks.bp)
-    app.register_blueprint(requests.bp)
-    app.register_blueprint(batches.bp)
-    app.register_blueprint(antibodies.bp)
-    app.register_blueprint(plasmids.bp)
-    app.register_blueprint(oligonucleotides.bp)
+    app.register_blueprint(views.base.bp)
+    app.register_blueprint(views.auth.bp)
+    app.register_blueprint(views.imports.bp)
+    app.register_blueprint(views.chemicals.bp)
+    app.register_blueprint(views.comments.bp)
+    app.register_blueprint(views.files.bp)
+    app.register_blueprint(views.fly_stocks.bp)
+    app.register_blueprint(views.requests.bp)
+    app.register_blueprint(views.batches.bp)
+    app.register_blueprint(views.antibodies.bp)
+    app.register_blueprint(views.plasmids.bp)
+    app.register_blueprint(views.oligonucleotides.bp)
 
     # Add custom template filters to Jinja2.
     from labbase2.utils import template_filters
