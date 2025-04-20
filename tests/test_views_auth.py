@@ -1,5 +1,5 @@
 from flask import url_for
-from flask_login import current_user
+from flask_login import current_user, login_user
 from labbase2 import models
 from labbase2.models import db
 
@@ -77,3 +77,15 @@ def test_login_with_correct_data(app, client):
         assert not current_user.is_anonymous
         assert current_user.is_authenticated
         assert current_user.username == "Max Mustermann"
+
+
+def test_logout_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        url = url_for("auth.logout")
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        response = client.get(url, follow_redirects=True)
+
+        assert b"Successfully logged out!" in response.data
+        assert current_user.is_anonymous
+        assert not current_user.is_authenticated
