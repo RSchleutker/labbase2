@@ -1,3 +1,7 @@
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![Pytest](https://img.shields.io/badge/tests-pytest%20passed-brightgreen)
+![coverage](https://img.shields.io/badge/coverage-48%25-brightgreen)
+
 # Labbase 2
 
 Labbase2 is a database application written in Python using the Flask 
