@@ -1,5 +1,6 @@
 from flask import url_for
 from flask_login import current_user, login_user
+from sqlalchemy import select, func
 from labbase2 import models
 from labbase2.models import db
 
@@ -89,3 +90,53 @@ def test_logout_user(app, client):
         assert b"Successfully logged out!" in response.data
         assert current_user.is_anonymous
         assert not current_user.is_authenticated
+
+
+def test_register_existing_email(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        login_user(admin)
+
+        url = url_for("auth.register")
+        response = client.post(
+            url,
+            data={
+                "first_name": "Maja",
+                "last_name": "Musterfrau",
+                "email": "test@test.de",
+                "password": "This_isAPassword123",
+                "password2": "This_isAPassword123",
+                "submit": True,
+            },
+            follow_redirects=True,
+        )
+
+        user_count = db.session.scalar(select(func.count()).select_from(models.User))
+
+        assert b"Email address already exists!" in response.data
+        assert user_count == 1
+
+
+def test_register_new_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        login_user(admin)
+
+        url = url_for("auth.register")
+        response = client.post(
+            url,
+            data={
+                "first_name": "Maja",
+                "last_name": "Musterfrau",
+                "email": "test2@test.de",
+                "password": "This_isAPassword123",
+                "password2": "This_isAPassword123",
+                "submit": True,
+            },
+            follow_redirects=True,
+        )
+
+        user_count = db.session.scalar(select(func.count()).select_from(models.User))
+
+        assert b"Successfully registered new user!" in response.data
+        assert user_count == 2
