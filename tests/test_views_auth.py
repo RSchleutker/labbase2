@@ -140,3 +140,58 @@ def test_register_new_user(app, client):
 
         assert b"Successfully registered new user!" in response.data
         assert user_count == 2
+
+
+def test_get_edit_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        url = url_for("auth.edit_user")
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert b"Edit Profile" in response.data
+
+
+def test_edit_user_with_wrong_pw(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        url = url_for("auth.edit_user")
+        response = client.post(
+            url,
+            data={
+                "first_name": "Maximilian",
+                "last_name": "Mustermann",
+                "email": "test@test.de",
+                "timezone": "UTC",
+                "password": "wrong_password",
+            },
+            follow_redirects=True,
+        )
+
+        assert response.status_code == 200
+        assert b"Password is incorrect!" in response.data
+        assert user.first_name == "Max"
+
+
+def test_edit_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        url = url_for("auth.edit_user")
+        response = client.post(
+            url,
+            data={
+                "first_name": "Maximilian",
+                "last_name": "Mustermann",
+                "email": "test@test.de",
+                "timezone": "UTC",
+                "password": "admin",
+            },
+            follow_redirects=True,
+        )
+
+        assert response.status_code == 200
+        assert b"Successfully edited user profile!" in response.data
+        assert user.first_name == "Maximilian"
