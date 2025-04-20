@@ -18,10 +18,10 @@ class RequestFormatter(logging.Formatter):
         if has_request_context():
             record.url = request.url
             record.remote_addr = request.remote_addr
+            record.user = "Anonymous" if isinstance(user, AnonymousUserMixin) else user.username
         else:
             record.url = None
             record.remote_addr = None
-
-        record.user = "Anonymous" if isinstance(user, AnonymousUserMixin) else user.username
+            record.user = "Anonymous"
 
         return super().format(record)

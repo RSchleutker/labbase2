@@ -1,16 +1,20 @@
 import pytest
 from labbase2 import create_app
 
+
 @pytest.fixture
 def app():
-    app = create_app()
-    app.config.update({
-        "TESTING": True,
-        "SERVER_NAME": "localhost",
-        "USER": ["Raphael", "Schleutker", "test@test.de"]
-    })
+    app = create_app(
+        config_dict={
+            "TESTING": True,
+            "SERVER_NAME": "localhost",
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "USER": ["Max", "Mustermann", "test@test.de"],
+        }
+    )
 
     yield app
+
 
 @pytest.fixture
 def client(app):

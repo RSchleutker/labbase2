@@ -2,7 +2,7 @@ __all__ = ["DefaultConfig"]
 
 
 class DefaultConfig(object):
-    SECRET_KEY: str ="verysecretkey"
+    SECRET_KEY: str = "verysecretkey"
 
     # Database.
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///labbase2.db"
@@ -25,7 +25,7 @@ class DefaultConfig(object):
         ),
         (
             "Upload files",
-            """"Allows a user to upload files. Applies to all entity types that support 
+            """Allows a user to upload files. Applies to all entity types that support 
             files. Suggested level: Master student.""",
         ),
         (

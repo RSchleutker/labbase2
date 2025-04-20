@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 from flask import Flask
 from labbase2 import logging
+from sqlalchemy import select, func
 
 
 __all__ = ["create_app"]
@@ -68,7 +69,7 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     with app.app_context():
         # Add permissions to database.
         for name, description in app.config.get("PERMISSIONS"):
-            if (permission := Permission.query.get(name)) is None:
+            if (permission := db.session.get(Permission, name)) is None:
                 db.session.add(Permission(name=name, description=description))
             else:
                 permission.description = description
@@ -80,17 +81,25 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     with app.app_context():
         first, last, email = app.config.get("USER")
 
-        if User.query.count() == 0:
+        user_count = db.session.scalar(
+            select(func.count())
+            .select_from(User)
+        )
+        admin_count = db.session.scalar(
+            select(func.count())
+            .select_from(User)
+            .where(User.is_active & User.is_admin)
+        )
+
+        if user_count == 0:
             app.logger.info("No user in database; create admin as specified in config.")
             admin = User(first_name=first, last_name=last, email=email, is_admin=True)
             admin.set_password("admin")
-            admin.permissions = Permission.query.all()
+            admin.permissions = db.session.scalars(select(Permission)).all()
             db.session.add(admin)
-        elif User.query.filter(User.is_active, User.is_admin).count() == 0:
-            app.logger.info(
-                "No active user with admin rights; trying to re-activate admin specified in config."
-            )
-            admin = User.query.filter(User.email == email).first()
+        elif admin_count == 0:
+            app.logger.info("No active user with admin rights; trying to re-activate admin specified in config.")
+            admin = db.session.scalars(select(User).where(User.email == email)).first()
             if admin is not None:
                 app.logger.info("Re-activated initial admin '%s' from config.", admin.username)
                 admin.is_admin = True
@@ -101,10 +110,16 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
                 )
                 admin = User(first_name=first, last_name=last, email=email, is_admin=True)
                 admin.set_password("admin")
-                admin.permissions = Permission.query.all()
+                admin.permissions = db.session.scalars(select(Permission)).all()
                 db.session.add(admin)
 
-        db.session.commit()
+        app.logger.info("Had %d users and %d admins in database at startup.", user_count, admin_count)
+
+        try:
+            db.session.commit()
+        except Exception as error:
+            app.logger.error("Could not add initial user/admin to database: %s", error)
+            raise error
 
     # Register login_manager with application.
     from labbase2.models.user import login_manager
