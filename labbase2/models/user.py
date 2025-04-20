@@ -18,9 +18,7 @@ login_manager.login_message_category = "warning"
 user_permissions = db.Table(
     "user_permissions",
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column(
-        "role_id", db.Integer, db.ForeignKey("permission.name"), primary_key=True
-    ),
+    db.Column("role_id", db.Integer, db.ForeignKey("permission.name"), primary_key=True),
 )
 
 
@@ -111,12 +109,8 @@ class User(db.Model, UserMixin, Export):
     last_name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String(512), nullable=False)
-    file_picture_id = db.Column(
-        db.Integer, db.ForeignKey("base_file.id"), nullable=True
-    )
-    timestamp_created = db.Column(
-        db.DateTime, server_default=func.now(), nullable=False
-    )
+    file_picture_id = db.Column(db.Integer, db.ForeignKey("base_file.id"), nullable=True)
+    timestamp_created = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     timestamp_last_login = db.Column(db.DateTime, nullable=True)
     timezone = db.Column(db.String(64), nullable=False, default="UTC")
     is_active = db.Column(db.Boolean, nullable=False, default=True)
@@ -250,7 +244,7 @@ class User(db.Model, UserMixin, Export):
         return check_password_hash(self.password_hash, password)
 
     def has_permission(self, permission: str) -> bool:
-        permission_db = Permission.query.get(permission)
+        permission_db = db.session.get(Permission, permission)
         if permission_db is None:
             raise ValueError(f"Unknown permission '{permission}'!")
 
@@ -300,9 +294,7 @@ class ResetPassword(db.Model):
     __tablename__: str = "reset_password"
 
     token = db.Column(db.String(64), primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True)
     timeout = db.Column(db.DateTime, nullable=False)
 
 
