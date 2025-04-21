@@ -317,7 +317,10 @@ def change_active_status(id_: int):
         user.is_active = True
         db.session.commit()
 
-    return redirect(request.referrer)
+    if request.referrer is None:
+        return redirect(url_for(".users"))
+    else:
+        return redirect(request.referrer)
 
 
 @bp.route("/reset-password/<int:id_>", methods=["GET"])
@@ -347,7 +350,10 @@ def create_password_reset(id_: int):
     flash(f"Generated a password reset . Expires: {reset.timeout.isoformat()}!", "success")
     flash(f"Visit: {url_for('auth.change_password', key=reset.token)}")
 
-    return redirect(request.referrer)
+    if request.referrer is None:
+        return redirect(url_for(".users"))
+    else:
+        return redirect(request.referrer)
 
 
 @bp.route("/users", methods=["GET"])
