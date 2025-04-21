@@ -291,4 +291,28 @@ def test_inactivate_user(app, client):
 
 
 # TODO Test auth.create_password_reset
-# TODO Test auth.users
+
+
+def test_users_get(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        url = url_for("auth.users")
+
+        admin = db.session.get(models.User, 1)
+        login_user(admin)
+
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert b"Mustermann" in response.data
+        assert b"Musterfrau" not in response.data
+
+        user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
+        user.set_password("TestPassword")
+        db.session.add(user)
+        db.session.commit()
+
+        response = client.get(url)
+
+        assert response.status_code == 200
+        assert b"Mustermann" in response.data
+        assert b"Musterfrau" in response.data
