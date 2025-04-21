@@ -280,7 +280,7 @@ def change_admin_status(id_: int):
         else:
             flash(f"Successfully changed admin setting for {user.username}!", "success")
 
-    user_count_stm = select(func.count()).select_from(User.is_admin).where(User.is_admin)
+    user_count_stm = select(func.count()).select_from(User).where(User.is_admin)
     if db.session.scalar(user_count_stm) == 0:
         flash("No user with admin rights! Reverting previous change!", "warning")
         user.is_admin = True
