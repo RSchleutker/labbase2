@@ -282,7 +282,10 @@ def change_admin_status(id_: int):
         user.is_admin = True
         db.session.commit()
 
-    return redirect(request.referrer)
+    if request.referrer is None:
+        return redirect(url_for(".users"))
+    else:
+        return redirect(request.referrer)
 
 
 @bp.route("/change-active-status/<int:id_>", methods=["GET"])
