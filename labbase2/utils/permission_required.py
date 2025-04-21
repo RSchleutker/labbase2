@@ -3,7 +3,7 @@ from typing import Callable
 
 from flask import flash, redirect, url_for
 from flask_login import current_user
-from labbase2.models import Permission
+from labbase2.models import db, Permission
 
 __all__ = ["permission_required"]
 
@@ -34,11 +34,10 @@ def permission_required(*allowed) -> Callable:
             verified = []
 
             for permission in allowed:
-                permission_db = Permission.query.get(permission)
+                permission_db = db.session.get(Permission, permission)
                 if permission_db is None:
                     flash(
-                        f"Permission '{permission}' not found."
-                        f"Please inform the developer!",
+                        f"Permission '{permission}' not found." f"Please inform the developer!",
                         "warning",
                     )
                 else:

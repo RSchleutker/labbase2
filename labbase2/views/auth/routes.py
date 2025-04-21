@@ -11,7 +11,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from labbase2.models import BaseFile, Permission, ResetPassword, User, db
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.routes import upload_file
-from sqlalchemy import func
+from sqlalchemy import select, func
 from sqlalchemy.exc import DataError
 
 from .forms.edit import EditUserForm
@@ -44,7 +44,7 @@ def login() -> str | Response:
 
     # POST fork with correct credentials.
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = db.session.scalar(select(User).where(User.email == form.email.data))
 
         if not user:
             app.logger.warning("Login attempt with invalid credentials")
@@ -106,7 +106,8 @@ def register():
     if form.validate_on_submit():
         email = validate_email(form.email.data).normalized
 
-        if User.query.filter(User.email.ilike(email)).count() > 0:
+        user_count_stm = select(func.count()).select_from(User).where(User.email == email)
+        if db.session.scalar(user_count_stm) > 0:
             app.logger.warning("Tried to register new user with existing email address: %s", email)
             flash("Email address already exists!", "danger")
         else:
@@ -178,7 +179,7 @@ def edit_user():
 @bp.route("/change-password/<string:key>", methods=["GET", "POST"])
 @login_required
 def change_password(key: Optional[str] = None):
-    if key and (reset := ResetPassword.query.get(key)) is not None:
+    if key and (reset := db.session.get(ResetPassword, key)) is not None:
         if datetime.now() > reset.timeout:
             flash("Token to reset password has expired!")
             db.session.delete(reset)
@@ -226,12 +227,14 @@ def change_password(key: Optional[str] = None):
 @login_required
 @permission_required("Manage users")
 def change_permissions(id_: int = None):
-    users = User.query.filter(User.is_active).order_by(User.last_name, User.first_name).all()
+    users = db.session.scalars(
+        select(User).where(User.is_active).order_by(User.last_name, User.first_name)
+    )
 
     if id_ is None:
         user = current_user
     else:
-        user = User.query.get(id_)
+        user = db.session.get(User, id_)
 
     form = EditPermissions(**user.form_permissions)
 
@@ -243,7 +246,7 @@ def change_permissions(id_: int = None):
             if not field.data:
                 continue
 
-            permission = Permission.query.get(field.name.replace("_", " ").capitalize())
+            permission = db.session.get(Permission, field.name.replace("_", " ").capitalize())
             user.permissions.append(permission)
 
         db.session.commit()
@@ -262,7 +265,7 @@ def change_permissions(id_: int = None):
 @login_required
 @permission_required("Manage users")
 def change_admin_status(id_: int):
-    user = User.query.get(id_)
+    user = db.session.get(User, id_)
 
     if user is None:
         flash(f"No user with ID {id_})!", "danger")
@@ -277,7 +280,8 @@ def change_admin_status(id_: int):
         else:
             flash(f"Successfully changed admin setting for {user.username}!", "success")
 
-    if User.query.filter(User.is_admin).count() == 0:
+    user_count_stm = select(func.count()).select_from(User).where(User.is_admin)
+    if db.session.scalar(user_count_stm) == 0:
         flash("No user with admin rights! Reverting previous change!", "warning")
         user.is_admin = True
         db.session.commit()
@@ -292,7 +296,7 @@ def change_admin_status(id_: int):
 @login_required
 @permission_required("Manage users")
 def change_active_status(id_: int):
-    user = User.query.get(id_)
+    user = db.session.get(User, id_)
 
     if user is None:
         flash(f"No user with ID {id_})!", "danger")
@@ -307,7 +311,8 @@ def change_active_status(id_: int):
         else:
             flash(f"Successfully changed active setting for {user.username}!", "success")
 
-    if User.query.filter(User.is_active).count() == 0:
+    user_count_stm = select(func.count()).select_from(User).where(User.is_active)
+    if db.session.scalar(user_count_stm) == 0:
         flash("No active user! Reverting previous change!", "warning")
         user.is_active = True
         db.session.commit()
@@ -319,7 +324,7 @@ def change_active_status(id_: int):
 @login_required
 @permission_required("Manage users")
 def create_password_reset(id_: int):
-    user = User.query.get(id_)
+    user = db.session.get(User, id_)
 
     if user is None:
         flash(f"No user with ID {id_})!", "danger")
@@ -348,9 +353,9 @@ def create_password_reset(id_: int):
 @bp.route("/users", methods=["GET"])
 @login_required
 def users():
-    users = (
-        User.query.order_by(
+    users = db.session.scalars(
+        select(User).order_by(
             User.is_active.desc(), User.is_admin.desc(), User.last_name, User.first_name
         )
-    ).all()
+    )
     return render_template("auth/users.html", users=users, title="Users")
