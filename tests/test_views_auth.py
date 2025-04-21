@@ -247,3 +247,48 @@ def test_remove_admin_from_user(app, client):
         assert b"Successfully changed admin setting for" in response.data
         assert b"No user with admin rights! Reverting previous change!" not in response.data
         assert not user.is_admin
+
+
+# TODO Test auth.change_password
+# TODO Test auth.change_permissions
+# TODO Test auth.change_active_status
+
+
+def test_inactivate_only_admin(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        login_user(admin)
+
+        assert admin.is_active
+
+        url = url_for("auth.change_active_status", id_=1)
+        response = client.get(url, follow_redirects=True)
+
+        assert response.status_code == 200
+        assert b"Successfully changed active setting for" in response.data
+        assert b"No active user! Reverting previous change!" in response.data
+        assert admin.is_active
+
+
+def test_inactivate_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
+        user.set_password("TestPassword")
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(admin)
+
+        assert user.is_active
+
+        url = url_for("auth.change_active_status", id_=2)
+        response = client.get(url, follow_redirects=True)
+
+        assert response.status_code == 200
+        assert b"Successfully changed active setting for" in response.data
+        assert not user.is_active
+
+
+# TODO Test auth.create_password_reset
+# TODO Test auth.users
