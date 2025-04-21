@@ -1,3 +1,5 @@
+from http.client import responses
+
 from flask import url_for
 from flask_login import current_user, login_user
 from sqlalchemy import select, func
@@ -195,3 +197,53 @@ def test_edit_user(app, client):
         assert response.status_code == 200
         assert b"Successfully edited user profile!" in response.data
         assert user.first_name == "Maximilian"
+
+
+def test_remove_only_admin(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        url = url_for("auth.change_admin_status", id_=1)
+        response = client.get(url, follow_redirects=True)
+
+        assert response.status_code == 200
+        assert b"Successfully changed admin setting for" in response.data
+        assert b"No user with admin rights! Reverting previous change!" in response.data
+        assert user.is_admin
+
+
+def test_make_user_admin(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
+        user.set_password("TestPassword")
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(admin)
+        url = url_for("auth.change_admin_status", id_=2)
+        response = client.get(url, follow_redirects=True)
+
+        assert response.status_code == 200
+        assert b"Successfully changed admin setting for" in response.data
+        assert b"No user with admin rights! Reverting previous change!" not in response.data
+        assert user.is_admin
+
+
+def test_remove_admin_from_user(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        admin = db.session.get(models.User, 1)
+        user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
+        user.is_admin = True
+        user.set_password("TestPassword")
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(admin)
+        url = url_for("auth.change_admin_status", id_=2)
+        response = client.get(url, follow_redirects=True)
+
+        assert response.status_code == 200
+        assert b"Successfully changed admin setting for" in response.data
+        assert b"No user with admin rights! Reverting previous change!" not in response.data
+        assert not user.is_admin
