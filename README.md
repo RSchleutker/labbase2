@@ -11,10 +11,10 @@ This project is a complete rewrite of the original Labbase and includes major im
 
 ## 🚀 Installation
 
-Install the `labbase2` package directly from GitHub:
+Install the `labbase2` package directly from PyPI:
 
 ````commandline
-pip install labbase2@git+https://github.com/RSchleutker/labbase2.git
+pip install labbase2
 ````
 
 Labbase2 is an installable Flask application. After installation, you can create a dedicated folder for your app instance. The folder typically contains:
