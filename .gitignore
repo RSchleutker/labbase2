@@ -132,4 +132,5 @@ app/static/files/*
 structure.pdf
 structure.graphml
 run_app.py
+.pypirc
 *.db
