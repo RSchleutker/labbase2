@@ -1,43 +1,38 @@
-![Python](https://img.shields.io/badge/python-3.11-blue)
+![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Pytest](https://img.shields.io/badge/tests-pytest%20passed-brightgreen)
-![coverage](https://img.shields.io/badge/coverage-48%25-brightgreen)
 
-# Labbase 2
+# Labbase2
 
-Labbase2 is a database application written in Python using the Flask 
-web-framework. The target of Labbase2 is to organize lab ressources in a 
-centralized manner. Labbase2 is a complete re-write of the original Labbase 
-that includes a range of improvements in usability, code quality, and 
-maintainability.
+**Labbase2** is a database application written in Python using the Flask web framework. It is designed to help manage lab resources in a centralized and efficient way.
 
+This project is a complete rewrite of the original Labbase and includes major improvements in usability, code quality, and maintainability.
 
-## Installation
+---
 
-You can install the `labbase2` package to your local Python environment by running the following line of code.
+## 🚀 Installation
+
+Install the `labbase2` package directly from GitHub:
 
 ````commandline
 pip install labbase2@git+https://github.com/RSchleutker/labbase2.git
 ````
 
-Labbase2 is an installable Flask application. After installation, you can create a folder for an instance of the app. That folder contains a python file to run the app, a config file, the SQLite file, a log file, and a sub-folder for files uploaded through the app. So a basic scheme might look like this.
+Labbase2 is an installable Flask application. After installation, you can create a dedicated folder for your app instance. The folder typically contains:
 
 ````commandline
 project_folder/
-├───upload/
-├───config.json
-├───labbase2.db
-├───log.log
-└───main.py
+├── upload/           # Folder for uploaded files
+├── labbase2.db       # SQLite database (created on first run)
+├── log.log           # Log file (created on first run)
+└── main.py           # Script to start the app
 ````
 
-At the very least, `config.json` should define a secret key for the app.
+## ⚙️ Configuration
 
-**config.json**
-````json
-{"SECRET_KEY": "645588a195c5bbd01943d0addaa3d77c26871ed04c7db3103ed52bb642ce64ee"}
-````
+At the very least, a secret ky should be configured, either through a config file or via the `config_dict` argument of `create_app`.
 
-In `main.py`, you can then set up the app. A simple example using Flask's integrated development server looks like this.
+## 🧪 Example main.py
+Here's a minimal setup to launch the app with Flask's built-in development server:
 
 **main.py**
 ````python
@@ -82,16 +77,31 @@ if __name__ == "__main__":
     logger_werkz.level = logging.ERROR
 
     # Configure the app.
-    config_filename = Path(Path.cwd(), "config.json")
-    app = create_app(config=config_filename)
+    app = create_app(config_dict={"SECRET_KEY": "645588a195c5bbd"})
 
     app.run()
 ````
 
-Now, you can start the app.
+Start the app by running:
 
 ````commandline
 python main.py
 ````
 
-`log.log` and `labbase2.db` will be created automatically once the app is run for the first time.
+The database (`labbase2.db`) and log file (`log.log`) will be created automatically on first run.
+
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+
+### Third-Party Libraries
+
+This project uses the following third-party libraries:
+
+- [Bootstrap 5.2.3-dist](https://getbootstrap.com/) – MIT License
+- [jQuery 3.7.1](https://jquery.com/) – MIT License
+- [Popper.js](https://popper.js.org/) – MIT License
+
+The above libraries are included locally in this repository or via CDNs. If included locally, their original license files are included in the respective folders.
+

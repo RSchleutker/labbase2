@@ -1,7 +1,13 @@
 [project]
 name = "labbase2"
-version="0.9.1"
-description="A database application to manage lab ressources."
+version = "0.1.0"
+description="A database application to manage lab resources."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Raphael Schleutker", email = "raphaelschleutker@gmx.de" }
+]
+requires-python = ">=3.9"
 dependencies = [
     "flask>=3.0.0",
     "flask-login>=0.6.3",
@@ -13,9 +19,15 @@ dependencies = [
     "scikit-image>0.23.0",
     "biopython>=1.78",
     "email-validator>=1.2.1",
-    "pytest>=8.3.4"
 ]
+
+[project.optional-dependencies]
+dev = ["black"]
+test = ["pytest>=8.3.4"]
 
 [build-system]
 requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "labbase2"
