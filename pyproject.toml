@@ -28,6 +28,3 @@ test = ["pytest>=8.3.4"]
 [build-system]
 requires = ["flit_core<4"]
 build-backend = "flit_core.buildapi"
-
-[tool.flit.metadata]
-module = "labbase2"
