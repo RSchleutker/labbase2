@@ -5,6 +5,7 @@ from flask_login import current_user, login_required
 from labbase2.models import GlycerolStock, Plasmid, Preparation, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
+from sqlalchemy import select
 
 from .forms import EditPreparation
 
@@ -12,9 +13,7 @@ __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "preparations", __name__, url_prefix="/preparations", template_folder="templates"
-)
+bp = Blueprint("preparations", __name__, url_prefix="/preparations", template_folder="templates")
 
 
 @bp.route("/<int:plasmid_id>", methods=["POST"])
@@ -26,7 +25,7 @@ def add(plasmid_id: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if Plasmid.query.get(plasmid_id) is None:
+    if db.session.get(Plasmid, plasmid_id) is None:
         return Message.ERROR(f"No plasmid with ID {plasmid_id}!")
 
     preparation = Preparation(owner_id=current_user.id, plasmid_id=plasmid_id)
@@ -50,9 +49,7 @@ def add(plasmid_id: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(
-        f"Successfully added preparation to '{preparation.plasmid.label}'!"
-    )
+    return Message.SUCCESS(f"Successfully added preparation to '{preparation.plasmid.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -64,7 +61,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (preparation := Preparation.query.get(id_)) is None:
+    if (preparation := db.session.get(Preparation, id_)) is None:
         return Message.ERROR(f"No preparation with ID {id_}!")
 
     if preparation.owner_id != current_user.id:
@@ -85,7 +82,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add preparations")
 def delete(id_: int):
-    if not (preparation := Preparation.query.get(id_)):
+    if not (preparation := db.session.get(Preparation, id_)):
         return Message.ERROR(f"No preparation with ID {id_}!")
 
     try:

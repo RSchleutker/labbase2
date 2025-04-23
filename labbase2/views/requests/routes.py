@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_login import login_required
 from labbase2.forms.utils import errors2messages
 from labbase2.models import Request, db
+from sqlalchemy import select
 
 from .forms import EditRequest
 
@@ -35,7 +36,7 @@ def add(entity_id: int):
 @login_required
 def edit(id_: int):
     if (form := EditRequest()).validate():
-        if not (request := Request.query.get(id_)):
+        if not (request := db.session.get(Request, id_)):
             return f"No request with ID {id_}!", 404
         else:
             form.populate_obj(request)
@@ -53,7 +54,7 @@ def edit(id_: int):
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_):
-    if not (request := Request.query.get(id_)):
+    if not (request := db.session.get(Request, id_)):
         return f"No comment with ID {id_}!", 404
     else:
         try:

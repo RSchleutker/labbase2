@@ -18,6 +18,7 @@ from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.files.routes import upload_file
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from .forms import MappingForm
@@ -31,9 +32,7 @@ bp = Blueprint("imports", __name__, url_prefix="/imports", template_folder="temp
 @bp.route("/", methods=["GET"])
 @login_required
 def index():
-    return render_template(
-        "imports/main.html", title="Pending imports", jobs=current_user.import_jobs
-    )
+    return render_template("imports/main.html", title="Pending imports", jobs=current_user.import_jobs)
 
 
 @bp.route("/upload/<string:type_>", methods=["POST"])
@@ -106,7 +105,7 @@ def upload(type_: str):
 @bp.route("/edit/<int:id_>", methods=["GET", "POST"])
 @login_required
 def edit(id_: int):
-    import_job = ImportJob.query.get(id_)
+    import_job = db.session.get(ImportJob, id_)
 
     if import_job is None:
         flash(f"No import with ID {id_}!", "danger")
@@ -148,7 +147,7 @@ def edit(id_: int):
 @bp.route("/import/<int:id_>", methods=["GET", "POST"])
 @login_required
 def execute(id_: int):
-    job = ImportJob.query.get(id_)
+    job = db.session.get(ImportJob, id_)
 
     if job.user_id != current_user.id:
         flash(Message.ERROR("You are not authorized to execute this import."))
@@ -169,8 +168,8 @@ def execute(id_: int):
             flash(f"Unknown entity type {job.entity_type}!", "danger")
             return redirect(request.referrer)
 
-    mappings = ColumnMapping.query.filter(
-        ColumnMapping.job_id == job.id, ColumnMapping.input_column.isnot(None)
+    mappings = db.session.scalars(
+        select(ColumnMapping).where(ColumnMapping.job_id == job.id & ColumnMapping.input_column.isnot(None))
     )
     fields = [mapping.mapped_field for mapping in mappings]
     colmns = [mapping.input_column for mapping in mappings]
@@ -203,9 +202,7 @@ def execute(id_: int):
             if isinstance(value, str):
                 row[key] = value.strip()
 
-        origin = (
-            f"Created from file {file.filename_exposed} by {current_user.username}."
-        )
+        origin = f"Created from file {file.filename_exposed} by {current_user.username}."
         entity = entity_cls(origin=origin, **row)
 
         try:
@@ -231,7 +228,7 @@ def execute(id_: int):
 @bp.route("/delete/<int:id_>", methods=["DELETE"])
 @login_required
 def delete(id_: int):
-    if not (job := ImportJob.query.get(id_)):
+    if not (job := db.session.get(ImportJob, id_)):
         return Message.ERROR(f"No import with ID {id_}!")
 
     if job.user_id != current_user.id:

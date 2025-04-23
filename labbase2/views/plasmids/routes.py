@@ -9,6 +9,7 @@ from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.files.routes import upload_file
 from labbase2.views.requests.forms import EditRequest
+from sqlalchemy import select, func
 
 from . import bacteria, preparations
 from .bacteria.forms import EditBacterium
@@ -47,7 +48,7 @@ def index():
         import_file_form=UploadFile(),
         add_form=EditPlasmid(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=Plasmid.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(Plasmid)),
         title="Plasmids",
     )
 
@@ -82,7 +83,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (plasmid := Plasmid.query.get(id_)) is None:
+    if (plasmid := db.session.get(Plasmid, id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
 
     if plasmid.owner_id != current_user.id:
@@ -103,7 +104,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add plasmid")
 def delete(id_: int):
-    if (plasmid := Plasmid.query.get(id_)) is None:
+    if (plasmid := db.session.get(Plasmid, id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
 
     if plasmid.owner_id != current_user.id:
@@ -122,7 +123,7 @@ def delete(id_: int):
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if (plasmid := Plasmid.query.get(id_)) is None:
+    if (plasmid := db.session.get(Plasmid, id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
 
     return render_template(
@@ -143,7 +144,7 @@ def details(id_: int):
 def upload_plasmid_file(id_: int, type_: str):
     form = UploadFile()
 
-    if (plasmid := Plasmid.query.get(id_)) is None:
+    if (plasmid := db.session.get(Plasmid, id_)) is None:
         flash(f"No plasmid with ID {id_}!", "danger")
         return redirect(request.referrer)
 

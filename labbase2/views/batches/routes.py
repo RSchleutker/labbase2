@@ -7,6 +7,7 @@ from flask_login import login_required
 from labbase2.models import Batch, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
+from sqlalchemy import func, select
 
 from .forms import EditBatch, FilterBatch
 
@@ -41,7 +42,7 @@ def index():
         filter_form=form,
         add_form=EditBatch(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=Batch.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(Batch)),
         title="Batches",
     )
 
@@ -82,7 +83,7 @@ def edit(id_: int):
         app.logger.info("Couldn't edit batch with ID %d due to invalid user input.", id_)
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (batch := Batch.query.get(id_)) is None:
+    if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
@@ -103,7 +104,7 @@ def edit(id_: int):
 @bp.route("/open/<int:id_>", methods=["PUT"])
 @login_required
 def in_use(id_: int):
-    if (batch := Batch.query.get(id_)) is None:
+    if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
@@ -129,7 +130,7 @@ def in_use(id_: int):
 @bp.route("/empty/<int:id_>", methods=["PUT"])
 @login_required
 def emptied(id_: int):
-    if (batch := Batch.query.get(id_)) is None:
+    if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
@@ -156,7 +157,7 @@ def emptied(id_: int):
 @login_required
 @permission_required("Add consumable batches")
 def delete(id_: int):
-    if (batch := Batch.query.get(id_)) is None:
+    if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 
@@ -176,7 +177,7 @@ def delete(id_: int):
 @bp.route("/<int:id_>/<string:format_>", methods=["GET"])
 @login_required
 def details(id_: int, format_: str):
-    if (batch := Batch.query.get(id_)) is None:
+    if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)
         return Message.ERROR(f"No batch with ID {id_}!")
 

@@ -10,6 +10,7 @@ from labbase2.utils.permission_required import permission_required
 from labbase2.views.batches.forms import EditBatch
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
+from sqlalchemy import select, func
 
 from . import stock_solutions
 from .forms import EditChemical, FilterChemical
@@ -19,9 +20,7 @@ __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "chemicals", __name__, url_prefix="/chemical", template_folder="templates"
-)
+bp = Blueprint("chemicals", __name__, url_prefix="/chemical", template_folder="templates")
 
 bp.register_blueprint(stock_solutions.bp)
 
@@ -48,7 +47,7 @@ def index():
         import_file_form=UploadFile(),
         add_form=EditChemical(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=Chemical.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(Chemical)),
         title="Chemicals",
     )
 
@@ -86,7 +85,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if not (chemical := Chemical.query.get(id_)):
+    if not (chemical := db.session.get(Chemical, id_)):
         return Message.ERROR(f"No chemical with ID {id_}!")
 
     form.populate_obj(chemical)
@@ -103,7 +102,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add chemicals")
 def delete(id_: int):
-    if (chemical := Chemical.query.get(id_)) is None:
+    if (chemical := db.session.get(Chemical, id_)) is None:
         return Message.ERROR(f"No chemical with ID {id_}!")
 
     try:
@@ -119,7 +118,7 @@ def delete(id_: int):
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if (chemical := Chemical.query.get(id_)) is None:
+    if (chemical := db.session.get(Chemical, id_)) is None:
         return Message.ERROR(f"No chemical found with ID {id_}!")
 
     return render_template(

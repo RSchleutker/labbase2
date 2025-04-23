@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from labbase2.models import Comment, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
+from sqlalchemy import select
 
 from .forms import EditComment
 
@@ -42,7 +43,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (comment := Comment.query.get(id_)) is None:
+    if (comment := db.session.get(Comment, id_)) is None:
         return Message.ERROR(f"No comment found with ID {id_}!")
 
     if comment.user_id != current_user.id:
@@ -62,7 +63,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Write comment")
 def delete(id_):
-    if not (comment := Comment.query.get(id_)):
+    if not (comment := db.session.get(Comment, id_)):
         return Message.ERROR(f"No comment with ID {id_}!")
 
     if comment.user_id != current_user.id:

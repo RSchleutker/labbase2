@@ -8,7 +8,7 @@ from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
-from sqlalchemy import func
+from sqlalchemy import func, select, and_
 from sqlalchemy.exc import IntegrityError
 
 from .forms import EditOligonucleotide, FilterOligonucleotide, FindOligonucleotide
@@ -48,7 +48,7 @@ def index():
         import_file_form=UploadFile(),
         add_form=EditOligonucleotide(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=Oligonucleotide.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(Oligonucleotide)),
         title="Oligonucleotides",
     )
 
@@ -56,7 +56,7 @@ def index():
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
+    if (oligonucleotide := db.session.get(Oligonucleotide, id_)) is None:
         return Message.ERROR(f"No oligonucleotide found with ID {id_}!")
 
     return render_template(
@@ -89,9 +89,7 @@ def add():
     except Exception as error:
         return Message.ERROR(error)
     else:
-        return Message.SUCCESS(
-            f"Successfully added oligonucleotide '{oligonucleotide.label}'!"
-        )
+        return Message.SUCCESS(f"Successfully added oligonucleotide '{oligonucleotide.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -103,7 +101,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if not (oligonucleotide := Oligonucleotide.query.get(id_)):
+    if not (oligonucleotide := db.session.get(Oligonucleotide, id_)):
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")
 
     if oligonucleotide.owner_id != current_user.id:
@@ -116,16 +114,14 @@ def edit(id_: int):
     except Exception as error:
         return Message.ERROR(error)
 
-    return Message.SUCCESS(
-        f"Successfully edited oligonucleotide {oligonucleotide.label}!"
-    )
+    return Message.SUCCESS(f"Successfully edited oligonucleotide {oligonucleotide.label}!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
 @permission_required("Add oligonucleotide")
 def delete(id_):
-    if (oligonucleotide := Oligonucleotide.query.get(id_)) is None:
+    if (oligonucleotide := db.session.get(Oligonucleotide, id_)) is None:
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")
 
     if oligonucleotide.owner_id != current_user.id:
@@ -138,9 +134,7 @@ def delete(id_):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(
-        f"Successfully deleted oligonucleotide '{oligonucleotide.label}'!"
-    )
+    return Message.SUCCESS(f"Successfully deleted oligonucleotide '{oligonucleotide.label}'!")
 
 
 @bp.route("/find", methods=["GET", "POST"])
@@ -159,9 +153,13 @@ def find():
             seq = str(Seq(seq).reverse_complement())
 
         lcsfinder = LCSFinder(seq)
-        oligonucleotides = Oligonucleotide.query.filter(
-            func.length(Oligonucleotide.sequence) >= min_match,
-            func.length(Oligonucleotide.sequence) <= max_len,
+        oligonucleotides = db.session.scalars(
+            select(Oligonucleotide).where(
+                and_(
+                    func.char_length(Oligonucleotide.sequence) >= min_match,
+                    func.char_length(Oligonucleotide.sequence) <= max_len,
+                )
+            )
         )
 
         for oligonucleotide in oligonucleotides:

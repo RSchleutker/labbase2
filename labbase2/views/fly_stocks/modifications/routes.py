@@ -2,6 +2,7 @@ from app.forms.utils import err2message
 from app.models import Modification, db
 from flask import Blueprint
 from flask_login import current_user, login_required
+from sqlalchemy import select
 
 from .forms import EditModification
 
@@ -9,9 +10,7 @@ __all__: list[str] = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "modifications", __name__, url_prefix="/modifications", template_folder="templates"
-)
+bp = Blueprint("modifications", __name__, url_prefix="/modifications", template_folder="templates")
 
 
 @bp.route("/<int:flystock_id>", methods=["POST"])
@@ -36,7 +35,7 @@ def add(flystock_id: int):
 @login_required
 def edit(id: int):
     if (form := EditModification()).validate():
-        if (modification := Modification.query.get(id)) is None:
+        if (modification := db.session.get(Modification, id_)) is None:
             return f"No preparation with ID {id}!", 404
         elif modification.user_id != current_user.id:
             return "Modification can only be edited by source user!", 400
@@ -56,7 +55,7 @@ def edit(id: int):
 @bp.route("/<int:flystock_id>/<int:id>", methods=["DELETE"])
 @login_required
 def delete(flystock_id: int, id: int):
-    if (modification := Modification.query.get(id)) is None:
+    if (modification := db.session.get(Modification, id_)) is None:
         return f"No modification with ID {id}!", 404
     elif modification.user_id != current_user.id:
         return "Modification can only be deleted by source user!", 400

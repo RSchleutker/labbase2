@@ -9,6 +9,7 @@ from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.files.routes import upload_file
 from labbase2.views.requests.forms import EditRequest
+from sqlalchemy import select, func
 
 from .forms import EditFlyStock, FilterFlyStocks
 
@@ -16,9 +17,7 @@ __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "flystocks", __name__, url_prefix="/fly-stocks", template_folder="templates"
-)
+bp = Blueprint("flystocks", __name__, url_prefix="/fly-stocks", template_folder="templates")
 
 # bp.register_blueprint(modifications.bp)
 
@@ -45,7 +44,7 @@ def index():
         import_file_form=UploadFile(),
         add_form=EditFlyStock(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=FlyStock.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(FlyStock)),
         title="Fly Stocks",
     )
 
@@ -80,7 +79,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (fly_stock := FlyStock.query.get(id_)) is None:
+    if (fly_stock := db.session.get(FlyStock, id_)) is None:
         return Message.ERROR(f"No fly stock with ID {id_}!")
 
     if fly_stock.owner_id != current_user.id:
@@ -101,7 +100,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add Fly Stock")
 def delete(id_):
-    if (fly_stock := FlyStock.query.get(id_)) is None:
+    if (fly_stock := db.session.get(FlyStock, id_)) is None:
         return Message.ERROR(f"No fly stock with ID {id_}!")
 
     if fly_stock.owner_id != current_user.id:
@@ -120,7 +119,7 @@ def delete(id_):
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if (fly_stock := FlyStock.query.get(id_)) is None:
+    if (fly_stock := db.session.get(FlyStock, id_)) is None:
         return Message.ERROR(f"No fly stock with ID {id_}!")
 
     return render_template(

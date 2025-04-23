@@ -5,6 +5,7 @@ from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.plasmids.forms import EditPlasmid
+from sqlalchemy import select, func
 
 from .forms import EditBacterium, FilterBacteria
 
@@ -12,9 +13,7 @@ __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "bacteria", __name__, url_prefix="/glycerol-stocks", template_folder="templates"
-)
+bp = Blueprint("bacteria", __name__, url_prefix="/glycerol-stocks", template_folder="templates")
 
 
 @bp.route("/", methods=["GET"])
@@ -38,7 +37,7 @@ def index():
         filter_form=form,
         add_form=EditBacterium(formdata=None),
         entities=entities.paginate(page=page, per_page=100),
-        total=GlycerolStock.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(GlycerolStock)),
         title="Glycerol stocks",
     )
 
@@ -52,7 +51,7 @@ def add(plasmid_id: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (plasmid := Plasmid.query.get(plasmid_id)) is None:
+    if (plasmid := db.session.get(Plasmid, plasmid_id)) is None:
         return f"No plasmid with ID {plasmid_id}!"
 
     stock = GlycerolStock(plasmid_id=plasmid_id, owner_id=current_user.id)
@@ -77,7 +76,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if not (plasmid := GlycerolStock.query.get(id_)):
+    if not (plasmid := db.session.get(GlycerolStock, id_)):
         return Message.ERROR(f"No glycerol stock with ID {id_}!")
 
     if plasmid.owner_id != current_user.id:
@@ -97,7 +96,7 @@ def edit(id_: int):
 @bp.route("/<int:id_>/<string:format_>", methods=["GET"])
 @login_required
 def details(id_: int, format_: str):
-    if (stock := GlycerolStock.query.get(id_)) is None:
+    if (stock := db.session.get(GlycerolStock, id_)) is None:
         return Message.ERROR(f"No glycerol stock with ID {id_}!")
 
     edit_form = EditBacterium(None, obj=stock)

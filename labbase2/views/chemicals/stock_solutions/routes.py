@@ -7,6 +7,7 @@ from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.chemicals.forms import EditChemical
 from labbase2.views.files.forms import UploadFile
+from sqlalchemy import select, func
 
 from .forms import EditStockSolution, FilterStockSolution
 
@@ -14,9 +15,7 @@ __all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
-bp = Blueprint(
-    "solutions", __name__, url_prefix="/stock-solutions", template_folder="templates"
-)
+bp = Blueprint("solutions", __name__, url_prefix="/stock-solutions", template_folder="templates")
 
 
 @bp.route("/", methods=["GET"])
@@ -40,7 +39,7 @@ def index():
         filter_form=form,
         add_form=EditStockSolution(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=StockSolution.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(StockSolution)),
         title="Stock Solutions",
     )
 
@@ -75,7 +74,7 @@ def edit(id_: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if (solution := StockSolution.query.get(id_)) is None:
+    if (solution := db.session.get(StockSolution, id_)) is None:
         return Message.ERROR(f"No stock solution with ID {id_}!")
 
     form.populate_obj(solution)
@@ -92,7 +91,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add stock solution")
 def delete(id_):
-    if (solution := StockSolution.query.get(id_)) is None:
+    if (solution := db.session.get(StockSolution, id_)) is None:
         return Message.ERROR(f"No stock solution with ID {id_}!")
 
     try:
@@ -108,7 +107,7 @@ def delete(id_):
 @bp.route("/<int:id_>/<string:format_>", methods=["GET"])
 @login_required
 def details(id_: int, format_: str):
-    if (solution := StockSolution.query.get(id_)) is None:
+    if (solution := db.session.get(StockSolution, id_)) is None:
         return Message.ERROR(f"No stock solution wth ID {id_}!")
 
     match format_:

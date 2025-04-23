@@ -11,6 +11,7 @@ from labbase2.views.batches.forms import EditBatch
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.requests.forms import EditRequest
+from sqlalchemy import func, select
 
 from . import dilutions
 from .dilutions.forms import EditDilution
@@ -50,7 +51,7 @@ def index():
         import_file_form=UploadFile(),
         add_form=EditAntibody(formdata=None),
         entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
-        total=Antibody.query.count(),
+        total=db.session.scalar(select(func.count()).select_from(Antibody)),
         title="Antibodies",
     )
 
@@ -58,7 +59,7 @@ def index():
 @bp.route("/<int:id_>", methods=["GET"])
 @login_required
 def details(id_: int):
-    if (antibody := Antibody.query.get(id_)) is None:
+    if (antibody := db.session.get(Antibody, id_)) is None:
         app.logger.warning("Couldn't find antibody with ID %s.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
@@ -97,9 +98,7 @@ def add():
         return Message.ERROR(error)
     except Exception as error:
         db.session.rollback()
-        app.logger.warning(
-            "Couldn't add antibody to database due to unknown database error: %s", error
-        )
+        app.logger.warning("Couldn't add antibody to database due to unknown database error: %s", error)
         return Message.ERROR(error)
     else:
         app.logger.info("Added new antibody with ID %5d.", antibody.id)
@@ -117,7 +116,7 @@ def edit(id_: int):
         app.logger.info("Couldn't edit antibody with ID %d due to invalid user input.", id_)
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    if not (antibody := Antibody.query.get(id_)):
+    if not (antibody := db.session.get(Antibody, id_)):
         app.logger.warning("Couldn't find antibody with ID %d.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
@@ -139,7 +138,7 @@ def edit(id_: int):
 @login_required
 @permission_required("Add antibodies")
 def delete(id_):
-    if (antibody := Antibody.query.get(id_)) is None:
+    if (antibody := db.session.get(Antibody, id_)) is None:
         app.logger.warning("Couldn't find antibody with ID %d.", id_)
         return Message.ERROR(f"No antibody found with ID {id_}!")
 
@@ -148,9 +147,7 @@ def delete(id_):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        app.logger.warning(
-            "Couldn't delete antibody with ID %d due to unknown database error.", id_
-        )
+        app.logger.warning("Couldn't delete antibody with ID %d due to unknown database error.", id_)
         return Message.ERROR(error)
     else:
         app.logger.info("Deleted antibody with ID %d.", id_)

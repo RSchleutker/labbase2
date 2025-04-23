@@ -7,6 +7,7 @@ from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from werkzeug.utils import secure_filename
 from pathlib import Path
+from sqlalchemy import select
 
 from .forms import EditFile, UploadFile
 
@@ -55,7 +56,7 @@ def upload_file(form, class_, **kwargs) -> Union[BaseFile, EntityFile]:
 def add(entity_id: Optional[int] = None):
     previous_site = request.referrer
 
-    if entity_id and BaseEntity.query.get(entity_id) is None:
+    if entity_id and db.session.get(BaseEntity, id_) is None:
         return f"No entity with ID {entity_id}!", 404
 
     if not (form := UploadFile()).validate():
@@ -78,7 +79,7 @@ def edit(id_: int):
     if not (form := EditFile()).validate():
         return str(form.errors)
 
-    if not (file := BaseFile.query.get(id_)):
+    if not (file := db.session.get(BaseFile, id_)):
         return Message.ERROR(f"No file with ID {id_}!")
     elif file.user_id != current_user.id:
         return Message.ERROR("File can only be edited by owner!")
@@ -101,7 +102,7 @@ def download(id_: Optional[int] = None):
     if id_ is None:
         return None
 
-    if (file := BaseFile.query.get(id_)) is None:
+    if (file := db.session.get(BaseFile, id_)) is None:
         return f"No file with ID {id_}!"
 
     as_attachment = request.args.get("download", False, type=bool)
@@ -118,7 +119,7 @@ def download(id_: Optional[int] = None):
 @login_required
 @permission_required("Upload files")
 def delete(id_: int):
-    if (file := BaseFile.query.get(id_)) is None:
+    if (file := db.session.get(BaseFile, id_)) is None:
         return Message.ERROR(f"No file with ID {id_}!")
 
     try:
@@ -139,7 +140,7 @@ def delete_orphans():
         return redirect(request.referrer)
 
     # Get all absolute file paths from the database.
-    files_db = [file.path for file in BaseFile.query.all()]
+    files_db = [file.path for file in db.session.scalars(select(BaseFile)).all()]
 
     # Get all files from the upload folder.
     dir = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
