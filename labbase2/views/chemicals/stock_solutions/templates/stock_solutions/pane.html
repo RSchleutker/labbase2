@@ -24,11 +24,11 @@
             <a class="text-primary me-2"
                data-bs-toggle="modal"
                data-bs-target="#modal-edit-solution-{{ stock.id }}">
-                <i class="fa-solid fa-pen"></i></a>
+                <i class="bi bi-pencil-fill"></i></a>
 
             <a class="text-danger"
                onclick="delete_entity('{{ url_for("chemicals.solutions.delete", id_=stock.id) }}')">
-                <i class="fa-solid fa-trash"></i></a>
+                <i class="bi bi-trash3-fill"></i></a>
 
         {% endif %}
 
@@ -76,7 +76,7 @@
                         class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#modal-edit-solution--1">
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 {% endif %}
 

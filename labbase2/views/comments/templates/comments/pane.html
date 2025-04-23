@@ -36,17 +36,17 @@
                    href="#card-comment-{{ comment.id }}"
                    aria-expanded="false"
                    aria-controls="card-comment-{{ comment.id }}">
-                    <i class="fa-solid fa-eye-slash"></i></a>
+                    <i class="bi bi-eye-slash-fill"></i></a>
 
                 {% if comment.user_id == current_user.id %}
                     <a class="text-primary mx-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-comment-{{ comment.id }}">
-                        <i class="fa-solid fa-pen"></i></a>
+                        <i class="bi bi-pencil-fill"></i></a>
 
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("comments.delete", id_=comment.id) }}')">
-                        <i class="fa-solid fa-trash"></i></a>
+                        <i class="bi bi-trash3-fill"></i></a>
                 {% endif %}
 
             </div>
@@ -84,7 +84,7 @@
                         class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#modal-edit-comment--1">
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 {% endif %}
 

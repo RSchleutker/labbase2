@@ -22,13 +22,13 @@
                 <a href="{{ url_for(".edit", id_=job.id) }}"
                    type="button"
                    class="btn btn-success btn-sm">
-                    <i class="fa-solid fa-pen"></i>
+                    <i class="bi bi-pencil-fill"></i>
                 </a>
                 <a class="btn btn-danger btn-sm"
                    type="button"
                    style="color: white;"
                    onclick="delete_import('{{ url_for(".delete", id_=job.id) }}', '#{{ div_id}}')">
-                    <i class="fa-solid fa-trash"></i>
+                    <i class="bi bi-trash3-fill"></i>
                 </a>
             </div>
         </div>

@@ -23,23 +23,23 @@
             <a class="text-primary me-2"
                data-bs-toggle="modal"
                data-bs-target="#modal-edit-batch-{{ batch.id }}">
-                <i class="fa-solid fa-pen"></i></a>
+                <i class="bi bi-pencil-fill"></i></a>
 
             {% if (not batch.in_use) and (batch.date_emptied is none) %}
                 <a class="text-info me-2"
                    onclick="batch_action('{{ url_for("batches.in_use", id_=batch.id) }}')">
-                    <i class="fa-solid fa-box-open"></i></a>
+                    Mark open</a>
             {% endif %}
 
             {% if batch.in_use and batch.date_emptied is none %}
                 <a class="text-danger me-2"
                    onclick="batch_action('{{ url_for("batches.emptied", id_=batch.id) }}')">
-                    <i class="fa-solid fa-battery-empty"></i></a>
+                    Mark empty</a>
             {% endif %}
 
             <a class="text-danger"
                onclick="delete_entity('{{ url_for("batches.delete", id_=batch.id) }}')">
-                <i class="fa-solid fa-trash"></i></a>
+                <i class="bi bi-trash3-fill"></i></a>
 
         {% endif %}
 
@@ -86,7 +86,7 @@
                         class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#modal-edit-batch--1">
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 {% endif %}
 

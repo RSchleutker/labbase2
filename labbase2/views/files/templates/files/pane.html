@@ -22,22 +22,22 @@
                            href="#card-file-{{ file.id }}"
                            aria-expanded="false"
                            aria-controls="card-file-{{ file.id }}">
-                            <i class="fa-solid fa-circle-info"></i></a>
+                            <i class="bi bi-info-circle"></i></a>
                     {% endif %}
 
                     {% if current_user.has_permission('Upload files') %}
                         <a class="text-info me-2"
                            href="{{ url_for('files.download', id_=file.id, download=1) }}">
-                            <i class="fa-solid fa-download"></i></a>
+                            <i class="bi bi-download"></i></a>
 
                         <a class="text-primary me-2"
                            data-bs-toggle="modal"
                            data-bs-target="#modal-edit-file-{{ file.id }}">
-                            <i class="fa-solid fa-pen"></i></a>
+                            <i class="bi bi-pencil-fill"></i></a>
 
                         <a class="text-danger"
                            onclick="delete_entity('{{ url_for("files.delete", id_=file.id) }}')">
-                            <i class="fa-solid fa-trash"></i></a>
+                            <i class="bi bi-trash3-fill"></i></a>
                     {% endif %}
 
                 </p>
@@ -76,7 +76,7 @@
                         class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#modal-edit-file--1">
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 {% endif %}
             </div>

@@ -16,7 +16,7 @@
 
     <button class="btn btn-outline-light" type="button" data-bs-toggle="offcanvas"
             data-bs-target="#offcanvas-filters" aria-controls="offcanvas-filters">
-        <i class="fa-solid fa-filter"></i>
+        <i class="bi bi-funnel-fill"></i>
     </button>
 
 {% endblock %}
@@ -55,13 +55,13 @@
                             data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvas-filters"
                             aria-controls="offcanvas-filters">
-                        <i class="fa-solid fa-filter"></i>
+                        <i class="bi bi-funnel-fill"></i>
                     </button>
 
                     <button type="button"
                             class="btn btn-sm bg-white border me-2"
                             onclick="location.reload()">
-                        <i class="fa-solid fa-rotate-right"></i>
+                        <i class="bi bi-arrow-clockwise"></i>
                     </button>
 
                     <div class="rounded-1 border bg-white flex-shrink-0 fw-lighter py-1 px-2 me-2">
@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="rounded-1 border bg-white flex-shrink-0 fw-lighter py-1 px-2">
-                        <i class="fa-solid fa-database"></i> <strong>{{ total }}</strong>
+                        <i class="bi bi-database-fill"></i> <strong>{{ total }}</strong>
                     </div>
 
                     <div class="flex-fill"></div>
@@ -82,7 +82,7 @@
                                 class="btn btn-sm bg-white border"
                                 data-bs-toggle="modal"
                                 data-bs-target="#modal-import-file">
-                            <i class="fa-solid fa-file-import"></i>
+                            <i class="bi bi-file-earmark-plus-fill"></i>
                         </button>
                     </div>
 
@@ -91,7 +91,7 @@
                                 type="button"
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false">
-                            <i class="fa-solid fa-download"></i>
+                            <i class="bi bi-download"></i>
                         </button>
                         <ul class="dropdown-menu fw-lighter">
                             {% block download %}{% endblock %}

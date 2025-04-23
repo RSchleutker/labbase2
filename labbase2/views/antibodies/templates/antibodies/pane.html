@@ -15,12 +15,12 @@
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-antibody-{{ antibody.id }}">
-                        <i class="fa-solid fa-pen"></i></a>
+                        <i class="bi bi-pencil-fill"></i></a>
 
                     {% if antibody.deletable %}
                         <a class="text-danger"
                            onclick="delete_entity('{{ url_for(".delete", id_=antibody.id) }}')">
-                            <i class="fa-solid fa-trash"></i></a>
+                            <i class="bi bi-trash3-fill"></i></a>
                     {% endif %}
                 {% endif %}
 

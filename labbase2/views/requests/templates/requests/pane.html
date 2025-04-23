@@ -25,10 +25,10 @@
                     <a class="text-primary mx-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-request-{{ request.id }}">
-                        <i class="fa-solid fa-pen"></i></a>
+                        <i class="bi bi-pencil-fill"></i></a>
                     <a class="text-danger"
                        onclick="delete_entity('{{ url_for("requests.delete", id_=request.id) }}')">
-                        <i class="fa-solid fa-trash"></i></a>
+                        <i class="bi bi-trash3-fill"></i></a>
                 {% endif %}
 
             </div>
@@ -59,7 +59,7 @@
                         class="btn btn-success btn-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#modal-edit-request--1">
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 {% endif %}
 

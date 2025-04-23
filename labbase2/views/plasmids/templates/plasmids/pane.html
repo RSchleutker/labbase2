@@ -17,12 +17,12 @@
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-plasmid-{{ plasmid.id }}">
-                        <i class="fa-solid fa-pen"></i></a>
+                        <i class="bi bi-pencil-fill"></i></a>
 
                     {% if plasmid.deletable %}
                         <a class="text-danger"
                            onclick="delete_entity('{{ url_for("plasmids.delete", id_=plasmid.id) }}')">
-                            <i class="fa-solid fa-trash"></i></a>
+                            <i class="bi bi-trash3-fill"></i></a>
                     {% endif %}
                 {% endif %}
 
@@ -61,7 +61,7 @@
                 <td>{{ plasmid.vector }}</td>
             </tr>
             <tr>
-                <td><i class="fa-regular fa-circle pe-2"></i>File</td>
+                <td><i class="bi bi-circle"></i> File</td>
                 <td class="d-flex">
                     {% if plasmid.file_plasmid_id %}
                     <a class="link-primary flex-shrink-0"
@@ -73,11 +73,11 @@
                     <a class="link-primary me-2 flex-shrink-0"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-upload-{{ plasmid.id }}-file">
-                        <i class="fa-solid fa-upload"></i></a>
+                        <i class="bi bi-upload"></i></a>
                 </td>
             </tr>
             <tr>
-                <td><i class="fa-regular fa-map pe-2"></i>Map</td>
+                <td><i class="bi bi-map-fill"></i> Map</td>
                 <td class="d-flex">
                     {% if plasmid.file_map_id %}
                     {{ lightbox(plasmid.map) }}
@@ -86,7 +86,7 @@
                     <a class="link-primary me-2 flex-shrink-0"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-upload-{{ plasmid.id }}-map">
-                        <i class="fa-solid fa-upload"></i></a>
+                        <i class="bi bi-upload"></i></a>
                 </td>
             </tr>
             <tr>
