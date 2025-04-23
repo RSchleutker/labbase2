@@ -3,9 +3,12 @@ import secrets
 from flask_login import LoginManager, UserMixin
 from labbase2.models import db
 from labbase2.models.mixins import Export
-from sqlalchemy import func
+from sqlalchemy import func, String, ForeignKey, DateTime, Column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime
+
 
 __all__ = ["login_manager", "User", "Permission", "user_permissions", "ResetPassword"]
 
@@ -14,11 +17,12 @@ login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 login_manager.login_message_category = "warning"
 
+
 # Map users to their roles in a many-to-many relationship.
 user_permissions = db.Table(
     "user_permissions",
-    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
-    db.Column("role_id", db.Integer, db.ForeignKey("permission.name"), primary_key=True),
+    Column("user_id", ForeignKey("user.id"), primary_key=True),
+    Column("permission_id", ForeignKey("permission.name"), primary_key=True),
 )
 
 
@@ -104,79 +108,54 @@ class User(db.Model, UserMixin, Export):
 
     __tablename__: str = "user"
 
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(64), nullable=False)
-    last_name = db.Column(db.String(64), nullable=False)
-    email = db.Column(db.String(128), unique=True, nullable=False)
-    password_hash = db.Column(db.String(512), nullable=False)
-    file_picture_id = db.Column(db.Integer, db.ForeignKey("base_file.id"), nullable=True)
-    timestamp_created = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    timestamp_last_login = db.Column(db.DateTime, nullable=True)
-    timezone = db.Column(db.String(64), nullable=False, default="UTC")
-    is_active = db.Column(db.Boolean, nullable=False, default=True)
-    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    first_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(64), nullable=False)
+    email: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(512), nullable=False)
+    file_picture_id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), nullable=True)
+    timestamp_created: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    timestamp_last_login: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="UTC")
+    is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
+    is_admin: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     # Set relationship for profile picture.
-    picture = db.relationship(
-        "BaseFile",
-        backref="profile",
-        lazy=True,
-        foreign_keys=[file_picture_id],
-        cascade="all, delete-orphan",
-        single_parent=True,
+    picture: Mapped["BaseFile"] = relationship(
+        backref="profile", lazy=True, foreign_keys=[file_picture_id], cascade="all, delete-orphan", single_parent=True
     )
 
     # One-to-many relationships.
-    comments = db.relationship(
-        "Comment",
-        backref="user",
-        order_by="Comment.timestamp_created.desc()",
-        lazy=True,
+    comments: Mapped[list["Comment"]] = relationship(
+        backref="user", order_by="Comment.timestamp_created.desc()", lazy=True
     )
-    plasmids = db.relationship(
-        "Plasmid",
-        backref="owner",
-        lazy=True,
-        order_by="Plasmid.timestamp_created.desc()",
-        foreign_keys="Plasmid.owner_id",
+    plasmids: Mapped[list["Plasmid"]] = relationship(
+        backref="owner", lazy=True, order_by="Plasmid.timestamp_created.desc()", foreign_keys="Plasmid.owner_id"
     )
-    glycerol_stocks = db.relationship("GlycerolStock", backref="owner", lazy=True)
-    oligonucleotides = db.relationship(
-        "Oligonucleotide",
+    glycerol_stocks: Mapped[list["GlycerolStock"]] = relationship(backref="owner", lazy=True)
+    oligonucleotides: Mapped[list["Oligonucleotide"]] = relationship(
         backref="owner",
         lazy=True,
         order_by="Oligonucleotide.timestamp_created.desc()",
         foreign_keys="Oligonucleotide.owner_id",
     )
-    preparations = db.relationship("Preparation", backref="owner", lazy=True)
-    dilutions = db.relationship("Dilution", backref="user", lazy=True)
-    files = db.relationship(
-        "EntityFile", backref="user", lazy=True, foreign_keys="EntityFile.user_id"
+    preparations: Mapped[list["Preparation"]] = relationship(backref="owner", lazy=True)
+    dilutions: Mapped[list["Dilution"]] = relationship(backref="user", lazy=True)
+    files: Mapped[list["EntityFile"]] = relationship(backref="user", lazy=True, foreign_keys="EntityFile.user_id")
+    modifications: Mapped[list["Modification"]] = relationship(backref="user", lazy=True)
+    fly_stocks: Mapped[list["FlyStock"]] = relationship(backref="owner", lazy=True, foreign_keys="FlyStock.owner_id")
+    responsibilities: Mapped[list["Chemical"]] = relationship(
+        backref="responsible", lazy=True, foreign_keys="Chemical.owner_id"
     )
-    modifications = db.relationship("Modification", backref="user", lazy=True)
-    fly_stocks = db.relationship(
-        "FlyStock", backref="owner", lazy=True, foreign_keys="FlyStock.owner_id"
+    stock_solutions: Mapped[list["StockSolution"]] = relationship(backref="owner", lazy=True)
+    import_jobs: Mapped[list["ImportJob"]] = relationship(
+        backref="user", lazy=True, order_by="ImportJob.timestamp.asc()"
     )
-    responsibilities = db.relationship(
-        "Chemical",
-        backref="responsible",
-        lazy=True,
-        foreign_keys="Chemical.owner_id",
-    )
-    stock_solutions = db.relationship("StockSolution", backref="owner", lazy=True)
-    import_jobs = db.relationship(
-        "ImportJob", backref="user", lazy=True, order_by="ImportJob.timestamp.asc()"
-    )
-    resets = db.relationship(
-        "ResetPassword", backref="user", lazy=True, cascade="all, delete-orphan"
-    )
+    resets: Mapped[list["ResetPassword"]] = relationship(backref="user", lazy=True, cascade="all, delete-orphan")
 
     # Many-to-many relationships.
-    permissions = db.relationship(
-        "Permission",
-        secondary=user_permissions,
-        lazy="subquery",
-        backref=db.backref("users", lazy=True),
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=user_permissions, lazy="subquery", backref=db.backref("users", lazy=True)
     )
 
     @hybrid_property
@@ -196,8 +175,7 @@ class User(db.Model, UserMixin, Export):
         return out
 
     def set_password(self, password: str) -> None:
-        """Creates a hash that is stored in the database to validate the user's
-        password.
+        """Creates a hash that is stored in the database to validate the user's password.
 
         Parameters
         ----------
@@ -210,12 +188,9 @@ class User(db.Model, UserMixin, Export):
 
         Notes
         -----
-        Of course, passwords are not stored as clear text in the database. Instead,
-        a hash is generated from the
-        password the user enters and that hash is stored. It is not possible to
-        reconstruct the original password but
-        the same hash is generated from the same password. Thus, the hash can be used
-        to verify users.
+        Of course, passwords are not stored as clear text in the database. Instead, a hash is generated from the
+        password the user enters and that hash is stored. It is not possible to reconstruct the original password but
+        the same hash is generated from the same password. Thus, the hash can be used to verify users.
 
         Currently, this method accepts all strings. In the future users will maybe be
         forced to add passwords that
@@ -225,8 +200,8 @@ class User(db.Model, UserMixin, Export):
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password: str) -> bool:
-        """Creates the hash from the 'password' parameter and checks this
-        hash against the hash deployed in the database.
+        """Creates the hash from the 'password' parameter and checks this hash against the hash deployed in the
+        database.
 
         Parameters
         ----------
@@ -238,7 +213,6 @@ class User(db.Model, UserMixin, Export):
         bool
             Returns True if the hash is the same as in the database and False
             otherwise.
-
         """
 
         return check_password_hash(self.password_hash, password)
@@ -273,8 +247,8 @@ class Permission(db.Model, Export):
 
     __tablename__: str = "permission"
 
-    name = db.Column(db.String(32), primary_key=True, nullable=False)
-    description = db.Column(db.String(512), nullable=True)
+    name: Mapped[str] = mapped_column(String(32), primary_key=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(512), nullable=True)
 
 
 class ResetPassword(db.Model):
@@ -293,9 +267,9 @@ class ResetPassword(db.Model):
 
     __tablename__: str = "reset_password"
 
-    token = db.Column(db.String(64), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True)
-    timeout = db.Column(db.DateTime, nullable=False)
+    token: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, unique=True)
+    timeout: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 
 @login_manager.user_loader

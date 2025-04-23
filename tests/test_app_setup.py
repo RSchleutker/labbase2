@@ -28,4 +28,4 @@ def test_first_user_has_all_permissions(app):
         user = db.session.get(models.User, 1)
 
     assert len(permissions) == len(app.config["PERMISSIONS"])
-    assert user.permissions == permissions
+    assert set(user.permissions) == set(permissions)
