@@ -1,6 +1,9 @@
+from datetime import date
+
 from labbase2.models import db
 from labbase2.models.mixins.importer import Importer
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey, Date, String
+from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 __all__ = ["Request"]
 
@@ -32,19 +35,14 @@ class Request(db.Model, Importer):
     classes, for which requests are of interest.
     """
 
-    id = db.Column(db.Integer, primary_key=True, info={"importable": False})
-    entity_id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        nullable=False,
-        info={"importable": True},
+    id: Mapped[int] = mapped_column(primary_key=True, info={"importable": False})
+    entity_id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), nullable=False, info={"importable": True})
+    requested_by: Mapped[str] = mapped_column(String(128), nullable=False, info={"importable": True})
+    timestamp: Mapped[date] = mapped_column(
+        db.Date, server_default=func.today(), nullable=True, info={"importable": True}
     )
-    requested_by = db.Column(db.String(128), nullable=False, info={"importable": True})
-    timestamp = db.Column(
-        db.Date, server_default=func.today(), info={"importable": True}
-    )
-    timestamp_sent = db.Column(db.Date, info={"importable": True})
-    note = db.Column(db.String(2048), nullable=True, info={"importable": True})
+    timestamp_sent: Mapped[date] = mapped_column(Date, nullable=True, info={"importable": True})
+    note: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
 
     __table_args__ = {"extend_existing": True}
 

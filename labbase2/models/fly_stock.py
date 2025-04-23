@@ -4,6 +4,8 @@ from labbase2.models import db
 from labbase2.models.base_entity import BaseEntity
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins.importer import Importer
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 __all__ = ["Modification", "FlyStock"]
 
@@ -29,11 +31,11 @@ class Modification(db.Model, Importer):
 
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    fly_id = db.Column(db.Integer, db.ForeignKey("fly_stock.id"))
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    date = db.Column(db.Date)
-    description = db.Column(db.String(1024))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    fly_id: Mapped[int] = mapped_column(ForeignKey("fly_stock.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    date: Mapped[date] = mapped_column(db.Date, nullable=True)
+    description: Mapped[str] = mapped_column(String(1024), nullable=True)
 
 
 class FlyStock(BaseEntity):
@@ -75,53 +77,27 @@ class FlyStock(BaseEntity):
 
     """
 
-    id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        primary_key=True,
-        info={"importable": False},
-    )
-    short_genotype = db.Column(db.String(2048), info={"importable": True})
-    chromosome_xa = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_xb = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_y = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_2a = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_2b = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_3a = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_3b = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_4a = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    chromosome_4b = db.Column(
-        db.String(2048), nullable=False, default="+", info={"importable": True}
-    )
-    location = db.Column(db.String(64), info={"importable": True})
-    created_date = db.Column(CustomDate, info={"importable": True})
-    source = db.Column(db.String(512), info={"importable": True})
-    documentation = db.Column(db.String(2048), info={"importable": True})
-    reference = db.Column(db.String(512), info={"importable": True})
-    discarded_date = db.Column(CustomDate, info={"importable": True})
+    id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
+    short_genotype: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
+    chromosome_xa: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_xb: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_y: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_2a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_2b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_3a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_3b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_4a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    chromosome_4b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    location: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
+    created_date: Mapped[date] = mapped_column(CustomDate, nullable=True, info={"importable": True})
+    source: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
+    documentation: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
+    reference: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
+    discarded_date: Mapped[date] = mapped_column(CustomDate, nullable=True, info={"importable": True})
 
     # One-to-many relationships.
-    modifications = db.relationship(
-        "Modification",
-        backref="fly_stock",
-        order_by="Modification.date.desc()",
-        lazy=True,
+    modifications: Mapped[list["Modification"]] = relationship(
+        backref="fly_stock", order_by="Modification.date.desc()", lazy=True
     )
 
     # Proper setup for joined table inheritance.

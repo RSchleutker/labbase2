@@ -1,6 +1,7 @@
 import io
 from typing import Optional
 from zipfile import ZIP_DEFLATED, ZipFile
+from datetime import date
 
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -10,7 +11,9 @@ from flask_login import current_user
 from labbase2.models import BaseEntity, db
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins import Filter, Sequence
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, ForeignKey, String, Date
+from sqlalchemy.orm import relationship, mapped_column, Mapped
+
 
 __all__ = ["Plasmid", "Preparation", "GlycerolStock"]
 
@@ -51,44 +54,28 @@ class Plasmid(BaseEntity, Sequence):
     further explanations.
     """
 
-    id = db.Column(db.Integer, db.ForeignKey("base_entity.id"), primary_key=True)
-    insert = db.Column(db.String(128), nullable=False, info={"importable": True})
-    vector = db.Column(db.String(256), info={"importable": True})
-    cloning_date = db.Column(CustomDate, info={"importable": True})
-    description = db.Column(db.String(2048), info={"importable": True})
-    reference = db.Column(db.String(512), info={"importable": True})
-    file_plasmid_id = db.Column(
-        db.Integer, db.ForeignKey("base_file.id"), nullable=True
-    )
-    file_map_id = db.Column(db.Integer, db.ForeignKey("base_file.id"), nullable=True)
+    id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), primary_key=True)
+    insert: Mapped[str] = mapped_column(String(128), nullable=False, info={"importable": True})
+    vector: Mapped[str] = mapped_column(String(256), nullable=True, info={"importable": True})
+    cloning_date: Mapped[date] = mapped_column(CustomDate, nullable=True, info={"importable": True})
+    description: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
+    reference: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
+    file_plasmid_id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), nullable=True)
+    file_map_id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), nullable=True)
 
-    file = db.relationship(
-        "BaseFile",
-        lazy=True,
-        foreign_keys=[file_plasmid_id],
-        single_parent=True,
-        cascade="all, delete-orphan",
+    file: Mapped["BaseFile"] = relationship(
+        lazy=True, foreign_keys=[file_plasmid_id], single_parent=True, cascade="all, delete-orphan"
     )
-    map = db.relationship(
-        "BaseFile",
-        lazy=True,
-        foreign_keys=[file_map_id],
-        single_parent=True,
-        cascade="all, delete-orphan",
+    map: Mapped["BaseFile"] = db.relationship(
+        lazy=True, foreign_keys=[file_map_id], single_parent=True, cascade="all, delete-orphan"
     )
 
     # One-to-many relationships.
-    preparations = db.relationship(
-        "Preparation",
-        backref="plasmid",
-        lazy=True,
-        order_by="Preparation.emptied_date, Preparation.preparation_date",
+    preparations: Mapped[list["Preparation"]] = db.relationship(
+        backref="plasmid", lazy=True, order_by="Preparation.emptied_date, Preparation.preparation_date"
     )
-    glycerol_stocks = db.relationship(
-        "GlycerolStock",
-        backref="plasmid",
-        lazy=True,
-        order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()",
+    glycerol_stocks: Mapped[list["GlycerolStock"]] = db.relationship(
+        backref="plasmid", lazy=True, order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()"
     )
 
     __mapper_args__ = {"polymorphic_identity": "plasmid"}
@@ -102,10 +89,7 @@ class Plasmid(BaseEntity, Sequence):
     @property
     def storage_place(self) -> Optional[str]:
         for preparation in self.preparations:
-            if (
-                preparation.date_emptied is not None
-                and preparation.owner_id == current_user.id
-            ):
+            if preparation.date_emptied is not None and preparation.owner_id == current_user.id:
                 return preparation.restricted_storage_place
 
         return None
@@ -196,18 +180,18 @@ class Preparation(db.Model):
 
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    preparation_date = db.Column(db.Date)
-    method = db.Column(db.String(64))
-    eluent = db.Column(db.String(32))
-    concentration = db.Column(db.Integer())
-    storage_place = db.Column(db.String(64))
-    emptied_date = db.Column(db.Date)
-    stock_id = db.Column(db.Integer, db.ForeignKey("glycerol_stock.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    plasmid_id: Mapped[int] = mapped_column(ForeignKey("plasmid.id"), nullable=False)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    preparation_date: Mapped[date] = mapped_column(db.Date, nullable=True)
+    method: Mapped[str] = mapped_column(String(64), nullable=True)
+    eluent: Mapped[str] = mapped_column(String(32), nullable=True)
+    concentration: Mapped[int] = mapped_column(nullable=True)
+    storage_place: Mapped[str] = mapped_column(String(64), nullable=True)
+    emptied_date: Mapped[date] = mapped_column(Date, nullable=True)
+    stock_id: Mapped[int] = mapped_column(ForeignKey("glycerol_stock.id"), nullable=False)
 
-    stock = db.relationship("GlycerolStock", backref="preparation", lazy=True)
+    stock: Mapped["GlycerolStock"] = relationship(backref="preparation", lazy=True)
 
     @property
     def restricted_storage_place(self) -> str:
@@ -247,13 +231,13 @@ class GlycerolStock(db.Model, Filter):
 
     __tablename__: str = "glycerol_stock"
 
-    id = db.Column(db.Integer, primary_key=True)
-    plasmid_id = db.Column(db.Integer, db.ForeignKey("plasmid.id"), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    strain = db.Column(db.String(64), nullable=False)
-    transformation_date = db.Column(db.Date, nullable=False)
-    storage_place = db.Column(db.String(128), nullable=False)
-    disposal_date = db.Column(db.Date)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    plasmid_id: Mapped[int] = mapped_column(ForeignKey("plasmid.id"), nullable=False)
+    owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    strain: Mapped[str] = mapped_column(String(64), nullable=False)
+    transformation_date: Mapped[date] = mapped_column(Date, nullable=False)
+    storage_place: Mapped[str] = mapped_column(String(128), nullable=False)
+    disposal_date: Mapped[date] = mapped_column(Date)
 
     @classmethod
     def filter_(cls, order_by: str = "label", ascending: bool = True, **fields):

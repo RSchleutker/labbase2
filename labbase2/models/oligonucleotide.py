@@ -8,7 +8,8 @@ from Bio.SeqUtils import gc_fraction
 from labbase2.models import BaseEntity, db
 from labbase2.models.fields import SequenceString
 from labbase2.models.mixins import Sequence
-from sqlalchemy import asc, desc, func
+from sqlalchemy import asc, desc, func, ForeignKey, String, Date
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 __all__ = ["Oligonucleotide"]
 
@@ -34,16 +35,11 @@ class Oligonucleotide(BaseEntity, Sequence):
 
     __tablename__: str = "oligonucleotide"
 
-    id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        primary_key=True,
-        info={"importable": False},
-    )
-    date_ordered = db.Column(db.Date, nullable=False, info={"importable": True})
-    sequence = db.Column(SequenceString(256), nullable=False, info={"importable": True})
-    storage_place = db.Column(db.String(64), info={"importable": True})
-    description = db.Column(db.String(512), info={"importable": True})
+    id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
+    date_ordered: Mapped[date] = mapped_column(Date, nullable=False, info={"importable": True})
+    sequence: Mapped[str] = mapped_column(SequenceString(256), nullable=False, info={"importable": True})
+    storage_place: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
+    description: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
 
     __mapper_args__ = {"polymorphic_identity": "oligonucleotide"}
 

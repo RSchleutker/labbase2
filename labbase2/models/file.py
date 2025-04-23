@@ -1,12 +1,15 @@
 import math
 import mimetypes
 from pathlib import Path
+from datetime import datetime
 
 from flask import current_app
 from labbase2.models import db
 from skimage import io, util
 from skimage.transform import resize
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey, String, DateTime
+from sqlalchemy.orm import mapped_column, Mapped, relationship
+
 
 __all__ = ["BaseFile", "EntityFile"]
 
@@ -50,18 +53,16 @@ class BaseFile(db.Model):
 
     __tablename__: str = "base_file"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    filename_internal = db.Column(db.String(64), nullable=True, unique=True)
-    filename_exposed = db.Column(db.String(512), nullable=False)
-    note = db.Column(db.String(2048))
-    file_type = db.Column(db.String(32), nullable=False)
-    timestamp_uploaded = db.Column(
-        db.DateTime, nullable=False, server_default=func.now()
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    filename_internal: Mapped[str] = mapped_column(String(64), nullable=True, unique=True)
+    filename_exposed: Mapped[str] = mapped_column(String(512), nullable=False)
+    note: Mapped[str] = mapped_column(String(2048), nullable=True)
+    file_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    timestamp_uploaded: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    timestamp_edited = db.Column(
-        db.DateTime(timezone=True), nullable=True, onupdate=func.now()
-    )
+    timestamp_edited: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, onupdate=func.now())
 
     __mapper_args__ = {"polymorphic_on": file_type, "polymorphic_identity": "base_file"}
 
@@ -139,7 +140,7 @@ class EntityFile(BaseFile):
 
     __tablename__ = "entity_file"
 
-    id = db.Column(db.Integer, db.ForeignKey("base_file.id"), primary_key=True)
-    entity_id = db.Column(db.Integer, db.ForeignKey("base_entity.id"), nullable=False)
+    id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), primary_key=True)
+    entity_id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), nullable=False)
 
     __mapper_args__ = {"polymorphic_identity": "entity_file"}

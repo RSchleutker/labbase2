@@ -4,8 +4,8 @@ from labbase2.models import db
 from labbase2.models.base_entity import BaseEntity
 from labbase2.models.mixins.export import Export
 from labbase2.models.mixins.filter import Filter
-from sqlalchemy import asc, desc, not_
-from sqlalchemy.orm import column_property
+from sqlalchemy import asc, desc, not_, ForeignKey, String, DateTime, Date
+from sqlalchemy.orm import column_property, mapped_column, Mapped, relationship
 
 __all__ = ["Batch", "Consumable"]
 
@@ -66,26 +66,22 @@ class Batch(db.Model, Filter, Export):
     and source (the same chemical might be bought from different manufacturers).
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    consumable_id = db.Column(
-        db.Integer, db.ForeignKey("consumable.id"), nullable=False
-    )
-    supplier = db.Column(db.String(64), nullable=False)
-    article_number = db.Column(db.String(32), nullable=False)
-    amount = db.Column(db.String(32))
-    date_ordered = db.Column(db.Date)
-    date_opened = db.Column(db.Date)
-    date_expiration = db.Column(db.Date)
-    date_emptied = db.Column(db.Date)
-    price = db.Column(db.Float())
-    storage_place = db.Column(db.String(64), nullable=False)
-    lot = db.Column(db.String(64), nullable=False)
-    in_use = db.Column(db.Boolean, nullable=False, default=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    consumable_id: Mapped[int] = mapped_column(ForeignKey("consumable.id"), nullable=False)
+    supplier: Mapped[str] = mapped_column(String(64), nullable=False)
+    article_number: Mapped[str] = mapped_column(String(32), nullable=False)
+    amount: Mapped[str] = mapped_column(String(32), nullable=True)
+    date_ordered: Mapped[date] = mapped_column(Date, nullable=True)
+    date_opened: Mapped[date] = mapped_column(Date, nullable=True)
+    date_expiration: Mapped[date] = mapped_column(Date, nullable=True)
+    date_emptied: Mapped[date] = mapped_column(Date, nullable=True)
+    price: Mapped[float] = mapped_column(nullable=True)
+    storage_place: Mapped[str] = mapped_column(String(64), nullable=False)
+    lot: Mapped[str] = mapped_column(String(64), nullable=False)
+    in_use: Mapped[bool] = mapped_column(nullable=False, default=False)
 
-    is_open = column_property(date_opened.isnot(None).label("is_open"), deferred=True)
-    is_empty = column_property(
-        date_emptied.isnot(None).label("is_empty"), deferred=True
-    )
+    is_open: Mapped[bool] = column_property(date_opened.isnot(None).label("is_open"), deferred=True)
+    is_empty: Mapped[bool] = column_property(date_emptied.isnot(None).label("is_empty"), deferred=True)
 
     @classmethod
     def _filters(cls, **fields) -> list:
@@ -156,20 +152,12 @@ class Consumable(BaseEntity, Export):
         A list of all batches of this consumable that were ordered.
     """
 
-    id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        primary_key=True,
-        info={"importable": False},
-    )
-    storage_info = db.Column(db.String(64), info={"importable": True})
+    id: Mapped[int] = mapped_column(db.ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
+    storage_info: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
 
     # One-to-many relationships.
-    batches = db.relationship(
-        "Batch",
-        backref="consumable",
-        lazy=True,
-        order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered",
+    batches: Mapped[list["Batch"]] = relationship(
+        backref="consumable", lazy=True, order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered"
     )
 
     # Proper setup for joined table inheritance.
@@ -187,8 +175,4 @@ class Consumable(BaseEntity, Export):
 
     @classmethod
     def _subquery(cls):
-        return (
-            db.session.query(Batch.consumable_id, Batch.storage_place)
-            .filter(Batch.in_use)
-            .subquery(name="batch")
-        )
+        return db.session.query(Batch.consumable_id, Batch.storage_place).filter(Batch.in_use).subquery(name="batch")

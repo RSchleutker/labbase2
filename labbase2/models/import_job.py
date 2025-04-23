@@ -1,5 +1,8 @@
+from datetime import datetime
+
 from labbase2.models import db
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey, DateTime, String
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 __all__ = ["ImportJob", "ColumnMapping"]
 
@@ -8,25 +11,18 @@ class ImportJob(db.Model):
 
     __tablename__ = "import_job"
 
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    timestamp = db.Column(db.DateTime, default=func.now())
-    timestamp_edited = db.Column(db.DateTime, default=func.now())
-    file_id = db.Column(db.Text, db.ForeignKey("base_file.id"), nullable=False)
-    is_finished = db.Column(db.Boolean, default=False, nullable=False)
-    entity_type = db.Column(db.Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
+    timestamp_edited: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=func.now())
+    file_id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), nullable=False)
+    is_finished: Mapped[bool] = mapped_column(default=False, nullable=False)
+    entity_type: Mapped[str] = mapped_column(nullable=False)
 
     # One-to-many relationships.
-    mappings = db.relationship(
-        "ColumnMapping", backref="job", cascade="all, delete-orphan", lazy=True
-    )
-
-    file = db.relationship(
-        "BaseFile",
-        backref="import_job",
-        lazy=True,
-        cascade="all, delete",
-        single_parent=True,
+    mappings: Mapped[list["ColumnMapping"]] = relationship(backref="job", cascade="all, delete-orphan", lazy=True)
+    file: Mapped[list["BaseFile"]] = relationship(
+        backref="import_job", lazy=True, cascade="all, delete", single_parent=True
     )
 
     def get_file(self):
@@ -37,6 +33,6 @@ class ColumnMapping(db.Model):
 
     __tablename__ = "column_mapping"
 
-    job_id = db.Column(db.Integer, db.ForeignKey("import_job.id"), primary_key=True)
-    mapped_field = db.Column(db.String, primary_key=True)
-    input_column = db.Column(db.String)
+    job_id: Mapped[int] = mapped_column(ForeignKey("import_job.id"), primary_key=True)
+    mapped_field: Mapped[str] = mapped_column(primary_key=True)
+    input_column: Mapped[str] = mapped_column(nullable=True)
