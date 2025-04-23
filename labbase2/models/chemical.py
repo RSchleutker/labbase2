@@ -1,8 +1,11 @@
 from labbase2.models import db
 from labbase2.models.consumable import Consumable
 from labbase2.models.mixins.filter import Filter
-from sqlalchemy import asc, desc, func
-from sqlalchemy.orm import subqueryload
+from sqlalchemy import asc, desc, func, ForeignKey, Date, String
+from sqlalchemy.orm import subqueryload, mapped_column, Mapped, relationship
+
+from datetime import date
+
 
 __all__ = ["Chemical", "StockSolution"]
 
@@ -40,20 +43,12 @@ class Chemical(Consumable):
 
     __tablename__: str = "chemical"
 
-    id = db.Column(
-        db.Integer,
-        db.ForeignKey("consumable.id"),
-        primary_key=True,
-        info={"importable": False},
-    )
-    molecular_weight = db.Column(db.Float, info={"importable": True})
+    id: Mapped[int] = mapped_column(db.ForeignKey("consumable.id"), primary_key=True, info={"importable": False})
+    molecular_weight: Mapped[float] = mapped_column(nullable=True, info={"importable": True})
 
     # One-to-many relationships.
-    stocks = db.relationship(
-        "StockSolution",
-        backref="chemical",
-        lazy=True,
-        order_by="StockSolution.date_emptied, StockSolution.date_created.desc()",
+    stocks: Mapped[list["StockSolution"]] = relationship(
+        backref="chemical", lazy=True, order_by="StockSolution.date_emptied, StockSolution.date_created.desc()"
     )
 
     __mapper_args__ = {"polymorphic_identity": "chemical"}
@@ -83,15 +78,15 @@ class StockSolution(db.Model, Filter):
     relationship.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    chemical_id = db.Column(db.Integer, db.ForeignKey("chemical.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    solvent = db.Column(db.String(64), nullable=False)
-    date_created = db.Column(db.Date, nullable=False, default=func.today())
-    date_emptied = db.Column(db.Date, nullable=True)
-    concentration = db.Column(db.String(32), nullable=False)
-    storage_place = db.Column(db.String(64), nullable=False)
-    details = db.Column(db.String(2048))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    chemical_id: Mapped[int] = mapped_column(ForeignKey("chemical.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    solvent: Mapped[str] = mapped_column(String(64), nullable=False)
+    date_created: Mapped[date] = mapped_column(Date, nullable=False, default=func.today())
+    date_emptied: Mapped[date] = mapped_column(Date, nullable=True)
+    concentration: Mapped[str] = mapped_column(String(32), nullable=False)
+    storage_place: Mapped[str] = mapped_column(String(64), nullable=False)
+    details: Mapped[str] = mapped_column(String(2048), nullable=True)
 
     @classmethod
     def _filters(cls, **fields) -> list:
