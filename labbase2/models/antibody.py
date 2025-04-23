@@ -1,6 +1,9 @@
 from labbase2.models import db, mixins
 from labbase2.models.consumable import Consumable
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from datetime import datetime
 
 __all__ = ["Antibody", "Dilution"]
 
@@ -39,18 +42,17 @@ class Antibody(Consumable):
 
     __tablename__: str = "antibody"
 
-    id = db.Column(db.Integer, db.ForeignKey("consumable.id"), primary_key=True)
-    clone = db.Column(db.String(32), info={"importable": True})
-    host = db.Column(db.String(64), nullable=False, info={"importable": True})
-    antigen = db.Column(db.String(256), nullable=False, info={"importable": True})
-    specification = db.Column(db.String(64), info={"importable": True})
-    storage_temp = db.Column(db.Integer, info={"importable": True})
-    source = db.Column(db.String(64), info={"importable": True})
-    conjugate = db.Column(db.String(64), info={"importable": True})
+    id: Mapped[int] = mapped_column(ForeignKey("consumable.id"), primary_key=True)
+    clone: Mapped[str] = mapped_column(String(32), nullable=True, info={"importable": True})
+    host: Mapped[str] = mapped_column(String(64), nullable=False, info={"importable": True})
+    antigen: Mapped[str] = mapped_column(String(256), nullable=False, info={"importable": True})
+    specification: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
+    storage_temp: Mapped[int] = mapped_column(nullable=True, info={"importable": True})
+    source: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
+    conjugate: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
 
     # One-to-many relationships.
-    dilutions = db.relationship(
-        "Dilution",
+    dilutions: Mapped[list["Dilution"]] = relationship(
         backref="antibody",
         lazy=True,
         order_by="Dilution.application, Dilution.timestamp_created.desc(), Dilution.id",
@@ -93,20 +95,17 @@ class Dilution(db.Model, mixins.Export):
         never modified.
     """
 
-    id = db.Column(db.Integer, primary_key=True)
-    antibody_id = db.Column(db.Integer, db.ForeignKey("antibody.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    application = db.Column(db.String(64), nullable=False)
-    dilution = db.Column(db.String(32), nullable=False)
-    reference = db.Column(db.String(2048), nullable=False, info={"importable": True})
-    timestamp_created = db.Column(
-        db.DateTime, server_default=func.now(timezone=True), info={"importable": True}
+    id: Mapped[int] = mapped_column(primary_key=True)
+    antibody_id: Mapped[int] = mapped_column(ForeignKey("antibody.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    application: Mapped[str] = mapped_column(String(64), nullable=False)
+    dilution: Mapped[str] = mapped_column(String(32), nullable=False)
+    reference: Mapped[str] = mapped_column(String(2048), nullable=False, info={"importable": True})
+    timestamp_created: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(timezone=True), nullable=False, info={"importable": True}
     )
-    timestamp_edited = db.Column(
-        db.DateTime(timezone=True),
-        nullable=True,
-        onupdate=func.now(timezone=True),
-        info={"importable": True},
+    timestamp_edited: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True, onupdate=func.now(timezone=True), info={"importable": True}
     )
 
 
