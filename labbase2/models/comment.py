@@ -1,9 +1,14 @@
 from labbase2.models import db
 from labbase2.models.mixins.export import Export
 from labbase2.models.mixins.importer import Importer
-from sqlalchemy import func
+from sqlalchemy import func, String, DateTime, ForeignKey
+from sqlalchemy.orm import mapped_column, Mapped
+
+from datetime import datetime
 
 __all__ = ["Comment"]
+
+from sqlalchemy.orm import Mapped
 
 
 class Comment(db.Model, Importer, Export):
@@ -30,29 +35,16 @@ class Comment(db.Model, Importer, Export):
 
     __tablename__: str = "comment"
 
-    id = db.Column(db.Integer, primary_key=True, info={"importable": False})
-    entity_id = db.Column(
-        db.Integer,
-        db.ForeignKey("base_entity.id"),
-        nullable=False,
-        info={"importable": True},
+    id: Mapped[int] = mapped_column(primary_key=True, info={"importable": False})
+    entity_id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), nullable=False, info={"importable": True})
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, info={"importable": True})
+    timestamp_created: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), info={"importable": True}
     )
-    user_id = db.Column(
-        db.Integer, db.ForeignKey("user.id"), nullable=False, info={"importable": True}
+    timestamp_edited: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True, onupdate=func.now(), info={"importable": True}
     )
-    timestamp_created = db.Column(
-        db.DateTime,
-        nullable=False,
-        server_default=func.now(),
-        info={"importable": True},
-    )
-    timestamp_edited = db.Column(
-        db.DateTime(timezone=True),
-        nullable=True,
-        onupdate=func.now(),
-        info={"importable": True},
-    )
-    subject = db.Column(db.String(128), nullable=False, info={"importable": True})
-    text = db.Column(db.String(2048), nullable=False, info={"importable": True})
+    subject: Mapped[str] = mapped_column(String(128), nullable=False, info={"importable": True})
+    text: Mapped[str] = mapped_column(String(2048), nullable=False, info={"importable": True})
 
     __table_args__ = {"extend_existing": True}
