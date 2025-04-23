@@ -3,15 +3,16 @@ from datetime import datetime, timedelta
 from flask import current_app
 from flask_login import current_user
 from labbase2.models import db, mixins
-from sqlalchemy import func, Table
+from sqlalchemy import func, Table, Column, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 __all__ = ["BaseEntity"]
 
 
 base_to_base = db.Table(
     "base_to_base",
-    db.Column("left_base_id", db.Integer, db.ForeignKey("base_entity.id"), primary_key=True),
-    db.Column("right_base_id", db.Integer, db.ForeignKey("base_entity.id"), primary_key=True),
+    Column("left_base_id", db.ForeignKey("base_entity.id"), primary_key=True),
+    Column("right_base_id", db.ForeignKey("base_entity.id"), primary_key=True),
 )
 
 
@@ -62,59 +63,33 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
 
     __tablename__: str = "base_entity"
 
-    id = db.Column(db.Integer, primary_key=True, info={"importable": False})
-    label = db.Column(
-        db.String(64),
-        nullable=False,
-        unique=True,
-        index=True,
-        info={"importable": True},
+    id: Mapped[int] = mapped_column(primary_key=True, info={"importable": False})
+    label: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True, info={"importable": True})
+    timestamp_created: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=func.now(), info={"importable": False}
     )
-    timestamp_created = db.Column(
-        db.DateTime,
-        nullable=False,
-        server_default=func.now(),
-        info={"importable": False},
+    timestamp_edited: Mapped[datetime] = mapped_column(
+        DateTime(), nullable=True, onupdate=func.now(), info={"importable": True}
     )
-    timestamp_edited = db.Column(
-        db.DateTime(), nullable=True, onupdate=func.now(), info={"importable": True}
+    owner_id: Mapped[int] = mapped_column(
+        db.ForeignKey("user.id"), nullable=False, default=lambda: current_user.id, info={"importable": True}
     )
-    owner_id = db.Column(
-        db.Integer,
-        db.ForeignKey("user.id"),
-        nullable=False,
-        default=lambda: current_user.id,
-        info={"importable": True},
-    )
-    origin = db.Column(db.String(256), nullable=True, info={"importable": False})
-    entity_type = db.Column(db.String(32), nullable=False, info={"importable": False})
+    origin: Mapped[str] = mapped_column(String(256), nullable=True, info={"importable": False})
+    entity_type: Mapped[str] = mapped_column(String(32), nullable=False, info={"importable": False})
 
     # One-to-many relationships.
-    comments = db.relationship(
-        "Comment",
-        backref="entity",
-        order_by="Comment.timestamp_created.desc()",
-        lazy=True,
-        cascade="all, delete-orphan",
+    comments: Mapped[list["Comment"]] = relationship(
+        backref="entity", order_by="Comment.timestamp_created.desc()", lazy=True, cascade="all, delete-orphan"
     )
-    files = db.relationship(
-        "EntityFile",
-        backref="entity",
-        order_by="EntityFile.timestamp_uploaded.desc()",
-        lazy=True,
-        cascade="all, delete-orphan",
+    files: Mapped[list["EntityFile"]] = relationship(
+        backref="entity", order_by="EntityFile.timestamp_uploaded.desc()", lazy=True, cascade="all, delete-orphan"
     )
-    requests = db.relationship(
-        "Request",
-        backref="entity",
-        order_by="Request.timestamp.desc()",
-        lazy=True,
-        cascade="all, delete-orphan",
+    requests: Mapped[list["Request"]] = relationship(
+        backref="entity", order_by="Request.timestamp.desc()", lazy=True, cascade="all, delete-orphan"
     )
 
     # Self-referencing
-    self_references = db.relationship(
-        "BaseEntity",
+    self_references: Mapped[list["BaseEntity"]] = relationship(
         secondary=base_to_base,
         primaryjoin=id == base_to_base.c.left_base_id,
         secondaryjoin=id == base_to_base.c.right_base_id,
