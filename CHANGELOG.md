@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-04-24
+
 ### Changed
 
 - Updated queries: The project still used the query style from SQLAlchemy 1.4. This was updated to the new style introduced in SQLAlchemy 2. However, `labbase2` makes use of pagination from the `Flask-SQLAlchemy` package and the built-in pagination (as of v3.1) does not support tuples in case of rows with multiple columns. To solution as of now is to implicitly query additional data when the template is rendered. This is significantly slower and will hopefully be changed in the future. 
