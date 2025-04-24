@@ -4,6 +4,7 @@ from datetime import date
 from flask import send_file
 from pandas import DataFrame
 from sqlalchemy import inspect
+from labbase2.models import db
 
 __all__ = ["Export"]
 
@@ -26,6 +27,7 @@ class Export:
 
     @classmethod
     def to_df(cls, instances) -> DataFrame:
+        instances = db.session.scalars(instances)
         return DataFrame(i.to_dict() for i in instances)
 
     @classmethod
@@ -48,9 +50,7 @@ class Export:
     @classmethod
     def export_to_json(cls, instances):
         with io.StringIO() as proxy:
-            cls.to_df(instances).to_json(
-                proxy, orient="records", date_format="iso", indent=2
-            )
+            cls.to_df(instances).to_json(proxy, orient="records", date_format="iso", indent=2)
             mem = io.BytesIO(proxy.getvalue().encode("utf-8"))
 
         return send_file(
