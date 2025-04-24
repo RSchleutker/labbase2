@@ -17,10 +17,10 @@
 
         <tbody id="table-results-body">
 
-        {% for bacterium, label in entities %}
+        {% for bacterium in entities %}
             <tr onclick="request_details('{{ url_for(".details", id_=bacterium.id, format_="long") }}')">
                 <td class="id">{{ bacterium.id }}</td>
-                <td>{{ label }}</td>
+                <td>{{ bacterium.plasmid.label }}</td>
                 <td>{{ bacterium.owner.username }}</td>
                 <td>{{ bacterium.strain }}</td>
                 <td>{{ bacterium.transformation_date }}</td>

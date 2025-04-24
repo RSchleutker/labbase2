@@ -35,13 +35,13 @@ def index():
         app.logger.error("Couldn't filter batches: %s", error)
         entities = Batch.filter_(order_by="label")
     else:
-        app.logger.debug("Found %d batches.", entities.count())
+        app.logger.debug("Found %d batches.", select(func.count()).select_from(entities))
 
     return render_template(
         "batches/main.html",
         filter_form=form,
         add_form=EditBatch(formdata=None),
-        entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
+        entities=db.paginate(entities, page=page, per_page=app.config["PER_PAGE"]),
         total=db.session.scalar(select(func.count()).select_from(Batch)),
         title="Batches",
     )

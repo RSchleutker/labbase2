@@ -43,14 +43,14 @@ def index():
         app.logger.error("Couldn't filter antibodies: %s", error)
         entities = Antibody.filter_(order_by="label")
     else:
-        app.logger.debug("Found %d antibodies.", entities.count())
+        app.logger.debug("Found %d antibodies.", select(func.count()).select_from(entities))
 
     return render_template(
         "antibodies/main.html",
         filter_form=form,
         import_file_form=UploadFile(),
         add_form=EditAntibody(formdata=None),
-        entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
+        entities=db.paginate(entities, page=page, per_page=app.config["PER_PAGE"]),
         total=db.session.scalar(select(func.count()).select_from(Antibody)),
         title="Antibodies",
     )

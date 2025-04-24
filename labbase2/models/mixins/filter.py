@@ -1,5 +1,5 @@
 from labbase2.models import db
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, select
 
 __all__ = ["Filter"]
 
@@ -41,7 +41,8 @@ class Filter:
             from the database.
         """
 
-        query = db.session.query(*cls._entities())
+        # query = db.session.query(*cls._entities())
+        query = select(*cls._entities())
 
         for join in cls._joins():
             if isinstance(join, tuple):
@@ -50,9 +51,7 @@ class Filter:
                 query = query.join(join, isouter=True)
 
         return (
-            query.options(*cls._options())
-            .filter(*cls._filters(**fields))
-            .order_by(*cls._order_by(order_by, ascending))
+            query.options(*cls._options()).where(*cls._filters(**fields)).order_by(*cls._order_by(order_by, ascending))
         )
 
     @classmethod

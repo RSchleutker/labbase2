@@ -19,12 +19,12 @@
         </thead>
 
         <tbody id="table-results-body">
-        {% for batch, type, label in entities %}
+        {% for batch in entities %}
             <tr {% if batch.empty %}class="discarded"{% endif %}
                 onclick="request_details('{{ url_for(".details", id_=batch.id, format_="long") }}')">
                 <td class="id">{{ batch.id }}</td>
-                <td>{{ type.capitalize() }}</td>
-                <td>{{ label }}</td>
+                <td>{{ batch.consumable.entity_type.capitalize() }}</td>
+                <td>{{ batch.consumable.label }}</td>
                 <td>{{ batch.supplier }}</td>
                 <td>{{ batch.lot }}</td>
                 <td>{{ batch.date_ordered | format_date }}</td>

@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, flash, render_template, request, current_app as app
 from flask_login import current_user, login_required
 from labbase2.models import GlycerolStock, Plasmid, db
 from labbase2.utils.message import Message
@@ -36,7 +36,7 @@ def index():
         "bacteria/main.html",
         filter_form=form,
         add_form=EditBacterium(formdata=None),
-        entities=entities.paginate(page=page, per_page=100),
+        entities=db.paginate(entities, page=page, per_page=app.config["PER_PAGE"]),
         total=db.session.scalar(select(func.count()).select_from(GlycerolStock)),
         title="Glycerol stocks",
     )

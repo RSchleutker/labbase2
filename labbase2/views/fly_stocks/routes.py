@@ -43,7 +43,7 @@ def index():
         filter_form=form,
         import_file_form=UploadFile(),
         add_form=EditFlyStock(formdata=None),
-        entities=entities.paginate(page=page, per_page=app.config["PER_PAGE"]),
+        entities=db.paginate(entities, page=page, per_page=app.config["PER_PAGE"]),
         total=db.session.scalar(select(func.count()).select_from(FlyStock)),
         title="Fly Stocks",
     )
