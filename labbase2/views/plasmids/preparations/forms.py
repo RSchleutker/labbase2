@@ -1,14 +1,16 @@
 from flask import current_app
+from flask_wtf import FlaskForm
+from wtforms.fields import (DateField, IntegerField, SelectField, StringField,
+                            SubmitField)
+from wtforms.validators import DataRequired, Length, NumberRange, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import DateField, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 __all__ = ["EditPreparation"]
 
 
-class EditPreparation(BaseForm):
+class EditPreparation(FlaskForm):
     """Form to add or edit a plasmid preparation.
 
     Attributes
@@ -57,9 +59,8 @@ class EditPreparation(BaseForm):
         validators=[Optional()],
         render_kw=render.custom_field | {"type": "date"},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.strain.choices = [
-            (strain, strain) for strain in current_app.config["STRAINS"]
-        ]
+        self.strain.choices = [(strain, strain) for strain in current_app.config["STRAINS"]]

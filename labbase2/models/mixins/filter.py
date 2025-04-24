@@ -1,5 +1,6 @@
-from labbase2.models import db
 from sqlalchemy import asc, desc, select
+
+from labbase2.models import db
 
 __all__ = ["Filter"]
 

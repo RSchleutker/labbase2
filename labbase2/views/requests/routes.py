@@ -1,8 +1,8 @@
 from flask import Blueprint
 from flask_login import login_required
+
 from labbase2.forms.utils import errors2messages
 from labbase2.models import Request, db
-from sqlalchemy import select
 
 from .forms import EditRequest
 
@@ -24,12 +24,11 @@ def add(entity_id: int):
             db.session.commit()
         except Exception as err:
             return str(err), 400
-        else:
-            return f"Successfully added request!", 201
 
-    else:
-        print(form.errors)
-        return errors2messages(form.errors), 400
+        return "Successfully added request!", 201
+
+    print(form.errors)
+    return errors2messages(form.errors), 400
 
 
 @bp.route("/<int:id_>", methods=["PUT"])
@@ -38,17 +37,17 @@ def edit(id_: int):
     if (form := EditRequest()).validate():
         if not (request := db.session.get(Request, id_)):
             return f"No request with ID {id_}!", 404
-        else:
-            form.populate_obj(request)
+
+        form.populate_obj(request)
 
         try:
             db.session.commit()
         except Exception as err:
             return str(err), 400
-        else:
-            return f"Successfully edited request {id_}!", 200
-    else:
-        return errors2messages(form.errors), 400
+
+        return f"Successfully edited request {id_}!", 200
+
+    return errors2messages(form.errors), 400
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
@@ -56,12 +55,12 @@ def edit(id_: int):
 def delete(id_):
     if not (request := db.session.get(Request, id_)):
         return f"No comment with ID {id_}!", 404
-    else:
-        try:
-            db.session.delete(request)
-            db.session.commit()
-        except Exception as err:
-            db.session.rollback()
-            return str(err), 400
-        else:
-            return f"Successfully deleted request {id_}!", 200
+
+    try:
+        db.session.delete(request)
+        db.session.commit()
+    except Exception as err:
+        db.session.rollback()
+        return str(err), 400
+
+    return f"Successfully deleted request {id_}!", 200

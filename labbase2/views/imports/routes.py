@@ -3,23 +3,15 @@ from functools import partial
 import pandas as pd
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from labbase2.models import (
-    Antibody,
-    BaseFile,
-    Chemical,
-    ColumnMapping,
-    FlyStock,
-    ImportJob,
-    Oligonucleotide,
-    Plasmid,
-    db,
-)
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+
+from labbase2.models import (Antibody, BaseFile, Chemical, ColumnMapping,
+                             FlyStock, ImportJob, Oligonucleotide, Plasmid, db)
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.files.routes import upload_file
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 
 from .forms import MappingForm
 

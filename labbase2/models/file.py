@@ -1,15 +1,15 @@
 import math
 import mimetypes
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 from flask import current_app
-from labbase2.models import db
 from skimage import io, util
 from skimage.transform import resize
-from sqlalchemy import func, ForeignKey, String, DateTime
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy.orm import Mapped, mapped_column
 
+from labbase2.models import db
 
 __all__ = ["BaseFile", "EntityFile"]
 
@@ -60,14 +60,22 @@ class BaseFile(db.Model):
     note: Mapped[str] = mapped_column(String(2048), nullable=True)
     file_type: Mapped[str] = mapped_column(String(32), nullable=False)
     timestamp_uploaded: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),  # pylint: disable=not-callable
     )
-    timestamp_edited: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, onupdate=func.now())
+    timestamp_edited: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+        onupdate=func.now(),  # pylint: disable=not-callable
+    )
 
     __mapper_args__ = {"polymorphic_on": file_type, "polymorphic_identity": "base_file"}
 
     @property
     def path(self) -> Path:
+        """A Path pointing to the file on disc"""
+
         return Path(
             current_app.instance_path,
             current_app.config["UPLOAD_FOLDER"],
@@ -76,6 +84,8 @@ class BaseFile(db.Model):
 
     @property
     def data(self):
+        """The data from the file (either bytes or text)"""
+
         try:
             with open(self.path, mode="r") as file:
                 return file.read()

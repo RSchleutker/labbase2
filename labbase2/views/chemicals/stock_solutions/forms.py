@@ -1,15 +1,12 @@
-from labbase2.forms import BaseForm, FilterForm, render
+from flask_wtf import FlaskForm
+from sqlalchemy import func
+from wtforms.fields import (DateField, IntegerField, SelectField, StringField,
+                            SubmitField, TextAreaField)
+from wtforms.validators import DataRequired, Length, Optional
+
+from labbase2.forms import FilterForm, render
 from labbase2.forms.filters import strip_input
 from labbase2.models import Chemical, User
-from sqlalchemy import func
-from wtforms.fields import (
-    DateField,
-    IntegerField,
-    SelectField,
-    StringField,
-    TextAreaField,
-)
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["FilterStockSolution", "EditStockSolution"]
 
@@ -69,6 +66,7 @@ class FilterStockSolution(FilterForm):
         )
         self.responsible_id.choices += user
 
+    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -81,7 +79,7 @@ class FilterStockSolution(FilterForm):
         ]
 
 
-class EditStockSolution(BaseForm):
+class EditStockSolution(FlaskForm):
 
     solvent = StringField(
         label="Solvent",
@@ -113,6 +111,6 @@ class EditStockSolution(BaseForm):
     details = TextAreaField(
         label="Concentration",
         validators=[Optional(), Length(max=2048)],
-        render_kw=render.custom_field
-        | {"placeholder": "Further details...", "size": 8},
+        render_kw=render.custom_field | {"placeholder": "Further details...", "size": 8},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

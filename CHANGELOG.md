@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2025-04-24
+### Code quality
+
+- Applied consistent importing using `isort`.
+- Applied consistent formatting using `black` with a line length of 100.
+- Approved code quality by `pylint`. The quality was drastically improved.
+
+
+## [0.2.0] - 2025-04-24
 
 ### Changed
 

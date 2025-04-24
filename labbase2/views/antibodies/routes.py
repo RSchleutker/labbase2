@@ -4,6 +4,8 @@ from flask import Blueprint
 from flask import current_app as app
 from flask import flash, render_template, request
 from flask_login import current_user, login_required
+from sqlalchemy import func, select
+
 from labbase2.models import Antibody, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
@@ -11,12 +13,10 @@ from labbase2.views.batches.forms import EditBatch
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.requests.forms import EditRequest
-from sqlalchemy import func, select
 
 from . import dilutions
 from .dilutions.forms import EditDilution
 from .forms import EditAntibody, FilterAntibodies
-
 
 __all__ = ["bp"]
 
@@ -43,7 +43,8 @@ def index():
         app.logger.error("Couldn't filter antibodies: %s", error)
         entities = Antibody.filter_(order_by="label")
     else:
-        app.logger.debug("Found %d antibodies.", select(func.count()).select_from(entities))
+        entity_count = select(func.count()).select_from(entities)  # pylint: disable=not-callable
+        app.logger.debug("Found %d antibodies.", entity_count)
 
     return render_template(
         "antibodies/main.html",
@@ -98,10 +99,12 @@ def add():
         return Message.ERROR(error)
     except Exception as error:
         db.session.rollback()
-        app.logger.warning("Couldn't add antibody to database due to unknown database error: %s", error)
+        app.logger.warning(
+            "Couldn't add antibody to database due to unknown database error: %s", error
+        )
         return Message.ERROR(error)
-    else:
-        app.logger.info("Added new antibody with ID %5d.", antibody.id)
+
+    app.logger.info("Added new antibody with ID %5d.", antibody.id)
 
     return Message.SUCCESS(f"Successfully added antibody '{antibody.label}'!")
 
@@ -128,8 +131,8 @@ def edit(id_: int):
         db.session.rollback()
         app.logger.warning("Couldn't edit antibody with ID %d due to unknown database error.", id_)
         return Message.ERROR(error)
-    else:
-        app.logger.info("Edited antibody with ID %d.", id_)
+
+    app.logger.info("Edited antibody with ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully edited antibody '{antibody.label}'!")
 
@@ -147,7 +150,9 @@ def delete(id_):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        app.logger.warning("Couldn't delete antibody with ID %d due to unknown database error.", id_)
+        app.logger.warning(
+            "Couldn't delete antibody with ID %d due to unknown database error.", id_
+        )
         return Message.ERROR(error)
     else:
         app.logger.info("Deleted antibody with ID %d.", id_)

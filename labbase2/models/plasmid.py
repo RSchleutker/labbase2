@@ -1,19 +1,18 @@
 import io
+from datetime import date
 from typing import Optional
 from zipfile import ZIP_DEFLATED, ZipFile
-from datetime import date
 
 from Bio import SeqIO
-from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from flask import send_file
 from flask_login import current_user
+from sqlalchemy import Date, ForeignKey, String, asc, desc
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from labbase2.models import BaseEntity, db
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins import Filter, Sequence
-from sqlalchemy import asc, desc, ForeignKey, String, Date
-from sqlalchemy.orm import relationship, mapped_column, Mapped
-
 
 __all__ = ["Plasmid", "Preparation", "GlycerolStock"]
 
@@ -72,10 +71,14 @@ class Plasmid(BaseEntity, Sequence):
 
     # One-to-many relationships.
     preparations: Mapped[list["Preparation"]] = db.relationship(
-        backref="plasmid", lazy=True, order_by="Preparation.emptied_date, Preparation.preparation_date"
+        backref="plasmid",
+        lazy=True,
+        order_by="Preparation.emptied_date, Preparation.preparation_date",
     )
     glycerol_stocks: Mapped[list["GlycerolStock"]] = db.relationship(
-        backref="plasmid", lazy=True, order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()"
+        backref="plasmid",
+        lazy=True,
+        order_by="GlycerolStock.disposal_date, GlycerolStock.transformation_date.desc()",
     )
 
     __mapper_args__ = {"polymorphic_identity": "plasmid"}
@@ -83,8 +86,8 @@ class Plasmid(BaseEntity, Sequence):
     def __len__(self):
         if record := self.seqrecord:
             return len(record)
-        else:
-            return 0
+
+        return 0
 
     @property
     def storage_place(self) -> Optional[str]:
@@ -110,7 +113,7 @@ class Plasmid(BaseEntity, Sequence):
         """
 
         if self.file_plasmid_id is None:
-            return
+            return None
 
         match self.file.path.suffix.lower():
             case ".gb" | ".gbk":
@@ -127,8 +130,8 @@ class Plasmid(BaseEntity, Sequence):
         except Exception as error:
             print(error)
             return None
-        else:
-            return record
+
+        return record
 
     @classmethod
     def to_zip(cls, entities):
@@ -197,8 +200,8 @@ class Preparation(db.Model):
     def restricted_storage_place(self) -> str:
         if current_user.id == self.owner_id:
             return self.storage_place
-        else:
-            return "Only accessible by owner of preparation!"
+
+        return "Only accessible by owner of preparation!"
 
 
 class GlycerolStock(db.Model, Filter):

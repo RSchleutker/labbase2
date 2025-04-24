@@ -1,9 +1,10 @@
+from wtforms.fields import DateField, SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.models import User
-from wtforms.fields import DateField, SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["FilterPlasmids", "EditPlasmid"]
 
@@ -80,13 +81,10 @@ class FilterPlasmids(FilterForm):
             ("vector", "Vector"),
             ("cloning_date", "Cloning date"),
         ]
-        users = (
-            User.query.with_entities(User.id, User.username)
-            .order_by(User.username)
-            .all()
-        )
+        users = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += users
 
+    @property
     def fields(self) -> list:
         return [
             self.id,

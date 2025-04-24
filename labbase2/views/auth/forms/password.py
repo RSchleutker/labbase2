@@ -1,15 +1,11 @@
 from flask_wtf import FlaskForm
-from labbase2.forms import render
-from labbase2.forms.validators import (
-    AllASCII,
-    ContainsLower,
-    ContainsNotSpace,
-    ContainsNumber,
-    ContainsSpecial,
-    ContainsUpper,
-)
 from wtforms.fields import PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional
+
+from labbase2.forms import render
+from labbase2.forms.validators import (AllASCII, ContainsLower,
+                                       ContainsNotSpace, ContainsNumber,
+                                       ContainsSpecial, ContainsUpper)
 
 __all__ = ["ChangePassword"]
 

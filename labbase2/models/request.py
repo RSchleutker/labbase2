@@ -1,9 +1,10 @@
 from datetime import date
 
+from sqlalchemy import Date, ForeignKey, String, func
+from sqlalchemy.orm import Mapped, mapped_column
+
 from labbase2.models import db
 from labbase2.models.mixins.importer import Importer
-from sqlalchemy import func, ForeignKey, Date, String
-from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 __all__ = ["Request"]
 
@@ -36,8 +37,12 @@ class Request(db.Model, Importer):
     """
 
     id: Mapped[int] = mapped_column(primary_key=True, info={"importable": False})
-    entity_id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), nullable=False, info={"importable": True})
-    requested_by: Mapped[str] = mapped_column(String(128), nullable=False, info={"importable": True})
+    entity_id: Mapped[int] = mapped_column(
+        ForeignKey("base_entity.id"), nullable=False, info={"importable": True}
+    )
+    requested_by: Mapped[str] = mapped_column(
+        String(128), nullable=False, info={"importable": True}
+    )
     timestamp: Mapped[date] = mapped_column(
         db.Date, server_default=func.today(), nullable=True, info={"importable": True}
     )

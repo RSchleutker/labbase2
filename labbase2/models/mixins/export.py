@@ -4,6 +4,7 @@ from datetime import date
 from flask import send_file
 from pandas import DataFrame
 from sqlalchemy import inspect
+
 from labbase2.models import db
 
 __all__ = ["Export"]
@@ -18,8 +19,8 @@ class Export:
         Returns
         -------
         dict
-            A dictionary. The keys are exactly labeled like the attributes of
-            the instance.
+            A dictionary. The keys are exactly labeled like the attributes of the
+            instance.
         """
 
         inst = inspect(self).mapper.column_attrs

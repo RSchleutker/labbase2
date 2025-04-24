@@ -5,11 +5,12 @@ from itertools import chain, zip_longest
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.SeqUtils import gc_fraction
-from labbase2.models import BaseEntity, db
+from sqlalchemy import Date, ForeignKey, String, asc, desc, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from labbase2.models import BaseEntity
 from labbase2.models.fields import SequenceString
 from labbase2.models.mixins import Sequence
-from sqlalchemy import asc, desc, func, ForeignKey, String, Date
-from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 __all__ = ["Oligonucleotide"]
 
@@ -35,9 +36,13 @@ class Oligonucleotide(BaseEntity, Sequence):
 
     __tablename__: str = "oligonucleotide"
 
-    id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
+    id: Mapped[int] = mapped_column(
+        ForeignKey("base_entity.id"), primary_key=True, info={"importable": False}
+    )
     date_ordered: Mapped[date] = mapped_column(Date, nullable=False, info={"importable": True})
-    sequence: Mapped[str] = mapped_column(SequenceString(256), nullable=False, info={"importable": True})
+    sequence: Mapped[str] = mapped_column(
+        SequenceString(256), nullable=False, info={"importable": True}
+    )
     storage_place: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
     description: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
 
@@ -48,6 +53,8 @@ class Oligonucleotide(BaseEntity, Sequence):
 
     @property
     def gc_content(self) -> float:
+        """The GC content of the oligonucleotide"""
+
         return gc_fraction(self.sequence)
 
     def formatted_seq(self, max_len: int = None) -> str:

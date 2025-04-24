@@ -2,12 +2,13 @@ from datetime import date
 
 from flask import render_template
 from flask_login import current_user
+from wtforms.fields import DateField, SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import EditEntityForm, render
 from labbase2.forms.filters import remove_whitespaces, strip_input
 from labbase2.forms.validators import AllowCharacters
 from labbase2.models import User
-from wtforms.fields import DateField, SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["EditOligonucleotide"]
 
@@ -17,8 +18,7 @@ class EditOligonucleotide(EditEntityForm):
         "Order date",
         default=date.today,
         validators=[Optional()],
-        render_kw=render.custom_field
-        | {"type": "date", "placeholder": "Primer name, e.g. oRS-1"},
+        render_kw=render.custom_field | {"type": "date", "placeholder": "Primer name, e.g. oRS-1"},
     )
     owner_id = SelectField(
         "Owner",

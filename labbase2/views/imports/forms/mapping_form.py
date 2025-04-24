@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from labbase2.forms import render
 from wtforms.fields import FieldList, SelectField, SubmitField
+
+from labbase2.forms import render
 
 __all__ = ["MappingForm"]
 
@@ -51,9 +52,7 @@ class MappingForm(FlaskForm):
     )
     submit = SubmitField(label="Update mapping", render_kw=render.submit_field)
 
-    def __init__(
-        self, fields: list[str], choices: list[tuple[str, str]], *args, **kwargs
-    ) -> None:
+    def __init__(self, fields: list[str], choices: list[tuple[str, str]], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         if len(fields) != len(self.mapping):

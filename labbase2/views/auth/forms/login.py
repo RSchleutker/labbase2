@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
+from wtforms.fields import (BooleanField, PasswordField, StringField,
+                            SubmitField)
+from wtforms.validators import DataRequired
+
 from labbase2.forms import render
 from labbase2.forms.filters import make_lower, strip_input
-from wtforms.fields import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import DataRequired
 
 
 class LoginForm(FlaskForm):

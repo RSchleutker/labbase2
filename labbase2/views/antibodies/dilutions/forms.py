@@ -1,13 +1,14 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length
 
 __all__ = ["EditDilution"]
 
 
-class EditDilution(BaseForm):
+class EditDilution(FlaskForm):
     """Form to edit an antibody dilution.
 
     Attributes
@@ -45,3 +46,4 @@ class EditDilution(BaseForm):
         render_kw=render.custom_field | {"rows": 8},
         description="Give a short description of the sample and condition you used.",
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

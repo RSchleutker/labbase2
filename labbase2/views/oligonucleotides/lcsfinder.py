@@ -1,5 +1,4 @@
 import json
-from typing import Iterable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -60,7 +59,7 @@ class LCSFinder:
         """
 
         if len(query) > 255:
-            raise ValueError(f"Max supported query length is 255!")
+            raise ValueError("Max supported query length is 255!")
 
         # Clear table from any previous searches.
         self.idx2len[...] = 0

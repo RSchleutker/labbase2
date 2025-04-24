@@ -1,13 +1,14 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import StringField, TextAreaField
-from wtforms.validators import DataRequired, Length
 
 __all__ = ["EditComment"]
 
 
-class EditComment(BaseForm):
+class EditComment(FlaskForm):
     """Form to edit a comment.
 
     Attributes
@@ -30,3 +31,4 @@ class EditComment(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"placeholder": "Comment", "rows": 8},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

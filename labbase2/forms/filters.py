@@ -1,6 +1,5 @@
 from typing import Optional
 
-
 __all__ = ["remove_whitespaces", "strip_input", "make_lower", "make_upper"]
 
 
@@ -45,7 +44,7 @@ def strip_input(x: Optional[str] = None) -> Optional[str]:
     """
 
     if x is None:
-        return
+        return None
 
     if not isinstance(x, str):
         raise ValueError("`x` has to be a string!")
@@ -54,8 +53,8 @@ def strip_input(x: Optional[str] = None) -> Optional[str]:
 
 
 def make_lower(x: Optional[str] = None) -> Optional[str]:
-    """A simple wrapper for the lower-method of strings applicable for use as a
-    filter for form fields.
+    """A simple wrapper for the lower-method of strings applicable for use as a filter
+    for form fields.
 
     Parameters
     ----------

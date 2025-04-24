@@ -1,15 +1,12 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import (DateField, DecimalField, IntegerField, SelectField,
+                            StringField, SubmitField)
+from wtforms.validators import DataRequired, Length, NumberRange, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm, FilterForm
+from labbase2.forms.forms import FilterForm
 from labbase2.models import Batch
-from wtforms.fields import (
-    DateField,
-    DecimalField,
-    IntegerField,
-    SelectField,
-    StringField,
-)
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 __all__ = ["FilterBatch", "EditBatch"]
 
@@ -101,6 +98,7 @@ class FilterBatch(FilterForm):
         )
         self.supplier.choices += supplier
 
+    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -115,7 +113,7 @@ class FilterBatch(FilterForm):
         ]
 
 
-class EditBatch(BaseForm):
+class EditBatch(FlaskForm):
     """A form for adding or editing of a batch.
 
     Attributes
@@ -200,3 +198,4 @@ class EditBatch(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"placeholder": "Lot number"},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

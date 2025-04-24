@@ -1,8 +1,9 @@
+from wtforms.fields import Field, SelectField, StringField, SubmitField
+from wtforms.validators import Optional
+
 from labbase2.forms import FilterForm, render
 from labbase2.forms.filters import strip_input
 from labbase2.models import User
-from wtforms.fields import Field, SelectField, StringField, SubmitField
-from wtforms.validators import Optional
 
 __all__ = ["FilterOligonucleotide"]
 
@@ -49,11 +50,7 @@ class FilterOligonucleotide(FilterForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = (
-            User.query.with_entities(User.id, User.username)
-            .order_by(User.username)
-            .all()
-        )
+        user = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += user
         self.order_by.choices += [
             ("label", "Label"),
@@ -63,6 +60,7 @@ class FilterOligonucleotide(FilterForm):
             ("timestamp_edited", "Last edited"),
         ]
 
+    @property
     def fields(self) -> list[Field]:
         return [
             self.id,

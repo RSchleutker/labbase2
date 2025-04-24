@@ -12,6 +12,3 @@ bp = Blueprint("base", __name__, template_folder="templates")
 @login_required
 def index() -> str:
     return render_template("base/index.html", title="Home")
-
-
-# TODO: Add changelog.

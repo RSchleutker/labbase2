@@ -4,10 +4,11 @@ from flask import Blueprint
 from flask import current_app as app
 from flask import flash, render_template, request
 from flask_login import login_required
+from sqlalchemy import func, select
+
 from labbase2.models import Batch, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from sqlalchemy import func, select
 
 from .forms import EditBatch, FilterBatch
 
@@ -67,8 +68,8 @@ def add(consumable_id: int):
         db.session.rollback()
         app.logger.warning("Couldn't add batch due to unknown database error: %s", error)
         return Message.ERROR(error)
-    else:
-        app.logger.info("Added new batch with ID %5d.", batch.id)
+
+    app.logger.info("Added new batch with ID %5d.", batch.id)
 
     return Message.SUCCESS(f"Successfully added batch to '{batch.consumable.label}'!")
 
@@ -93,10 +94,12 @@ def edit(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        app.logger.warning("Couldn't edit batch with ID %d due to unknown database error: %s", id_, error)
+        app.logger.warning(
+            "Couldn't edit batch with ID %d due to unknown database error: %s", id_, error
+        )
         return Message.ERROR(error)
-    else:
-        app.logger.info("Edited batch eith ID %d.", id_)
+
+    app.logger.info("Edited batch eith ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully edited batch {id_}!")
 
@@ -121,8 +124,8 @@ def in_use(id_: int):
         db.session.rollback()
         app.logger.warning("Couldn't mark batch with ID %d as open: %s", id_, error)
         return Message.ERROR(error)
-    else:
-        app.logger.info("Marked batch with ID %d as open.", id_)
+
+    app.logger.info("Marked batch with ID %d as open.", id_)
 
     return Message.SUCCESS(f"Marked batch {id_} as open!")
 
@@ -145,10 +148,12 @@ def emptied(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        app.logger.warning("Couldn't mark batch with ID %d empty due to unknown database error: %s", id_, error)
+        app.logger.warning(
+            "Couldn't mark batch with ID %d empty due to unknown database error: %s", id_, error
+        )
         return Message.ERROR(error)
-    else:
-        app.logger.info("Marked batch with ID %d as empty.", id_)
+
+    app.logger.info("Marked batch with ID %d as empty.", id_)
 
     return Message.SUCCESS(f"Marked batch {id_} as empty!")
 
@@ -166,10 +171,12 @@ def delete(id_: int):
         db.session.commit()
     except Exception as error:
         db.session.rollback()
-        app.logger.warning("Couldn't delete batch with ID %d due to unknown database error: %s", id_, error)
+        app.logger.warning(
+            "Couldn't delete batch with ID %d due to unknown database error: %s", id_, error
+        )
         return Message.ERROR(error)
-    else:
-        app.logger.info("Deleted batch with ID %d.", id_)
+
+    app.logger.info("Deleted batch with ID %d.", id_)
 
     return Message.SUCCESS(f"Successfully deleted batch {id_}!")
 

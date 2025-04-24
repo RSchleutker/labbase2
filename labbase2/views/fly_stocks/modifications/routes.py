@@ -1,12 +1,12 @@
-from app.forms.utils import err2message
-from app.models import Modification, db
 from flask import Blueprint
 from flask_login import current_user, login_required
-from sqlalchemy import select
+
+from labbase2.forms.utils import errors2messages
+from labbase2.models import Modification, db
 
 from .forms import EditModification
 
-__all__: list[str] = ["bp"]
+__all__ = ["bp"]
 
 
 # The blueprint to register all coming blueprints with.
@@ -25,45 +25,45 @@ def add(flystock_id: int):
             db.session.commit()
         except Exception as error:
             return str(error), 400
-        else:
-            return "Successfully added modification!", 201
-    else:
-        return err2message(form.errors), 400
+
+        return "Successfully added modification!", 201
+
+    return errors2messages(form.errors), 400
 
 
 @bp.route("/<int:id>", methods=["PUT"])
 @login_required
-def edit(id: int):
+def edit(id_: int):
     if (form := EditModification()).validate():
         if (modification := db.session.get(Modification, id_)) is None:
-            return f"No preparation with ID {id}!", 404
-        elif modification.user_id != current_user.id:
+            return f"No preparation with ID {id_}!", 404
+        if modification.user_id != current_user.id:
             return "Modification can only be edited by source user!", 400
-        else:
-            form.populate_obj(modification)
+
+        form.populate_obj(modification)
 
         try:
             db.session.commit()
         except Exception as error:
             return str(error), 400
-        else:
-            return f"Successfully edited modification!", 200
-    else:
-        return err2message(form.errors), 400
+
+        return "Successfully edited modification!", 200
+
+    return errors2messages(form.errors), 400
 
 
-@bp.route("/<int:flystock_id>/<int:id>", methods=["DELETE"])
+@bp.route("/<int:flystock_id>/<int:id_>", methods=["DELETE"])
 @login_required
-def delete(flystock_id: int, id: int):
+def delete(flystock_id: int, id_: int):
     if (modification := db.session.get(Modification, id_)) is None:
         return f"No modification with ID {id}!", 404
-    elif modification.user_id != current_user.id:
+    if modification.user_id != current_user.id:
         return "Modification can only be deleted by source user!", 400
-    else:
-        try:
-            db.session.delete(modification)
-            db.session.commit()
-        except Exception as error:
-            return str(error), 400
-        else:
-            return f"Successfully deleted modification {id}!", 200
+
+    try:
+        db.session.delete(modification)
+        db.session.commit()
+    except Exception as error:
+        return str(error), 400
+
+    return f"Successfully deleted modification {id}!", 200

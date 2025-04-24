@@ -1,13 +1,16 @@
+from pathlib import Path
 from typing import Optional, Union
 
-from flask import Blueprint, flash, redirect, request, send_file, url_for, current_app as app
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, redirect, request, send_file
 from flask_login import current_user, login_required
+from sqlalchemy import select
+from werkzeug.utils import secure_filename
+
 from labbase2.models import BaseEntity, BaseFile, EntityFile, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from werkzeug.utils import secure_filename
-from pathlib import Path
-from sqlalchemy import select
 
 from .forms import EditFile, UploadFile
 
@@ -56,7 +59,7 @@ def upload_file(form, class_, **kwargs) -> Union[BaseFile, EntityFile]:
 def add(entity_id: Optional[int] = None):
     previous_site = request.referrer
 
-    if entity_id and db.session.get(BaseEntity, id_) is None:
+    if entity_id and db.session.get(BaseEntity, entity_id) is None:
         return f"No entity with ID {entity_id}!", 404
 
     if not (form := UploadFile()).validate():
@@ -81,11 +84,11 @@ def edit(id_: int):
 
     if not (file := db.session.get(BaseFile, id_)):
         return Message.ERROR(f"No file with ID {id_}!")
-    elif file.user_id != current_user.id:
+    if file.user_id != current_user.id:
         return Message.ERROR("File can only be edited by owner!")
-    else:
-        file.note = form.note.data
-        file.filename_exposed = form.filename.data
+
+    file.note = form.note.data
+    file.filename_exposed = form.filename.data
 
     try:
         db.session.commit()
@@ -143,11 +146,11 @@ def delete_orphans():
     files_db = [file.path for file in db.session.scalars(select(BaseFile)).all()]
 
     # Get all files from the upload folder.
-    dir = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
+    directory = Path(app.instance_path, app.config["UPLOAD_FOLDER"])
 
     deleted = 0
 
-    for file in dir.iterdir():
+    for file in directory.iterdir():
         if not file.is_file():
             continue
 

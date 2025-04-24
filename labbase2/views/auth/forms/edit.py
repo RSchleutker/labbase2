@@ -1,20 +1,17 @@
 import zoneinfo
 
 from flask import current_app
-from labbase2.forms import BaseForm, render
-from wtforms.fields import (
-    FileField,
-    PasswordField,
-    SelectField,
-    StringField,
-    SubmitField,
-)
+from flask_wtf import FlaskForm
+from wtforms.fields import (FileField, PasswordField, SelectField, StringField,
+                            SubmitField)
 from wtforms.validators import DataRequired, Email, Length
+
+from labbase2.forms import render
 
 __all__ = ["EditUserForm"]
 
 
-class EditUserForm(BaseForm):
+class EditUserForm(FlaskForm):
     """A registration form for new users.
 
     Attributes
@@ -69,3 +66,4 @@ class EditUserForm(BaseForm):
         render_kw=render.custom_field | {"placeholder": "Password"},
         description="Verify your password.",
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

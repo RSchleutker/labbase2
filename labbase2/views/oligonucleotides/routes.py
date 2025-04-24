@@ -3,13 +3,14 @@ from flask import Blueprint
 from flask import current_app as app
 from flask import flash, render_template, request
 from flask_login import current_user, login_required
+from sqlalchemy import and_, func, select
+from sqlalchemy.exc import IntegrityError
+
 from labbase2.models import Oligonucleotide, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
-from sqlalchemy import func, select, and_
-from sqlalchemy.exc import IntegrityError
 
 from .forms import EditOligonucleotide, FilterOligonucleotide, FindOligonucleotide
 from .lcsfinder import LCSFinder
@@ -88,8 +89,8 @@ def add():
         return Message.ERROR(error)
     except Exception as error:
         return Message.ERROR(error)
-    else:
-        return Message.SUCCESS(f"Successfully added oligonucleotide '{oligonucleotide.label}'!")
+
+    return Message.SUCCESS(f"Successfully added oligonucleotide '{oligonucleotide.label}'!")
 
 
 @bp.route("/<int:id_>", methods=["PUT"])

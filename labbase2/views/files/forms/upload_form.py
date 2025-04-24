@@ -1,13 +1,14 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import FileField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import FileField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["UploadFile"]
 
 
-class UploadFile(BaseForm):
+class UploadFile(FlaskForm):
     """Form to upload files.
 
     Attributes
@@ -15,9 +16,7 @@ class UploadFile(BaseForm):
 
     """
 
-    file = FileField(
-        "Select File", validators=[DataRequired()], render_kw=render.file_field
-    )
+    file = FileField("Select File", validators=[DataRequired()], render_kw=render.file_field)
     filename = StringField(
         "Filename",
         validators=[Optional(), Length(max=64)],
@@ -30,3 +29,4 @@ class UploadFile(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"placeholder": "Note", "rows": 8},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

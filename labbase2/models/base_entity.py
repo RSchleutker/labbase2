@@ -2,9 +2,10 @@ from datetime import datetime, timedelta
 
 from flask import current_app
 from flask_login import current_user
-from labbase2.models import db, mixins
-from sqlalchemy import func, Table, Column, String, DateTime
+from sqlalchemy import Column, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from labbase2.models import db, mixins
 
 __all__ = ["BaseEntity"]
 
@@ -64,28 +65,48 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
     __tablename__: str = "base_entity"
 
     id: Mapped[int] = mapped_column(primary_key=True, info={"importable": False})
-    label: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True, info={"importable": True})
+    label: Mapped[str] = mapped_column(
+        String(64), nullable=False, unique=True, index=True, info={"importable": True}
+    )
     timestamp_created: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, server_default=func.now(), info={"importable": False}
+        DateTime,
+        nullable=False,
+        server_default=func.now(),  # pylint: disable=not-callable
+        info={"importable": False},
     )
     timestamp_edited: Mapped[datetime] = mapped_column(
-        DateTime(), nullable=True, onupdate=func.now(), info={"importable": True}
+        DateTime(),
+        nullable=True,
+        onupdate=func.now(),  # pylint: disable=not-callable
+        info={"importable": True},
     )
     owner_id: Mapped[int] = mapped_column(
-        db.ForeignKey("user.id"), nullable=False, default=lambda: current_user.id, info={"importable": True}
+        db.ForeignKey("user.id"),
+        nullable=False,
+        default=lambda: current_user.id,
+        info={"importable": True},
     )
     origin: Mapped[str] = mapped_column(String(256), nullable=True, info={"importable": False})
     entity_type: Mapped[str] = mapped_column(String(32), nullable=False, info={"importable": False})
 
     # One-to-many relationships.
     comments: Mapped[list["Comment"]] = relationship(
-        backref="entity", order_by="Comment.timestamp_created.desc()", lazy=True, cascade="all, delete-orphan"
+        backref="entity",
+        order_by="Comment.timestamp_created.desc()",
+        lazy=True,
+        cascade="all, delete-orphan",
     )
     files: Mapped[list["EntityFile"]] = relationship(
-        backref="entity", order_by="EntityFile.timestamp_uploaded.desc()", lazy=True, cascade="all, delete-orphan"
+        backref="entity",
+        order_by="EntityFile.timestamp_uploaded.desc()",
+        lazy=True,
+        cascade="all, delete-orphan",
     )
     requests: Mapped[list["Request"]] = relationship(
-        backref="entity", order_by="Request.timestamp.desc()", lazy=True, cascade="all, delete-orphan"
+        backref="entity",
+        order_by="Request.timestamp.desc()",
+        lazy=True,
+        cascade="all, delete-orphan",
     )
 
     # Self-referencing

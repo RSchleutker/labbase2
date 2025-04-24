@@ -1,11 +1,12 @@
 from datetime import date
 
+from sqlalchemy import Date, ForeignKey, String, asc, desc, not_
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
+
 from labbase2.models import db
 from labbase2.models.base_entity import BaseEntity
 from labbase2.models.mixins.export import Export
 from labbase2.models.mixins.filter import Filter
-from sqlalchemy import asc, desc, not_, ForeignKey, String, DateTime, Date
-from sqlalchemy.orm import column_property, mapped_column, Mapped, relationship
 
 __all__ = ["Batch", "Consumable"]
 
@@ -81,7 +82,9 @@ class Batch(db.Model, Filter, Export):
     in_use: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     is_open: Mapped[bool] = column_property(date_opened.isnot(None).label("is_open"), deferred=True)
-    is_empty: Mapped[bool] = column_property(date_emptied.isnot(None).label("is_empty"), deferred=True)
+    is_empty: Mapped[bool] = column_property(
+        date_emptied.isnot(None).label("is_empty"), deferred=True
+    )
 
     @classmethod
     def _filters(cls, **fields) -> list:
@@ -152,12 +155,16 @@ class Consumable(BaseEntity, Export):
         A list of all batches of this consumable that were ordered.
     """
 
-    id: Mapped[int] = mapped_column(db.ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
+    id: Mapped[int] = mapped_column(
+        db.ForeignKey("base_entity.id"), primary_key=True, info={"importable": False}
+    )
     storage_info: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
 
     # One-to-many relationships.
     batches: Mapped[list["Batch"]] = relationship(
-        backref="consumable", lazy=True, order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered"
+        backref="consumable",
+        lazy=True,
+        order_by="Batch.date_emptied, Batch.in_use.desc(), Batch.date_ordered",
     )
 
     # Proper setup for joined table inheritance.
@@ -170,9 +177,13 @@ class Consumable(BaseEntity, Export):
     def location(self):
         if self.batches:
             return self.batches[0].storage_place
-        else:
-            return None
+
+        return None
 
     @classmethod
     def _subquery(cls):
-        return db.session.query(Batch.consumable_id, Batch.storage_place).filter(Batch.in_use).subquery(name="batch")
+        return (
+            db.session.query(Batch.consumable_id, Batch.storage_place)
+            .filter(Batch.in_use)
+            .subquery(name="batch")
+        )

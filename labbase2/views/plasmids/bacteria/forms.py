@@ -1,10 +1,12 @@
 from flask import current_app
+from flask_wtf import FlaskForm
+from wtforms.fields import DateField, SelectField, StringField, SubmitField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm, FilterForm
+from labbase2.forms.forms import FilterForm
 from labbase2.models.plasmid import GlycerolStock
-from wtforms.fields import DateField, SelectField, StringField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["FilterBacteria", "EditBacterium"]
 
@@ -20,19 +22,18 @@ class FilterBacteria(FilterForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         strains = (
-            GlycerolStock.query.with_entities(
-                GlycerolStock.strain, GlycerolStock.strain
-            )
+            GlycerolStock.query.with_entities(GlycerolStock.strain, GlycerolStock.strain)
             .order_by(GlycerolStock.strain)
             .all()
         )
         self.strain.choices += strains
 
+    @property
     def fields(self):
         return [self.id, self.strain, self.order_by, self.ascending]
 
 
-class EditBacterium(BaseForm):
+class EditBacterium(FlaskForm):
     """A form for adding or editing a bacterial stock.
 
     Attributes
@@ -72,9 +73,8 @@ class EditBacterium(BaseForm):
         validators=[Optional()],
         render_kw=render.custom_field | {"type": "date"},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.strain.choices = [
-            (strain, strain) for strain in current_app.config["STRAINS"]
-        ]
+        self.strain.choices = [(strain, strain) for strain in current_app.config["STRAINS"]]

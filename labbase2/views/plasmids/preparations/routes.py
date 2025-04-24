@@ -1,11 +1,11 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from flask import Blueprint
 from flask_login import current_user, login_required
+
 from labbase2.models import GlycerolStock, Plasmid, Preparation, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
-from sqlalchemy import select
 
 from .forms import EditPreparation
 
@@ -75,7 +75,7 @@ def edit(id_: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return f"Successfully edited preparation!", 200
+    return "Successfully edited preparation!", 200
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])

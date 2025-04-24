@@ -4,14 +4,21 @@ from pathlib import Path
 from typing import Optional, Union
 
 from flask import Flask
-from labbase2 import logging
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
+from labbase2 import logging, views
+from labbase2.models import Permission, User, db, events
+from labbase2.models.user import login_manager
+from labbase2.utils import template_filters
 
 __all__ = ["create_app"]
 
 
-def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[dict] = None, **kwargs) -> Flask:
+def create_app(
+    config: Optional[Union[str, Path]] = None,
+    config_dict: Optional[dict] = None,
+    **kwargs,
+) -> Flask:
     """Create an app instance of the labbase2 application.
 
     Parameters
@@ -20,20 +27,20 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
         A filename pointing to the configuration file. File has to be in JSON format.
         Filename is supposed to be relative to the instance path.
     config_dict : Optional[dict]
-        Additional config parameters for the app. If `config` und `config_dict` contain the same keys, settings from
-        `config_dict` will be applied.
+        Additional config parameters for the app. If `config` und `config_dict` contain
+        the same keys, settings from `config_dict` will be applied.
     kwargs
-        Additional parameters passed to the Flask class during instantiation.
-        Supports all parameters of the Flask class except `import_name` and
+        Additional parameters passed to the Flask class during instantiation. Supports
+        all parameters of the Flask class except `import_name` and
         `instance_relative_config`, which are hardcoded to `labbase2` and `True`
         respectively.
 
     Returns
     -------
     Flask
-        A configured Flask application instance. If run for the first time,
-        an instance folder as well as a sub-folder for uploading files and a SQLite
-        database will be created.
+        A configured Flask application instance. If run for the first time, an instance
+        folder as well as a sub-folder for uploading files and a SQLite database will be
+        created.
     """
 
     app: Flask = Flask("labbase2", instance_relative_config=True, **kwargs)
@@ -55,8 +62,6 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
         raise error
 
     # Initiate the database.
-    from labbase2.models import db
-
     db.init_app(app)
 
     with app.app_context():
@@ -64,71 +69,15 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
         db.create_all()
 
     # Create/update permissions from the config.
-    from labbase2.models import Permission, User
-
-    with app.app_context():
-        # Add permissions to database.
-        for name, description in app.config.get("PERMISSIONS"):
-            if (permission := db.session.get(Permission, name)) is None:
-                db.session.add(Permission(name=name, description=description))
-            else:
-                permission.description = description
-            db.session.commit()
-
-    from labbase2.models import events
+    _set_up_permissions(app=app)
 
     # If no user with admin rights is in the database, create one.
-    with app.app_context():
-        first, last, email = app.config.get("USER")
-
-        user_count = db.session.scalar(
-            select(func.count())
-            .select_from(User)
-        )
-        admin_count = db.session.scalar(
-            select(func.count())
-            .select_from(User)
-            .where(User.is_active & User.is_admin)
-        )
-
-        if user_count == 0:
-            app.logger.info("No user in database; create admin as specified in config.")
-            admin = User(first_name=first, last_name=last, email=email, is_admin=True)
-            admin.set_password("admin")
-            admin.permissions = db.session.scalars(select(Permission)).all()
-            db.session.add(admin)
-        elif admin_count == 0:
-            app.logger.info("No active user with admin rights; trying to re-activate admin specified in config.")
-            admin = db.session.scalars(select(User).where(User.email == email)).first()
-            if admin is not None:
-                app.logger.info("Re-activated initial admin '%s' from config.", admin.username)
-                admin.is_admin = True
-                admin.is_active = True
-            else:
-                app.logger.info(
-                    "Did not find admin user specified in config; create an initial admin from config."
-                )
-                admin = User(first_name=first, last_name=last, email=email, is_admin=True)
-                admin.set_password("admin")
-                admin.permissions = db.session.scalars(select(Permission)).all()
-                db.session.add(admin)
-
-        app.logger.info("Had %d users and %d admins in database at startup.", user_count, admin_count)
-
-        try:
-            db.session.commit()
-        except Exception as error:
-            app.logger.error("Could not add initial user/admin to database: %s", error)
-            raise error
+    _set_up_admin(app=app)
 
     # Register login_manager with application.
-    from labbase2.models.user import login_manager
-
     login_manager.init_app(app)
 
     # Register blueprints with application.
-    from labbase2 import views
-
     app.register_blueprint(views.base.bp)
     app.register_blueprint(views.auth.bp)
     app.register_blueprint(views.imports.bp)
@@ -143,10 +92,61 @@ def create_app(config: Optional[Union[str, Path]] = None, config_dict: Optional[
     app.register_blueprint(views.oligonucleotides.bp)
 
     # Add custom template filters to Jinja2.
-    from labbase2.utils import template_filters
-
     app.jinja_env.filters["format_date"] = template_filters.format_date
     app.jinja_env.filters["format_datetime"] = template_filters.format_datetime
     app.jinja_env.globals["random_string"] = secrets.token_hex
 
     return app
+
+
+def _set_up_permissions(app: Flask):
+    with app.app_context():
+        # Add permissions to database.
+        for name, description in app.config.get("PERMISSIONS"):
+            if (permission := db.session.get(Permission, name)) is None:
+                db.session.add(Permission(name=name, description=description))
+            else:
+                permission.description = description
+            db.session.commit()
+
+
+def _set_up_admin(app: Flask):
+    with app.app_context():
+        first, last, email = app.config.get("USER")
+
+        user_count = select(func.count()).select_from(User)  # pylint: disable=not-callable
+        admin_count = (
+            select(func.count())  # pylint: disable=not-callable
+            .select_from(User)
+            .where(User.is_active & User.is_admin)
+        )
+
+        if db.session.scalar(user_count) == 0:
+            app.logger.info("No user in database; create admin as specified in config.")
+            admin = User(first_name=first, last_name=last, email=email, is_admin=True)
+            admin.set_password("admin")
+            admin.permissions = db.session.scalars(select(Permission)).all()
+            db.session.add(admin)
+        elif db.session.scalar(admin_count) == 0:
+            app.logger.info(
+                "No active user with admin rights; trying to re-activate admin specified in config."
+            )
+            admin = db.session.scalars(select(User).where(User.email == email)).first()
+            if admin is not None:
+                app.logger.info("Re-activated initial admin '%s' from config.", admin.username)
+                admin.is_admin = True
+                admin.is_active = True
+            else:
+                app.logger.info(
+                    "Did not find admin user specified in config; create an admin from config."
+                )
+                admin = User(first_name=first, last_name=last, email=email, is_admin=True)
+                admin.set_password("admin")
+                admin.permissions = db.session.scalars(select(Permission)).all()
+                db.session.add(admin)
+
+        try:
+            db.session.commit()
+        except Exception as error:
+            app.logger.error("Could not add initial user/admin to database: %s", error)
+            raise error

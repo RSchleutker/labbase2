@@ -1,19 +1,11 @@
-from flask_wtf import FlaskForm
+from sqlalchemy import func
+from wtforms.fields import DecimalField, IntegerField, SelectField, StringField
+from wtforms.validators import NumberRange, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.models import Chemical, User
-from sqlalchemy import func
-from wtforms.fields import (
-    DecimalField,
-    Field,
-    IntegerField,
-    SelectField,
-    SelectMultipleField,
-    StringField,
-)
-from wtforms.validators import Length, NumberRange, Optional
-from wtforms.widgets import CheckboxInput, ListWidget
 
 __all__: list = ["FilterChemical", "EditChemical"]
 
@@ -67,6 +59,7 @@ class FilterChemical(FilterForm):
         )
         self.owner_id.choices += user
 
+    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -103,9 +96,5 @@ class EditChemical(EditEntityForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = (
-            User.query.with_entities(User.id, User.username)
-            .order_by(User.username)
-            .all()
-        )
+        user = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += user

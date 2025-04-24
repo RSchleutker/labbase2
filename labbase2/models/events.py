@@ -1,5 +1,6 @@
-from labbase2.models import ColumnMapping, Oligonucleotide, db, file
 from sqlalchemy import event, func
+
+from labbase2.models import ColumnMapping, Oligonucleotide, db, file
 
 
 @event.listens_for(db.session, "deleted_to_detached")

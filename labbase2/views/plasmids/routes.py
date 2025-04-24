@@ -2,6 +2,8 @@ from flask import Blueprint
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
 from flask_login import current_user, login_required
+from sqlalchemy import func, select
+
 from labbase2.models import BaseFile, Plasmid, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
@@ -9,7 +11,6 @@ from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 from labbase2.views.files.routes import upload_file
 from labbase2.views.requests.forms import EditRequest
-from sqlalchemy import select, func
 
 from . import bacteria, preparations
 from .bacteria.forms import EditBacterium
@@ -97,7 +98,7 @@ def edit(id_: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully edited plasmid!")
+    return Message.SUCCESS("Successfully edited plasmid!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])
@@ -149,7 +150,7 @@ def upload_plasmid_file(id_: int, type_: str):
         return redirect(request.referrer)
 
     if plasmid.owner_id != current_user.id:
-        flash(f"Only plasmid owner can upload files!", "danger")
+        flash("Only plasmid owner can upload files!", "danger")
         return redirect(request.referrer)
 
     if not form.validate():

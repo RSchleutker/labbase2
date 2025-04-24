@@ -1,28 +1,28 @@
 from flask import render_template
 from flask_wtf import FlaskForm
-from wtforms.fields import (
-    BooleanField,
-    Field,
-    IntegerField,
-    SelectField,
-    StringField,
-    SubmitField,
-)
+from wtforms.fields import (BooleanField, Field, IntegerField, SelectField,
+                            StringField, SubmitField)
 from wtforms.validators import NumberRange, Optional
 
 from . import filters, render
 
-__all__ = ["BaseForm", "FilterForm", "EditEntityForm"]
+__all__ = ["FilterForm", "EditEntityForm"]
 
 
-class BaseForm(FlaskForm):
-    submit = SubmitField(label="Submit", render_kw=render.submit_field)
+class FilterForm(FlaskForm):
+    """Base class for filter forms
 
-    def render(self, action: str = "", method: str = "GET") -> str:
-        raise NotImplementedError
+    Attributes
+    ----------
+    id: IntegerField
+    ascending: BooleanField
+    order_by: SelectField
+    submit: SelectField
+    download_csv: SelectField
+    download_pdf: SelectField
+    download_excel: SelectField
+    """
 
-
-class FilterForm(BaseForm):
     id = IntegerField(
         label="ID",
         validators=[Optional(), NumberRange(min=1)],
@@ -42,18 +42,45 @@ class FilterForm(BaseForm):
         render_kw=render.select_field,
         description="The column by which the results shall be ordered.",
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)
     download_csv = SubmitField(label="Export to CSV", render_kw=render.submit_field)
     download_pdf = SubmitField(label="Export to PDF", render_kw=render.submit_field)
     download_excel = SubmitField(label="Export to Excel", render_kw=render.submit_field)
 
+    @property
     def fields(self) -> list[Field]:
+        """Returns all fields for rendering"""
+
         raise NotImplementedError
 
     def render(self, action: str = "", method: str = "GET") -> str:
-        return render_template("forms/filter.html", form=self, method=method)
+        """Render the form to HTML
+
+        Parameters
+        ----------
+        action: str, optional
+            The target URL for the form.
+        method: str, optional
+            The request method, e.g. 'GET' or 'POST'.
+
+        Returns
+        -------
+        str
+            The rendered HTML.
+        """
+
+        return render_template("forms/filter.html", form=self, action=action, method=method)
 
 
-class EditEntityForm(BaseForm):
+class EditEntityForm(FlaskForm):
+    """The base form to edit entries in the database.
+
+    Attributes
+    ----------
+    label: StringField
+    submit: SubmitField
+    """
+
     label = StringField(
         label="Label",
         validators=[Optional()],
@@ -61,3 +88,4 @@ class EditEntityForm(BaseForm):
         render_kw=render.custom_field | {"placeholder": "Name"},
         description="Must be unique among ALL database entries.",
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

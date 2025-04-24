@@ -1,13 +1,14 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import StringField, SubmitField, TextAreaField
+from wtforms.validators import Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import StringField, TextAreaField
-from wtforms.validators import Length, Optional
 
 __all__ = ["EditFile"]
 
 
-class EditFile(BaseForm):
+class EditFile(FlaskForm):
     filename = StringField(
         "Filename",
         validators=[Optional(), Length(max=64)],
@@ -20,3 +21,4 @@ class EditFile(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"placeholder": "Note", "rows": 8},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

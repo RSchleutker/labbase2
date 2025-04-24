@@ -1,13 +1,14 @@
+from flask_wtf import FlaskForm
+from wtforms.fields import DateField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
-from labbase2.forms.forms import BaseForm
-from wtforms.fields import DateField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["EditRequest"]
 
 
-class EditRequest(BaseForm):
+class EditRequest(FlaskForm):
     """Form to add or edit a request.
 
     Attributes
@@ -37,3 +38,4 @@ class EditRequest(BaseForm):
         filters=[strip_input],
         render_kw=render.custom_field | {"rows": 4},
     )
+    submit = SubmitField(label="Submit", render_kw=render.submit_field)

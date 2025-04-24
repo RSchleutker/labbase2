@@ -1,11 +1,12 @@
 from datetime import date
 
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from labbase2.models import db
 from labbase2.models.base_entity import BaseEntity
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins.importer import Importer
-from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 __all__ = ["Modification", "FlyStock"]
 
@@ -77,23 +78,49 @@ class FlyStock(BaseEntity):
 
     """
 
-    id: Mapped[int] = mapped_column(ForeignKey("base_entity.id"), primary_key=True, info={"importable": False})
-    short_genotype: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
-    chromosome_xa: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_xb: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_y: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_2a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_2b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_3a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_3b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_4a: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
-    chromosome_4b: Mapped[str] = mapped_column(String(2048), nullable=False, default="+", info={"importable": True})
+    id: Mapped[int] = mapped_column(
+        ForeignKey("base_entity.id"), primary_key=True, info={"importable": False}
+    )
+    short_genotype: Mapped[str] = mapped_column(
+        String(2048), nullable=True, info={"importable": True}
+    )
+    chromosome_xa: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_xb: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_y: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_2a: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_2b: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_3a: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_3b: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_4a: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
+    chromosome_4b: Mapped[str] = mapped_column(
+        String(2048), nullable=False, default="+", info={"importable": True}
+    )
     location: Mapped[str] = mapped_column(String(64), nullable=True, info={"importable": True})
     created_date: Mapped[date] = mapped_column(CustomDate, nullable=True, info={"importable": True})
     source: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
-    documentation: Mapped[str] = mapped_column(String(2048), nullable=True, info={"importable": True})
+    documentation: Mapped[str] = mapped_column(
+        String(2048), nullable=True, info={"importable": True}
+    )
     reference: Mapped[str] = mapped_column(String(512), nullable=True, info={"importable": True})
-    discarded_date: Mapped[date] = mapped_column(CustomDate, nullable=True, info={"importable": True})
+    discarded_date: Mapped[date] = mapped_column(
+        CustomDate, nullable=True, info={"importable": True}
+    )
 
     # One-to-many relationships.
     modifications: Mapped[list["Modification"]] = relationship(

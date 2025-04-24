@@ -1,15 +1,15 @@
 from flask import Blueprint
 from flask import current_app as app
-from flask import flash, redirect, render_template, request
+from flask import flash, render_template, request
 from flask_login import current_user, login_required
-from labbase2.models import BaseFile, FlyStock, db
+from sqlalchemy import func, select
+
+from labbase2.models import FlyStock, db
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
-from labbase2.views.files.routes import upload_file
 from labbase2.views.requests.forms import EditRequest
-from sqlalchemy import select, func
 
 from .forms import EditFlyStock, FilterFlyStocks
 
@@ -93,7 +93,7 @@ def edit(id_: int):
         db.session.rollback()
         return Message.ERROR(error)
 
-    return Message.SUCCESS(f"Successfully edited fly stock!")
+    return Message.SUCCESS("Successfully edited fly stock!")
 
 
 @bp.route("/<int:id_>", methods=["DELETE"])

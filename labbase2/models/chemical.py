@@ -1,11 +1,11 @@
+from datetime import date
+
+from sqlalchemy import Date, ForeignKey, String, asc, desc, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship, subqueryload
+
 from labbase2.models import db
 from labbase2.models.consumable import Consumable
 from labbase2.models.mixins.filter import Filter
-from sqlalchemy import asc, desc, func, ForeignKey, Date, String
-from sqlalchemy.orm import subqueryload, mapped_column, Mapped, relationship
-
-from datetime import date
-
 
 __all__ = ["Chemical", "StockSolution"]
 
@@ -43,12 +43,16 @@ class Chemical(Consumable):
 
     __tablename__: str = "chemical"
 
-    id: Mapped[int] = mapped_column(db.ForeignKey("consumable.id"), primary_key=True, info={"importable": False})
+    id: Mapped[int] = mapped_column(
+        db.ForeignKey("consumable.id"), primary_key=True, info={"importable": False}
+    )
     molecular_weight: Mapped[float] = mapped_column(nullable=True, info={"importable": True})
 
     # One-to-many relationships.
     stocks: Mapped[list["StockSolution"]] = relationship(
-        backref="chemical", lazy=True, order_by="StockSolution.date_emptied, StockSolution.date_created.desc()"
+        backref="chemical",
+        lazy=True,
+        order_by="StockSolution.date_emptied, StockSolution.date_created.desc()",
     )
 
     __mapper_args__ = {"polymorphic_identity": "chemical"}

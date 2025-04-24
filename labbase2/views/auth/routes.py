@@ -8,11 +8,12 @@ from flask import Blueprint, Response
 from flask import current_app as app
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+from sqlalchemy import func, select
+from sqlalchemy.exc import DataError
+
 from labbase2.models import BaseFile, Permission, ResetPassword, User, db
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.routes import upload_file
-from sqlalchemy import select, func
-from sqlalchemy.exc import DataError
 
 from .forms.edit import EditUserForm
 from .forms.edit_permissions import EditPermissions
@@ -288,8 +289,8 @@ def change_admin_status(id_: int):
 
     if request.referrer is None:
         return redirect(url_for(".users"))
-    else:
-        return redirect(request.referrer)
+
+    return redirect(request.referrer)
 
 
 @bp.route("/change-active-status/<int:id_>", methods=["GET"])
@@ -359,9 +360,9 @@ def create_password_reset(id_: int):
 @bp.route("/users", methods=["GET"])
 @login_required
 def users():
-    users = db.session.scalars(
+    entities = db.session.scalars(
         select(User).order_by(
             User.is_active.desc(), User.is_admin.desc(), User.last_name, User.first_name
         )
     )
-    return render_template("auth/users.html", users=users, title="Users")
+    return render_template("auth/users.html", users=entities, title="Users")

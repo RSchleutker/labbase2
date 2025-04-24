@@ -1,14 +1,14 @@
 import secrets
-
-from flask_login import LoginManager, UserMixin
-from labbase2.models import db
-from labbase2.models.mixins import Export
-from sqlalchemy import func, String, ForeignKey, DateTime, Column
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.hybrid import hybrid_property
-from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 
+from flask_login import LoginManager, UserMixin
+from sqlalchemy import Column, DateTime, ForeignKey, String, func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from labbase2.models import db
+from labbase2.models.mixins import Export
 
 __all__ = ["login_manager", "User", "Permission", "user_permissions", "ResetPassword"]
 
@@ -114,7 +114,11 @@ class User(db.Model, UserMixin, Export):
     email: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(512), nullable=False)
     file_picture_id: Mapped[int] = mapped_column(ForeignKey("base_file.id"), nullable=True)
-    timestamp_created: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    timestamp_created: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),  # pylint: disable=not-callable
+        nullable=False,
+    )
     timestamp_last_login: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="UTC")
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
@@ -122,7 +126,11 @@ class User(db.Model, UserMixin, Export):
 
     # Set relationship for profile picture.
     picture: Mapped["BaseFile"] = relationship(
-        backref="profile", lazy=True, foreign_keys=[file_picture_id], cascade="all, delete-orphan", single_parent=True
+        backref="profile",
+        lazy=True,
+        foreign_keys=[file_picture_id],
+        cascade="all, delete-orphan",
+        single_parent=True,
     )
 
     # One-to-many relationships.
@@ -130,7 +138,10 @@ class User(db.Model, UserMixin, Export):
         backref="user", order_by="Comment.timestamp_created.desc()", lazy=True
     )
     plasmids: Mapped[list["Plasmid"]] = relationship(
-        backref="owner", lazy=True, order_by="Plasmid.timestamp_created.desc()", foreign_keys="Plasmid.owner_id"
+        backref="owner",
+        lazy=True,
+        order_by="Plasmid.timestamp_created.desc()",
+        foreign_keys="Plasmid.owner_id",
     )
     glycerol_stocks: Mapped[list["GlycerolStock"]] = relationship(backref="owner", lazy=True)
     oligonucleotides: Mapped[list["Oligonucleotide"]] = relationship(
@@ -141,9 +152,13 @@ class User(db.Model, UserMixin, Export):
     )
     preparations: Mapped[list["Preparation"]] = relationship(backref="owner", lazy=True)
     dilutions: Mapped[list["Dilution"]] = relationship(backref="user", lazy=True)
-    files: Mapped[list["EntityFile"]] = relationship(backref="user", lazy=True, foreign_keys="EntityFile.user_id")
+    files: Mapped[list["EntityFile"]] = relationship(
+        backref="user", lazy=True, foreign_keys="EntityFile.user_id"
+    )
     modifications: Mapped[list["Modification"]] = relationship(backref="user", lazy=True)
-    fly_stocks: Mapped[list["FlyStock"]] = relationship(backref="owner", lazy=True, foreign_keys="FlyStock.owner_id")
+    fly_stocks: Mapped[list["FlyStock"]] = relationship(
+        backref="owner", lazy=True, foreign_keys="FlyStock.owner_id"
+    )
     responsibilities: Mapped[list["Chemical"]] = relationship(
         backref="responsible", lazy=True, foreign_keys="Chemical.owner_id"
     )
@@ -151,7 +166,9 @@ class User(db.Model, UserMixin, Export):
     import_jobs: Mapped[list["ImportJob"]] = relationship(
         backref="user", lazy=True, order_by="ImportJob.timestamp.asc()"
     )
-    resets: Mapped[list["ResetPassword"]] = relationship(backref="user", lazy=True, cascade="all, delete-orphan")
+    resets: Mapped[list["ResetPassword"]] = relationship(
+        backref="user", lazy=True, cascade="all, delete-orphan"
+    )
 
     # Many-to-many relationships.
     permissions: Mapped[list["Permission"]] = relationship(
@@ -175,7 +192,8 @@ class User(db.Model, UserMixin, Export):
         return out
 
     def set_password(self, password: str) -> None:
-        """Creates a hash that is stored in the database to validate the user's password.
+        """Creates a hash that is stored in the database to validate the user's
+        password.
 
         Parameters
         ----------
@@ -188,20 +206,21 @@ class User(db.Model, UserMixin, Export):
 
         Notes
         -----
-        Of course, passwords are not stored as clear text in the database. Instead, a hash is generated from the
-        password the user enters and that hash is stored. It is not possible to reconstruct the original password but
-        the same hash is generated from the same password. Thus, the hash can be used to verify users.
+        Of course, passwords are not stored as clear text in the database. Instead, a
+        hash is generated from the password the user enters and that hash is stored. It
+        is not possible to reconstruct the original password but the same hash is
+        generated from the same password. Thus, the hash can be used to verify users.
 
         Currently, this method accepts all strings. In the future users will maybe be
-        forced to add passwords that
-        comply with certain restrictions to ensure a certain level of security.
+        forced to add passwords that comply with certain restrictions to ensure a
+        certain level of security.
         """
 
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password: str) -> bool:
-        """Creates the hash from the 'password' parameter and checks this hash against the hash deployed in the
-        database.
+        """Creates the hash from the 'password' parameter and checks this hash against
+        the hash deployed in the database.
 
         Parameters
         ----------
@@ -292,7 +311,7 @@ def _load_user(id_: str) -> User | None:
     try:
         id_ = int(id_)
     except ValueError:
-        print("Invalid ID provided: {}".format(id))
+        print(f"Invalid ID provided: {id}")
         return None
-    else:
-        return User.query.get(id_)
+
+    return User.query.get(id_)

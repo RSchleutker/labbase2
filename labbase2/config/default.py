@@ -1,7 +1,9 @@
 __all__ = ["DefaultConfig"]
 
 
-class DefaultConfig(object):
+class DefaultConfig:
+    """A default config for logging"""
+
     SECRET_KEY: str = "verysecretkey"
 
     # Database.

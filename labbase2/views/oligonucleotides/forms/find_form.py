@@ -1,10 +1,12 @@
 from flask import render_template
 from flask_wtf import FlaskForm
+from wtforms.fields import (BooleanField, IntegerField, SubmitField,
+                            TextAreaField)
+from wtforms.validators import DataRequired, Length, NumberRange
+
 from labbase2.forms import render
 from labbase2.forms.filters import make_upper, strip_input
 from labbase2.forms.validators import AllowCharacters
-from wtforms.fields import BooleanField, IntegerField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Length, NumberRange
 
 __all__ = ["FindOligonucleotide"]
 
@@ -14,8 +16,7 @@ class FindOligonucleotide(FlaskForm):
         "Target sequence",
         validators=[DataRequired(), Length(max=20_000), AllowCharacters("ACTGactg")],
         filters=[strip_input, make_upper],
-        render_kw=render.custom_field
-        | {"size": 4, "Placeholder": "Target sequence..."},
+        render_kw=render.custom_field | {"size": 4, "Placeholder": "Target sequence..."},
         description="""
         The target sequence, for which a matching primer shall be found. Please note,
         that long sequence will considerably take longer to search. Therefor, 

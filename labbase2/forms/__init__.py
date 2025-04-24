@@ -1,1 +1,1 @@
-from .forms import BaseForm, EditEntityForm, FilterForm
+from .forms import EditEntityForm, FilterForm

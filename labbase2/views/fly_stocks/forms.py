@@ -1,17 +1,18 @@
 from flask_login import current_user
+from wtforms.fields import DateField, SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.forms.validators import ContainsNot
 from labbase2.models import User
-from wtforms.fields import DateField, SelectField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
 
 __all__ = ["FilterFlyStocks", "EditFlyStock"]
 
 
 class FilterFlyStocks(FilterForm):
-    """ """
+    """A form to filter fly stock"""
 
     label = StringField(
         label="Label",
@@ -62,8 +63,7 @@ class FilterFlyStocks(FilterForm):
         label="Reference",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field
-        | {"id": "filter-form-reference", "placeholder": "byri"},
+        render_kw=render.custom_field | {"id": "filter-form-reference", "placeholder": "byri"},
         description="A paper that was added as a reference for this stock.",
     )
     discarded = SelectField(
@@ -88,13 +88,10 @@ class FilterFlyStocks(FilterForm):
             ("source", "Source"),
             ("discarded", "Discarded"),
         ]
-        users = (
-            User.query.with_entities(User.id, User.username)
-            .order_by(User.username)
-            .all()
-        )
+        users = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += users
 
+    @property
     def fields(self) -> list:
         return [
             self.label,
@@ -232,9 +229,5 @@ class EditFlyStock(EditEntityForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        users = (
-            User.query.with_entities(User.id, User.username)
-            .order_by(User.username)
-            .all()
-        )
+        users = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += users

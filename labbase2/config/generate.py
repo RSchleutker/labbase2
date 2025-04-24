@@ -14,26 +14,26 @@ def generate():
 
         if 0 < len(first_name) < 64:
             break
-        else:
-            print("The username is too short or too long.")
+
+        print("The username is too short or too long.")
 
     while True:
         last_name = input("\nEnter the last name of an admin: ").strip()
 
         if 0 < len(last_name) < 64:
             break
-        else:
-            print("The username is too short or too long.")
+
+        print("The username is too short or too long.")
 
     while True:
         email = input("\nEnter the email address of an admin: ").strip()
 
-        if not validate_email(email):
-            print("The email address is invalid!")
-        else:
+        if validate_email(email):
             break
+
+        print("The email address is invalid!")
 
     for_json = {"SECRET_KEY": secret_key, "USER": (first_name, last_name, email)}
 
-    with open("config.json", "w") as file:
+    with open("config.json", "w", encoding="UTF-8") as file:
         file.write(json.dumps(for_json))

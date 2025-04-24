@@ -1,10 +1,11 @@
+from sqlalchemy import func
+from wtforms.fields import Field, IntegerField, SelectField, StringField
+from wtforms.validators import DataRequired, Length, NumberRange, Optional
+
 from labbase2.forms import render
 from labbase2.forms.filters import make_lower, strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.models import Antibody
-from sqlalchemy import func
-from wtforms.fields import Field, IntegerField, SelectField, StringField
-from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 __all__ = ["FilterAntibodies", "EditAntibody"]
 
@@ -41,8 +42,7 @@ class FilterAntibodies(FilterForm):
         label="Conjugate",
         choices=[("all", "All"), ("any", "Any"), ("none", "None")],
         render_kw=render.select_field,
-        description="""The conjugate of the antibody. Primary antibodies are 
-        all antibodies without a conjugate.""",
+        description="The conjugate of the antibody.",
     )
     order_by = SelectField(
         label="Order by",
@@ -77,6 +77,7 @@ class FilterAntibodies(FilterForm):
             .all()
         )
 
+    @property
     def fields(self) -> list[Field]:
         return [
             self.id,

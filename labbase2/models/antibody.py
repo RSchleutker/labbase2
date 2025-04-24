@@ -1,9 +1,10 @@
-from labbase2.models import db, mixins
-from labbase2.models.consumable import Consumable
-from sqlalchemy import func, ForeignKey, String, DateTime
+from datetime import datetime
+
+from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from datetime import datetime
+from labbase2.models import db, mixins
+from labbase2.models.consumable import Consumable
 
 __all__ = ["Antibody", "Dilution"]
 
@@ -102,10 +103,16 @@ class Dilution(db.Model, mixins.Export):
     dilution: Mapped[str] = mapped_column(String(32), nullable=False)
     reference: Mapped[str] = mapped_column(String(2048), nullable=False, info={"importable": True})
     timestamp_created: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(timezone=True), nullable=False, info={"importable": True}
+        DateTime,
+        server_default=func.now(timezone=True),  # pylint: disable=not-callable
+        nullable=False,
+        info={"importable": True},
     )
     timestamp_edited: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True, onupdate=func.now(timezone=True), info={"importable": True}
+        DateTime(timezone=True),
+        nullable=True,
+        onupdate=func.now(timezone=True),  # pylint: disable=not-callable
+        info={"importable": True},
     )
 
 
