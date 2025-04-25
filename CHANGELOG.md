@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move `db = SQLAlchemy()` to its own module. Previously, `db` was defined in the `__init__.py` of the `models` package. To avoid the risk of circular imports it was now moved to `labbase2/database.py`.
 - Permissions are no longer assigned to users directly but to groups. Those groups are then assigned to users. This also includes a group for *admins*. The `.is_admin` attribute of class `User` will be dropped.
+- Moved `config` from its own package to a module.
 
 ### Code quality
 

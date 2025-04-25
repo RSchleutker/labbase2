@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import DataError
 
 from labbase2.database import db
-from labbase2.models import BaseFile, Permission, ResetPassword, User, Group
+from labbase2.models import BaseFile, Group, Permission, ResetPassword, User
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.routes import upload_file
 

@@ -1,7 +1,8 @@
 from functools import wraps
 from typing import Callable
 
-from flask import flash, redirect, url_for, current_app as app
+from flask import current_app as app
+from flask import flash, redirect, url_for
 from flask_login import current_user
 
 from labbase2.database import db

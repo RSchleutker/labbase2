@@ -2,9 +2,9 @@ from flask import Blueprint
 from flask_login import login_required
 
 from labbase2.database import db
-from labbase2.utils.permission_required import permission_required
 from labbase2.forms.utils import errors2messages
 from labbase2.models import Request
+from labbase2.utils.permission_required import permission_required
 
 from .forms import EditRequest
 
