@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_login import login_required
 
 from labbase2.database import db
+from labbase2.utils.permission_required import permission_required
 from labbase2.forms.utils import errors2messages
 from labbase2.models import Request
 
@@ -15,6 +16,7 @@ bp = Blueprint("requests", __name__, url_prefix="/request", template_folder="tem
 
 @bp.route("/<int:entity_id>", methods=["POST"])
 @login_required
+@permission_required("add-request")
 def add(entity_id: int):
     if (form := EditRequest()).validate():
         request = Request(entity_id=entity_id)
@@ -34,6 +36,7 @@ def add(entity_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
+@permission_required("add-request")
 def edit(id_: int):
     if (form := EditRequest()).validate():
         if not (request := db.session.get(Request, id_)):
@@ -53,6 +56,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
+@permission_required("add-request")
 def delete(id_):
     if not (request := db.session.get(Request, id_)):
         return f"No comment with ID {id_}!", 404

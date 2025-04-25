@@ -79,7 +79,7 @@ def details(id_: int):
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add antibodies")
+@permission_required("add-antibody")
 def add():
     form = EditAntibody()
 
@@ -112,7 +112,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add antibodies")
+@permission_required("add-antibody")
 def edit(id_: int):
     form = EditAntibody()
 
@@ -140,7 +140,7 @@ def edit(id_: int):
 
 @bp.route("/delete/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add antibodies")
+@permission_required("delete-antibody")
 def delete(id_):
     if (antibody := db.session.get(Antibody, id_)) is None:
         app.logger.warning("Couldn't find antibody with ID %d.", id_)
@@ -163,7 +163,7 @@ def delete(id_):
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterAntibodies(request.args).data
     del data["submit"]

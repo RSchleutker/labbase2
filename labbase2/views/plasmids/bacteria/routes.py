@@ -48,7 +48,7 @@ def index():
 
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
-@permission_required("Add glycerol stocks")
+@permission_required("add-glycerol-stock")
 def add(plasmid_id: int):
     form = EditBacterium()
 
@@ -73,7 +73,7 @@ def add(plasmid_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add glycerol stocks")
+@permission_required("add-glycerol-stock")
 def edit(id_: int):
     form = EditBacterium()
 
@@ -124,7 +124,7 @@ def details(id_: int, format_: str):
 
 @bp.route("/glycerol-stock/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterBacteria(request.args).data
     del data["submit"]

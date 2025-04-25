@@ -52,7 +52,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add Fly Stock")
+@permission_required("add-fly-stock")
 def add():
     form = EditFlyStock()
 
@@ -73,7 +73,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add Fly Stock")
+@permission_required("add-fly-stock")
 def edit(id_: int):
     form = EditFlyStock()
 
@@ -99,7 +99,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add Fly Stock")
+@permission_required("add-fly-stock")
 def delete(id_):
     if (fly_stock := db.session.get(FlyStock, id_)) is None:
         return Message.ERROR(f"No fly stock with ID {id_}!")
@@ -135,7 +135,7 @@ def details(id_: int):
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterFlyStocks(request.args).data
     del data["submit"]

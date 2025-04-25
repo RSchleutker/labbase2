@@ -19,7 +19,7 @@ bp = Blueprint("preparations", __name__, url_prefix="/preparations", template_fo
 
 @bp.route("/<int:plasmid_id>", methods=["POST"])
 @login_required
-@permission_required("Add preparations")
+@permission_required("add-preparation")
 def add(plasmid_id: int):
     form = EditPreparation()
 
@@ -55,7 +55,7 @@ def add(plasmid_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add preparations")
+@permission_required("add-preparation")
 def edit(id_: int):
     form = EditPreparation()
 
@@ -81,7 +81,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add preparations")
+@permission_required("add-preparation")
 def delete(id_: int):
     if not (preparation := db.session.get(Preparation, id_)):
         return Message.ERROR(f"No preparation with ID {id_}!")

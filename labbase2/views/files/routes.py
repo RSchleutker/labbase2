@@ -56,7 +56,7 @@ def upload_file(form, class_, **kwargs) -> Union[BaseFile, EntityFile]:
 @bp.route("/", defaults={"entity_id": None})
 @bp.route("/upload/<int:entity_id>", methods=["POST"])
 @login_required
-@permission_required("Upload files")
+@permission_required("upload-file")
 def add(entity_id: Optional[int] = None):
     previous_site = request.referrer
 
@@ -78,7 +78,7 @@ def add(entity_id: Optional[int] = None):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Upload files")
+@permission_required("upload-file")
 def edit(id_: int):
     if not (form := EditFile()).validate():
         return str(form.errors)
@@ -121,7 +121,7 @@ def download(id_: Optional[int] = None):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Upload files")
+@permission_required("upload-file")
 def delete(id_: int):
     if (file := db.session.get(BaseFile, id_)) is None:
         return Message.ERROR(f"No file with ID {id_}!")

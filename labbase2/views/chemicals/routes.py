@@ -56,7 +56,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add chemicals")
+@permission_required("add-chemical")
 def add():
     form = EditChemical()
 
@@ -80,7 +80,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add chemicals")
+@permission_required("add-chemical")
 def edit(id_: int):
     form = EditChemical()
 
@@ -102,7 +102,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add chemicals")
+@permission_required("add-chemical")
 def delete(id_: int):
     if (chemical := db.session.get(Chemical, id_)) is None:
         return Message.ERROR(f"No chemical with ID {id_}!")
@@ -136,7 +136,7 @@ def details(id_: int):
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterChemical(request.args).data
     del data["submit"]

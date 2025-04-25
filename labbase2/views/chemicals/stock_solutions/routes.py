@@ -48,7 +48,7 @@ def index():
 
 @bp.route("/<int:chemical_id>", methods=["POST"])
 @login_required
-@permission_required("Add stock solution")
+@permission_required("add-stock-solution")
 def add(chemical_id: int):
     form = EditStockSolution()
 
@@ -69,7 +69,7 @@ def add(chemical_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add stock solution")
+@permission_required("add-stock-solution")
 def edit(id_: int):
     form = EditStockSolution()
 
@@ -91,7 +91,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add stock solution")
+@permission_required("add-stock-solution")
 def delete(id_):
     if (solution := db.session.get(StockSolution, id_)) is None:
         return Message.ERROR(f"No stock solution with ID {id_}!")

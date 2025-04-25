@@ -57,7 +57,7 @@ def index():
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add plasmid")
+@permission_required("add-plasmid")
 def add():
     form = EditPlasmid()
 
@@ -78,7 +78,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add plasmid")
+@permission_required("add-plasmid")
 def edit(id_: int):
     form = EditPlasmid()
 
@@ -104,7 +104,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add plasmid")
+@permission_required("add-plasmid")
 def delete(id_: int):
     if (plasmid := db.session.get(Plasmid, id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
@@ -142,7 +142,7 @@ def details(id_: int):
 
 @bp.route("/<int:id_>/upload/<string:type_>/", methods=["POST"])
 @login_required
-@permission_required("Upload files")
+@permission_required("upload-file")
 def upload_plasmid_file(id_: int, type_: str):
     form = UploadFile()
 
@@ -182,7 +182,7 @@ def upload_plasmid_file(id_: int, type_: str):
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterPlasmids(request.args).data
     del data["submit"]

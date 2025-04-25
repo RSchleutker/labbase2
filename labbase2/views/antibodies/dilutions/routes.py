@@ -17,7 +17,7 @@ bp = Blueprint("dilutions", __name__, url_prefix="/dilution", template_folder="t
 
 @bp.route("/<int:antibody_id>", methods=["POST"])
 @login_required
-@permission_required("Add dilution")
+@permission_required("add-dilution")
 def add(antibody_id: int):
     form = EditDilution()
     if not form.validate():
@@ -46,7 +46,7 @@ def add(antibody_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add dilution")
+@permission_required("add-dilution")
 def edit(id_: int):
     form = EditDilution()
 
@@ -84,7 +84,7 @@ def edit(id_: int):
 
 @bp.route("<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add dilution")
+@permission_required("add-dilution")
 def delete(id_: int):
     if (dilution := db.session.get(Dilution, id_)) is None:
         app.logger.warning("Couldn't find dilution with ID %d.", id_)

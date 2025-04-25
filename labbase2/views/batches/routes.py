@@ -51,7 +51,7 @@ def index():
 
 @bp.route("/<int:consumable_id>", methods=["POST"])
 @login_required
-@permission_required("Add consumable batches")
+@permission_required("add-consumable-batch")
 def add(consumable_id: int):
     form = EditBatch()
 
@@ -77,7 +77,7 @@ def add(consumable_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add consumable batches")
+@permission_required("add-consumable-batch")
 def edit(id_: int):
     form = EditBatch()
 
@@ -161,7 +161,7 @@ def emptied(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add consumable batches")
+@permission_required("add-consumable-batches")
 def delete(id_: int):
     if (batch := db.session.get(Batch, id_)) is None:
         app.logger.warning("Couldn't find batch with ID %d.", id_)

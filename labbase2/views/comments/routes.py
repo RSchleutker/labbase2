@@ -16,7 +16,7 @@ bp = Blueprint("comments", __name__, url_prefix="/comment", template_folder="tem
 
 @bp.route("/attach/<int:entity_id>", methods=["POST"])
 @login_required
-@permission_required("Write comment")
+@permission_required("add-comment")
 def add(entity_id: int):
     form = EditComment()
 
@@ -37,7 +37,7 @@ def add(entity_id: int):
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Write comment")
+@permission_required("add-comment")
 def edit(id_: int):
     form = EditComment()
 
@@ -62,7 +62,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Write comment")
+@permission_required("add-comment")
 def delete(id_):
     if not (comment := db.session.get(Comment, id_)):
         return Message.ERROR(f"No comment with ID {id_}!")

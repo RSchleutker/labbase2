@@ -40,7 +40,7 @@ def index():
 
 @bp.route("/upload/<string:type_>", methods=["POST"])
 @login_required
-@permission_required("Upload files")
+@permission_required("upload-files")
 def upload(type_: str):
     form = UploadFile()
 

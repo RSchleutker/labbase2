@@ -73,7 +73,7 @@ def details(id_: int):
 
 @bp.route("/", methods=["POST"])
 @login_required
-@permission_required("Add oligonucleotide")
+@permission_required("add-oligonucleotide")
 def add():
     form = EditOligonucleotide()
 
@@ -97,7 +97,7 @@ def add():
 
 @bp.route("/<int:id_>", methods=["PUT"])
 @login_required
-@permission_required("Add oligonucleotide")
+@permission_required("add-oligonucleotide")
 def edit(id_: int):
     form = EditOligonucleotide()
 
@@ -122,7 +122,7 @@ def edit(id_: int):
 
 @bp.route("/<int:id_>", methods=["DELETE"])
 @login_required
-@permission_required("Add oligonucleotide")
+@permission_required("add-oligonucleotide")
 def delete(id_):
     if (oligonucleotide := db.session.get(Oligonucleotide, id_)) is None:
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")
@@ -191,7 +191,7 @@ def find():
 
 @bp.route("/export/<string:format_>/", methods=["GET"])
 @login_required
-@permission_required("Export content")
+@permission_required("export-content")
 def export(format_: str):
     data = FilterOligonucleotide(request.args).data
     del data["submit"]

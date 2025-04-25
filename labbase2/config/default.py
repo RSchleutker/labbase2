@@ -27,6 +27,7 @@ class DefaultConfig:
         ("add-glycerol-stock", "Allows a user to create glycerol stocks."),
         ("add-consumable-batch", "Allows a user to add batches of consumables."),
         ("add-antibody", "Allows a user to add antibodies."),
+        ("delete-antibody", "Allow a user to delete antibodies."),
         ("add-chemical", "Allows a user to add chemicals."),
         ("add-stock-solution", "Allows a user to add stock solutions of chemicals."),
         ("add-fly-stock", "Allows a user to create fly stocks."),
@@ -39,7 +40,7 @@ class DefaultConfig:
         ("change-group", "Allow a user to assign groups to users"),
         ("delete-user", "Allows a user to delete another user."),
         ("export-content", "Allows a user to export content. Suggested level: PhD Student."),
-        ("add-requests", "Allows a user to add requests for any ressource. Suggested level: PI."),
+        ("add-request", "Allows a user to add requests for any ressource. Suggested level: PI."),
     ]
 
     # Data.
