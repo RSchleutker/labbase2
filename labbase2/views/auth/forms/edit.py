@@ -2,8 +2,7 @@ import zoneinfo
 
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms.fields import (FileField, PasswordField, SelectField, StringField,
-                            SubmitField)
+from wtforms.fields import FileField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 
 from labbase2.forms import rendering

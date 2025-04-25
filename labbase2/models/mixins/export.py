@@ -5,7 +5,7 @@ import pandas as pd
 from flask import send_file
 from sqlalchemy import inspect
 
-from labbase2.models import db
+from labbase2.database import db
 
 __all__ = ["Export"]
 

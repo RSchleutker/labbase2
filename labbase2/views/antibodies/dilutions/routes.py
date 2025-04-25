@@ -2,7 +2,8 @@ from flask import Blueprint
 from flask import current_app as app
 from flask_login import current_user, login_required
 
-from labbase2.models import Dilution, db
+from labbase2.database import db
+from labbase2.models import Dilution
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 

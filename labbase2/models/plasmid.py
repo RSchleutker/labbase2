@@ -10,7 +10,8 @@ from flask_login import current_user
 from sqlalchemy import Date, ForeignKey, String, asc, desc
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2.models import BaseEntity, db
+from labbase2.database import db
+from labbase2.models import BaseEntity
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins import Filter, Sequence
 

@@ -3,7 +3,7 @@ from datetime import date
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2.models import db
+from labbase2.database import db
 from labbase2.models.base_entity import BaseEntity
 from labbase2.models.fields import CustomDate
 from labbase2.models.mixins.importer import Importer

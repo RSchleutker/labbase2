@@ -1,7 +1,8 @@
 from flask import Blueprint
 from flask_login import current_user, login_required
 
-from labbase2.models import Comment, db
+from labbase2.database import db
+from labbase2.models import Comment
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 

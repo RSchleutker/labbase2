@@ -6,7 +6,8 @@ from flask import flash, render_template, request
 from flask_login import current_user, login_required
 from sqlalchemy import func, select
 
-from labbase2.models import Antibody, db
+from labbase2.database import db
+from labbase2.models import Antibody
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.batches.forms import EditBatch

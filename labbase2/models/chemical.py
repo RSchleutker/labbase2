@@ -3,7 +3,7 @@ from datetime import date
 from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship, subqueryload
 
-from labbase2.models import db
+from labbase2.database import db
 from labbase2.models.consumable import Consumable
 from labbase2.models.mixins.filter import Filter
 

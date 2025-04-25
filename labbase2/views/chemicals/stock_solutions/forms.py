@@ -1,7 +1,13 @@
 from flask_wtf import FlaskForm
 from sqlalchemy import func
-from wtforms.fields import (DateField, IntegerField, SelectField, StringField,
-                            SubmitField, TextAreaField)
+from wtforms.fields import (
+    DateField,
+    IntegerField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import DataRequired, Length, Optional
 
 from labbase2.forms import FilterForm, rendering

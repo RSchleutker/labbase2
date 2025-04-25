@@ -1,9 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
-
-# Is used in model classes, so has to be specified before model import.
-db = SQLAlchemy()
-
-
 from .antibody import Antibody, Dilution
 from .base_entity import BaseEntity
 from .chemical import Chemical, StockSolution

@@ -7,7 +7,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from labbase2.models import db
+from labbase2.database import db
 from labbase2.models.mixins import Export
 
 __all__ = ["login_manager", "User", "Permission", "user_permissions", "ResetPassword"]

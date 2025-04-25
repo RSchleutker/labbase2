@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Move `db = SQLAlchemy()` to its own module. Previously, `db` was defined in the `__init__.py` of the `models` package. To avoid the risk of circular imports it was now moved to `labbase2/database.py`.
+
 ### Code quality
 
 - Applied consistent importing using `isort`.
@@ -22,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [0.1.2] - 2025-04-23
+
+### Changed
+
+- Dropped Font Awesome: Replaced all icons from Font Awesome with icons from Bootstrap Icons.
 
 
 ## [0.1.1] - 2025-04-22

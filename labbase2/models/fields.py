@@ -2,7 +2,7 @@ from datetime import date
 
 from sqlalchemy.types import TypeDecorator
 
-from labbase2.models import db
+from labbase2.database import db
 
 
 class CustomDate(TypeDecorator):

@@ -4,7 +4,7 @@ from flask import url_for
 from flask_login import current_user, login_user
 from sqlalchemy import select, func
 from labbase2 import models
-from labbase2.models import db
+from labbase2.database import db
 
 
 def test_login_get(app, client):

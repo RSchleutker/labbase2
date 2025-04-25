@@ -1,7 +1,6 @@
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms.fields import (DateField, IntegerField, SelectField, StringField,
-                            SubmitField)
+from wtforms.fields import DateField, IntegerField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
 from labbase2.forms import rendering

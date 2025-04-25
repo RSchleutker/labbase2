@@ -1,5 +1,5 @@
 from labbase2 import models
-from labbase2.models import db
+from labbase2.database import db
 from sqlalchemy import select, func
 
 

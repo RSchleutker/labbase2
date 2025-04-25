@@ -6,7 +6,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import and_, func, select
 from sqlalchemy.exc import IntegrityError
 
-from labbase2.models import Oligonucleotide, db
+from labbase2.database import db
+from labbase2.models import Oligonucleotide
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment

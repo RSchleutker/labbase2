@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2.models import db
+from labbase2.database import db
 
 __all__ = ["ImportJob", "ColumnMapping"]
 

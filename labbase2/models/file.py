@@ -9,7 +9,7 @@ from skimage.transform import resize
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from labbase2.models import db
+from labbase2.database import db
 
 __all__ = ["BaseFile", "EntityFile"]
 

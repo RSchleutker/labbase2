@@ -3,9 +3,14 @@ from wtforms.fields import PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional
 
 from labbase2.forms import rendering
-from labbase2.forms.validators import (AllASCII, ContainsLower,
-                                       ContainsNotSpace, ContainsNumber,
-                                       ContainsSpecial, ContainsUpper)
+from labbase2.forms.validators import (
+    AllASCII,
+    ContainsLower,
+    ContainsNotSpace,
+    ContainsNumber,
+    ContainsSpecial,
+    ContainsUpper,
+)
 
 __all__ = ["ChangePassword"]
 

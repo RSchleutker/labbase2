@@ -5,7 +5,8 @@ from flask_login import current_user
 from sqlalchemy import Column, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2.models import db, mixins
+from labbase2.database import db
+from labbase2.models import mixins
 
 __all__ = ["BaseEntity"]
 

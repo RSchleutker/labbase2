@@ -4,7 +4,8 @@ from typing import Callable
 from flask import flash, redirect, url_for
 from flask_login import current_user
 
-from labbase2.models import Permission, db
+from labbase2.database import db
+from labbase2.models import Permission
 
 __all__ = ["permission_required"]
 

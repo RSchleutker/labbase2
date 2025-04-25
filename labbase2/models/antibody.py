@@ -3,7 +3,8 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2.models import db, mixins
+from labbase2.database import db
+from labbase2.models import mixins
 from labbase2.models.consumable import Consumable
 
 __all__ = ["Antibody", "Dilution"]

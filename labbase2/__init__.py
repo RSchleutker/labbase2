@@ -7,7 +7,8 @@ from flask import Flask
 from sqlalchemy import func, select
 
 from labbase2 import logging, views
-from labbase2.models import Permission, User, db, events
+from labbase2.database import db
+from labbase2.models import Permission, User, events
 from labbase2.models.user import login_manager
 from labbase2.utils import template_filters
 
