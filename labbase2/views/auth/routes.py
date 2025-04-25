@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import DataError
 
 from labbase2.database import db
-from labbase2.models import BaseFile, Permission, ResetPassword, User
+from labbase2.models import BaseFile, Permission, ResetPassword, User, Group
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.routes import upload_file
 
@@ -100,7 +100,7 @@ def logout() -> str | Response:
 
 @bp.route("/register", methods=["GET", "POST"])
 @login_required
-@permission_required("Manage users")
+@permission_required("register-user")
 def register():
     form = RegisterForm()
 
@@ -227,7 +227,7 @@ def change_password(key: Optional[str] = None):
 @bp.route("/change-permissions", methods=["GET"], defaults={"id_": None})
 @bp.route("/change-permissions/<int:id_>", methods=["GET", "POST"])
 @login_required
-@permission_required("Manage users")
+@permission_required("change-group")
 def change_permissions(id_: int = None):
     users = db.session.scalars(
         select(User).where(User.is_active).order_by(User.last_name, User.first_name)
@@ -265,38 +265,42 @@ def change_permissions(id_: int = None):
 
 @bp.route("/change-admin-status/<int:id_>", methods=["GET"])
 @login_required
-@permission_required("Manage users")
+@permission_required("change-group")
 def change_admin_status(id_: int):
     user = db.session.get(User, id_)
+    admin_group = db.session.get(Group, "admin")
 
     if user is None:
         flash(f"No user with ID {id_})!", "danger")
+        return redirect(url_for(".users"))
+
+    if admin_group in user.groups:
+        user.groups.remove(admin_group)
     else:
-        user.is_admin = not user.is_admin
+        user.groups.append(admin_group)
 
-        try:
-            db.session.commit()
-        except Exception as error:
-            db.session.rollback()
-            flash(str(error), "danger")
-        else:
-            flash(f"Successfully changed admin setting for {user.username}!", "success")
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        flash(str(error), "danger")
+    else:
+        flash(f"Successfully changed admin setting for {user.username}!", "success")
 
-    user_count_stm = select(func.count()).select_from(User).where(User.is_admin)
+    user_count_stm = (
+        select(func.count()).select_from(User).join(User.groups).where(Group.name == "admin")
+    )
     if db.session.scalar(user_count_stm) == 0:
         flash("No user with admin rights! Reverting previous change!", "warning")
         user.is_admin = True
         db.session.commit()
 
-    if request.referrer is None:
-        return redirect(url_for(".users"))
-
-    return redirect(request.referrer)
+    return redirect(url_for(".users"))
 
 
 @bp.route("/change-active-status/<int:id_>", methods=["GET"])
 @login_required
-@permission_required("Manage users")
+@permission_required("inactivate-user")
 def change_active_status(id_: int):
     user = db.session.get(User, id_)
 
@@ -327,7 +331,7 @@ def change_active_status(id_: int):
 
 @bp.route("/reset-password/<int:id_>", methods=["GET"])
 @login_required
-@permission_required("Manage users")
+@permission_required("reset-password")
 def create_password_reset(id_: int):
     user = db.session.get(User, id_)
 
@@ -360,6 +364,7 @@ def create_password_reset(id_: int):
 
 @bp.route("/users", methods=["GET"])
 @login_required
+@permission_required("view-user")
 def users():
     entities = db.session.scalars(
         select(User).order_by(

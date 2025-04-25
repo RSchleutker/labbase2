@@ -1,5 +1,3 @@
-from http.client import responses
-
 from flask import url_for
 from flask_login import current_user, login_user
 from sqlalchemy import select, func
@@ -215,6 +213,7 @@ def test_remove_only_admin(app, client):
 def test_make_user_admin(app, client):
     with app.app_context(), app.test_request_context(), client:
         admin = db.session.get(models.User, 1)
+        group = db.session.get(models.Group, "admin")
         user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
         user.set_password("TestPassword")
         db.session.add(user)
@@ -227,14 +226,15 @@ def test_make_user_admin(app, client):
         assert response.status_code == 200
         assert b"Successfully changed admin setting for" in response.data
         assert b"No user with admin rights! Reverting previous change!" not in response.data
-        assert user.is_admin
+        assert group in admin.groups
 
 
 def test_remove_admin_from_user(app, client):
     with app.app_context(), app.test_request_context(), client:
         admin = db.session.get(models.User, 1)
+        group = db.session.get(models.Group, "admin")
         user = models.User(first_name="Maja", last_name="Musterfrau", email="test2@test.de")
-        user.is_admin = True
+        user.groups.append(group)
         user.set_password("TestPassword")
         db.session.add(user)
         db.session.commit()
@@ -246,7 +246,7 @@ def test_remove_admin_from_user(app, client):
         assert response.status_code == 200
         assert b"Successfully changed admin setting for" in response.data
         assert b"No user with admin rights! Reverting previous change!" not in response.data
-        assert not user.is_admin
+        assert group not in user.groups
 
 
 # TODO Test auth.change_password

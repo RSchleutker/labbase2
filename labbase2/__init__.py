@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 
 from labbase2 import logging, views
 from labbase2.database import db
-from labbase2.models import Permission, User, events
+from labbase2.models import Permission, User, Group, events
 from labbase2.models.user import login_manager
 from labbase2.utils import template_filters
 
@@ -71,6 +71,7 @@ def create_app(
 
     # Create/update permissions from the config.
     _set_up_permissions(app=app)
+    _set_up_groups(app=app)
 
     # If no user with admin rights is in the database, create one.
     _set_up_admin(app=app)
@@ -108,6 +109,21 @@ def _set_up_permissions(app: Flask):
                 db.session.add(Permission(name=name, description=description))
             else:
                 permission.description = description
+
+        db.session.commit()
+
+
+def _set_up_groups(app: Flask):
+    with app.app_context():
+        if not db.session.get(Group, "admin"):
+            group = Group(name="admin")
+            group.permissions = db.session.scalars(select(Permission)).all()
+            db.session.add(group)
+            db.session.commit()
+        if not db.session.get(Group, "user"):
+            group = Group(name="user")
+            group.permissions = [db.session.get(Permission, "add-comment")]
+            db.session.add(group)
             db.session.commit()
 
 
@@ -119,31 +135,31 @@ def _set_up_admin(app: Flask):
         admin_count = (
             select(func.count())  # pylint: disable=not-callable
             .select_from(User)
-            .where(User.is_active & User.is_admin)
+            .join(User.groups)
+            .where(User.is_active, Group.name == "admin")
         )
 
         if db.session.scalar(user_count) == 0:
             app.logger.info("No user in database; create admin as specified in config.")
-            admin = User(first_name=first, last_name=last, email=email, is_admin=True)
+            admin = User(first_name=first, last_name=last, email=email)
             admin.set_password("admin")
-            admin.permissions = db.session.scalars(select(Permission)).all()
             db.session.add(admin)
+            db.session.commit()
+            admin.groups.append(db.session.get(Group, "admin"))
+            admin.groups.append(db.session.get(Group, "user"))
+            db.session.commit()
         elif db.session.scalar(admin_count) == 0:
-            app.logger.info(
-                "No active user with admin rights; trying to re-activate admin specified in config."
-            )
+            app.logger.info("No active user with admin rights; Re-activate admin.")
             admin = db.session.scalars(select(User).where(User.email == email)).first()
             if admin is not None:
-                app.logger.info("Re-activated initial admin '%s' from config.", admin.username)
-                admin.is_admin = True
-                admin.is_active = True
+                app.logger.info("Re-activated admin: %s", admin.username)
+                admin.groups.append(db.session.get(Group, "admin"))
             else:
-                app.logger.info(
-                    "Did not find admin user specified in config; create an admin from config."
-                )
+                app.logger.info("Did not find admin, create an admin from config.")
                 admin = User(first_name=first, last_name=last, email=email, is_admin=True)
                 admin.set_password("admin")
-                admin.permissions = db.session.scalars(select(Permission)).all()
+                admin.groups.append(db.session.get(Group, "admin"))
+                admin.groups.append(db.session.get(Group, "user"))
                 db.session.add(admin)
 
         try:

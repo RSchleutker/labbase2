@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from labbase2.database import db
 from labbase2.models.mixins import Export
 
-__all__ = ["login_manager", "User", "Permission", "user_permissions", "ResetPassword"]
+__all__ = ["login_manager", "User", "Group", "Permission", "user_permissions", "ResetPassword"]
 
 
 login_manager = LoginManager()
@@ -18,10 +18,15 @@ login_manager.login_view = "auth.login"
 login_manager.login_message_category = "warning"
 
 
-# Map users to their roles in a many-to-many relationship.
-user_permissions = db.Table(
-    "user_permissions",
+user_groups = db.Table(
+    "user_groups",
     Column("user_id", ForeignKey("user.id"), primary_key=True),
+    Column("group_id", ForeignKey("group.name"), primary_key=True),
+)
+
+group_permissions = db.Table(
+    "group_permissions",
+    Column("group_id", ForeignKey("group.name"), primary_key=True),
     Column("permission_id", ForeignKey("permission.name"), primary_key=True),
 )
 
@@ -171,8 +176,8 @@ class User(db.Model, UserMixin, Export):
     )
 
     # Many-to-many relationships.
-    permissions: Mapped[list["Permission"]] = relationship(
-        secondary=user_permissions, lazy="subquery", backref=db.backref("users", lazy=True)
+    groups: Mapped[list["Group"]] = relationship(
+        secondary=user_groups, lazy="subquery", backref=db.backref("users", lazy=True)
     )
 
     @hybrid_property
@@ -236,12 +241,12 @@ class User(db.Model, UserMixin, Export):
 
         return check_password_hash(self.password_hash, password)
 
-    def has_permission(self, permission: str) -> bool:
-        permission_db = db.session.get(Permission, permission)
-        if permission_db is None:
-            raise ValueError(f"Unknown permission '{permission}'!")
+    def has_permission(self, permission: "Permission") -> bool:
+        for group in self.groups:
+            if permission in group.permissions:
+                return True
 
-        return permission_db in self.permissions
+        return False
 
     @classmethod
     def generate_password(cls) -> str:
@@ -266,8 +271,20 @@ class Permission(db.Model, Export):
 
     __tablename__: str = "permission"
 
-    name: Mapped[str] = mapped_column(String(32), primary_key=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(64), primary_key=True)
     description: Mapped[str] = mapped_column(String(512), nullable=True)
+
+
+class Group(db.Model, Export):
+
+    __tablename__: str = "group"
+
+    name: Mapped[str] = mapped_column(String(32), primary_key=True)
+    description: Mapped[str] = mapped_column(nullable=True)
+
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=group_permissions, lazy="subquery", backref=db.backref("groups", lazy=True)
+    )
 
 
 class ResetPassword(db.Model):
