@@ -1,7 +1,6 @@
 from flask import render_template
 from flask_wtf import FlaskForm
-from wtforms.fields import (BooleanField, Field, IntegerField, SelectField,
-                            StringField, SubmitField)
+from wtforms.fields import BooleanField, Field, IntegerField, SelectField, StringField, SubmitField
 from wtforms.validators import NumberRange, Optional
 
 from . import filters, rendering

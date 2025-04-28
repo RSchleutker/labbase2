@@ -314,4 +314,4 @@ def _load_user(id_: str) -> User | None:
         print(f"Invalid ID provided: {id}")
         return None
 
-    return User.query.get(id_)
+    return db.session.get(User, id_)
