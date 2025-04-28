@@ -1,8 +1,7 @@
 import pandas as pd
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Mapped
-
-from labbase2.models import db
+from labbase2.database import db
 
 __all__ = ["Importer"]
 
@@ -109,6 +108,18 @@ class Importer:
         """
 
         return {k: v for k, v in rec.items() if not pd.isnull(v)}
+
+    # @classmethod
+    # def import_form(cls, columns: list, *args, **kwargs) -> ImportEntity:
+    #     data = {'mappings': len(columns) * [[]]}
+    #
+    #     form = ImportEntity(clss=cls.__name__, data=data, *args, **kwargs)
+    #
+    #     for column, field in zip(columns, form.mappings):
+    #         field.label = column
+    #         field.choices += cls.import_attr
+    #
+    #     return form
 
     @staticmethod
     def process_formdata(data: dict) -> dict:

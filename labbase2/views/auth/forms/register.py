@@ -6,9 +6,14 @@ from wtforms.fields import PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 from labbase2.forms import rendering
-from labbase2.forms.validators import (AllASCII, ContainsLower,
-                                       ContainsNotSpace, ContainsNumber,
-                                       ContainsSpecial, ContainsUpper)
+from labbase2.forms.validators import (
+    AllASCII,
+    ContainsLower,
+    ContainsNotSpace,
+    ContainsNumber,
+    ContainsSpecial,
+    ContainsUpper,
+)
 
 __all__ = ["RegisterForm"]
 

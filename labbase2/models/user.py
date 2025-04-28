@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from labbase2.database import db
 from labbase2.models.mixins import Export
 
-__all__ = ["login_manager", "User", "Group", "Permission", "user_permissions", "ResetPassword"]
+__all__ = ["login_manager", "User", "Group", "Permission", "ResetPassword"]
 
 
 login_manager = LoginManager()
