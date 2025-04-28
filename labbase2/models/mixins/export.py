@@ -1,8 +1,8 @@
 import io
 from datetime import date
 
+import pandas as pd
 from flask import send_file
-from pandas import DataFrame
 from sqlalchemy import inspect
 
 from labbase2.models import db
@@ -27,16 +27,42 @@ class Export:
         return {c.key: getattr(self, c.key) for c in inst}
 
     @classmethod
-    def to_df(cls, instances) -> DataFrame:
+    def to_df(cls, instances: list[db.Model]) -> pd.DataFrame:
+        """Create a pandas dataframe from a list of instances
+
+        Parameters
+        ----------
+        instances: list[db.Model]
+
+        Returns
+        -------
+        pd.DataFrame
+            A pandas dataframe. Each row reprsents one row in the database, which
+            usually consists of joined tables to fully represent the respective
+            instance.
+        """
+
         instances = db.session.scalars(instances)
-        return DataFrame(i.to_dict() for i in instances)
+        return pd.DataFrame(i.to_dict() for i in instances)
 
     @classmethod
     def _filename(cls) -> str:
         return cls.__name__ + "_" + date.today().isoformat()
 
     @classmethod
-    def export_to_csv(cls, instances):
+    def export_to_csv(cls, instances: list[db.Model]):
+        """Export a list of database model instances to CSV
+
+        Parameters
+        ----------
+        instances: list[db.Model]
+
+
+        Returns
+        -------
+        None
+        """
+
         with io.StringIO() as proxy:
             cls.to_df(instances).to_csv(proxy)
             mem = io.BytesIO(proxy.getvalue().encode("utf-8"))
@@ -50,6 +76,18 @@ class Export:
 
     @classmethod
     def export_to_json(cls, instances):
+        """Export a list of database model instances to JSON
+
+        Parameters
+        ----------
+        instances: list[db.Model]
+
+
+        Returns
+        -------
+        None
+        """
+
         with io.StringIO() as proxy:
             cls.to_df(instances).to_json(proxy, orient="records", date_format="iso", indent=2)
             mem = io.BytesIO(proxy.getvalue().encode("utf-8"))
@@ -63,8 +101,27 @@ class Export:
 
     @classmethod
     def to_pdf(cls, instances):
+        """Export a list of database model instances to PDF
+
+        Parameters
+        ----------
+        instances: list[db.Model]
+
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method is not implemented yet. Nevertheless, it returns an empty file.
+        """
+
         mem = io.BytesIO()
         mem.seek(0)
+
+        for instance in instances:
+            pass
 
         return send_file(
             mem,

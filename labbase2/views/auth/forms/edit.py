@@ -6,7 +6,7 @@ from wtforms.fields import (FileField, PasswordField, SelectField, StringField,
                             SubmitField)
 from wtforms.validators import DataRequired, Email, Length
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 
 __all__ = ["EditUserForm"]
 
@@ -32,18 +32,18 @@ class EditUserForm(FlaskForm):
     first_name = StringField(
         label="First name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=render.custom_field | {"placeholder": "First name"},
+        render_kw=rendering.custom_field | {"placeholder": "First name"},
         description="You given name. You may use initials for middle names.",
     )
     last_name = StringField(
         label="Last name",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=render.custom_field | {"placeholder": "First name"},
+        render_kw=rendering.custom_field | {"placeholder": "First name"},
     )
     email = StringField(
         label="E-Mail Address",
         validators=[DataRequired(), Email(), Length(max=128)],
-        render_kw=render.custom_field
+        render_kw=rendering.custom_field
         | {"id": "register-form-email", "placeholder": "Email Address"},
         description="The university email address.",
     )
@@ -52,18 +52,18 @@ class EditUserForm(FlaskForm):
         choices=[(tz, tz) for tz in sorted(zoneinfo.available_timezones())],
         default=lambda: current_app.config["DEFAULT_TIMEZONE"],
         validators=[DataRequired()],
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="Select the timezone in which times shall be displayed for you.",
     )
     file = FileField(
         "Picture",
-        render_kw=render.file_field,
+        render_kw=rendering.file_field,
         description="Ideally use a portrait with 1:1 aspect ratio.",
     )
     password = PasswordField(
         "Password",
         validators=[DataRequired()],
-        render_kw=render.custom_field | {"placeholder": "Password"},
+        render_kw=rendering.custom_field | {"placeholder": "Password"},
         description="Verify your password.",
     )
-    submit = SubmitField(label="Submit", render_kw=render.submit_field)
+    submit = SubmitField(label="Submit", render_kw=rendering.submit_field)

@@ -24,7 +24,9 @@ bp = Blueprint("imports", __name__, url_prefix="/imports", template_folder="temp
 @bp.route("/", methods=["GET"])
 @login_required
 def index():
-    return render_template("imports/main.html", title="Pending imports", jobs=current_user.import_jobs)
+    return render_template(
+        "imports/main.html", title="Pending imports", jobs=current_user.import_jobs
+    )
 
 
 @bp.route("/upload/<string:type_>", methods=["POST"])
@@ -161,7 +163,9 @@ def execute(id_: int):
             return redirect(request.referrer)
 
     mappings = db.session.scalars(
-        select(ColumnMapping).where(ColumnMapping.job_id == job.id & ColumnMapping.input_column.isnot(None))
+        select(ColumnMapping).where(
+            ColumnMapping.job_id == job.id & ColumnMapping.input_column.isnot(None)
+        )
     )
     fields = [mapping.mapped_field for mapping in mappings]
     colmns = [mapping.input_column for mapping in mappings]

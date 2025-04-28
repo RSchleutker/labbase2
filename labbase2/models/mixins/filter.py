@@ -1,6 +1,5 @@
 from sqlalchemy import asc, desc, select
-
-from labbase2.models import db
+from sqlalchemy.sql.selectable import Select
 
 __all__ = ["Filter"]
 
@@ -19,7 +18,7 @@ class Filter:
     """
 
     @classmethod
-    def filter_(cls, order_by: str, ascending: bool = True, **fields):
+    def filter_(cls, order_by: str, ascending: bool = True, **fields) -> Select:
         """Create a query object to retrieve matching rows from the database.
 
         Parameters
@@ -36,8 +35,8 @@ class Filter:
 
         Returns
         -------
-        query
-            An SQLAlchemy query object. Can be either further customized by adding
+        Select
+            An SQLAlchemy Select object. Can be either further customized by adding
             additional query parameters or be used to retrieve matching instances
             from the database.
         """
@@ -52,7 +51,9 @@ class Filter:
                 query = query.join(join, isouter=True)
 
         return (
-            query.options(*cls._options()).where(*cls._filters(**fields)).order_by(*cls._order_by(order_by, ascending))
+            query.options(*cls._options())
+            .where(*cls._filters(**fields))
+            .order_by(*cls._order_by(order_by, ascending))
         )
 
     @classmethod
@@ -72,9 +73,8 @@ class Filter:
                 filters.append(attr.is_(None))
             elif value == "any":
                 filters.append(attr.isnot(None))
-            elif value == "all" or value == 0:
+            elif value in ("all", 0):
                 continue
-            # TODO: Improve full-text search (FTS5?)
             elif field == "description":
                 value = [f"%{v.strip()}%" for v in value.split()]
                 filters += [attr.ilike(v) for v in value]

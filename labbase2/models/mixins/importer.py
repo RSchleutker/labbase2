@@ -1,5 +1,8 @@
 import pandas as pd
-from sqlalchemy import inspect
+from sqlalchemy import inspect, select
+from sqlalchemy.orm import Mapped
+
+from labbase2.models import db
 
 __all__ = ["Importer"]
 
@@ -33,7 +36,15 @@ class Importer:
                 setattr(self, attr, value)
 
     @classmethod
-    def importable_fields(cls) -> list:
+    def importable_fields(cls) -> list[Mapped]:
+        """Get a list of all importable columns
+
+        Returns
+        -------
+        list[Mapped]
+            A list of mapped columns that have been tagged as importable.
+        """
+
         fields = []
         for column in inspect(cls).columns:
             if column.info.get("importable", False):
@@ -42,19 +53,31 @@ class Importer:
 
     @classmethod
     def from_record(cls, rec: dict, update: bool = False):
+        """Create a class instance from a dict
+
+        Parameters
+        ----------
+        rec: dict
+        update: bool
+
+        Returns
+        -------
+        cls
+            An instance of this class
+        """
 
         rec = cls.process_record(rec=rec)
 
         if update:
             if id_ := rec.pop("id", None):
-                entity = cls.query.get(id_)
+                entity = db.session.get(cls, id_)
             elif label := rec.pop("label", None):
-                entity = cls.query.filter(cls.label == label).first()
+                entity = db.session.scalar(select(cls).where(cls.label == label))
             else:
                 entity = None
 
             if not entity:
-                return
+                return None
 
             for key in rec:
                 if key in cls.not_updatable:
@@ -72,19 +95,20 @@ class Importer:
 
     @classmethod
     def process_record(cls, rec: dict) -> dict:
-        return {k: v for k, v in rec.items() if not pd.isnull(v)}
+        """Process a row of pd.DataFrame represented as a dict
 
-    # @classmethod
-    # def import_form(cls, columns: list, *args, **kwargs) -> ImportEntity:
-    #     data = {'mappings': len(columns) * [[]]}
-    #
-    #     form = ImportEntity(clss=cls.__name__, data=data, *args, **kwargs)
-    #
-    #     for column, field in zip(columns, form.mappings):
-    #         field.label = column
-    #         field.choices += cls.import_attr
-    #
-    #     return form
+        Parameters
+        ----------
+        rec: dict
+
+        Returns
+        -------
+        dict
+            A dict with all entries remove where the value returns `True` for
+            `pd.isnull`.
+        """
+
+        return {k: v for k, v in rec.items() if not pd.isnull(v)}
 
     @staticmethod
     def process_formdata(data: dict) -> dict:

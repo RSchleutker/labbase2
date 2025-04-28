@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms.fields import SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.filters import strip_input
 
 __all__ = ["EditDilution"]
@@ -31,19 +31,19 @@ class EditDilution(FlaskForm):
             ("western blot", "Western blot"),
             ("immunoprecipitation", "Immunoprecipitation"),
         ],
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
     )
     dilution = StringField(
         label="Dilution",
         validators=[DataRequired(), Length(max=32)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Dilution"},
+        render_kw=rendering.custom_field | {"placeholder": "Dilution"},
     )
     reference = TextAreaField(
         label="Reference",
         validators=[DataRequired(), Length(max=2048)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"rows": 8},
+        render_kw=rendering.custom_field | {"rows": 8},
         description="Give a short description of the sample and condition you used.",
     )
-    submit = SubmitField(label="Submit", render_kw=render.submit_field)
+    submit = SubmitField(label="Submit", render_kw=rendering.submit_field)

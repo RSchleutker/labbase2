@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms.fields import PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length, Optional
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.validators import (AllASCII, ContainsLower,
                                        ContainsNotSpace, ContainsNumber,
                                        ContainsSpecial, ContainsUpper)
@@ -24,7 +24,7 @@ class ChangePassword(FlaskForm):
             ContainsNotSpace(),
             AllASCII(),
         ],
-        render_kw=render.custom_field | {"placeholder": "new password"},
+        render_kw=rendering.custom_field | {"placeholder": "new password"},
         description="""
         Minimum 12 characters. Contains lower- and uppercase characters. Contains at 
         least 1 number. Contains a special character. Does not contain spaces. Only 
@@ -34,11 +34,11 @@ class ChangePassword(FlaskForm):
     new_password2 = PasswordField(
         "Repeat new password",
         validators=[DataRequired(), EqualTo("new_password")],
-        render_kw=render.custom_field | {"placeholder": "repeat new password"},
+        render_kw=rendering.custom_field | {"placeholder": "repeat new password"},
     )
     old_password = PasswordField(
         "Old password",
         validators=[Optional()],
-        render_kw=render.custom_field | {"placeholder": "old password"},
+        render_kw=rendering.custom_field | {"placeholder": "old password"},
     )
-    submit = SubmitField("Submit", render_kw=render.submit_field)
+    submit = SubmitField("Submit", render_kw=rendering.submit_field)

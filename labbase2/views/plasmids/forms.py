@@ -1,7 +1,7 @@
 from wtforms.fields import DateField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, Optional
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.models import User
@@ -33,14 +33,14 @@ class FilterPlasmids(FilterForm):
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Label"},
+        render_kw=rendering.custom_field | {"placeholder": "Label"},
         description="The label, i.e. the name of the entity.",
     )
     insert = StringField(
         label="Insert",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "aka"},
+        render_kw=rendering.custom_field | {"placeholder": "aka"},
         description="""
         The construct that was inserted into the vector. The search is case
         insensitive.
@@ -50,7 +50,7 @@ class FilterPlasmids(FilterForm):
         label="Vector",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "pUASt-attB"},
+        render_kw=rendering.custom_field | {"placeholder": "pUASt-attB"},
         description="The vector, i.e., the backbone of the plasmid.",
     )
     owner_id = SelectField(
@@ -59,14 +59,14 @@ class FilterPlasmids(FilterForm):
         choices=[(0, "All")],
         default=0,
         coerce=int,
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="The owner of the primer.",
     )
     description = StringField(
         label="Description",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "anne uv flyfos"},
+        render_kw=rendering.custom_field | {"placeholder": "anne uv flyfos"},
         description="""
         A whitespace separated list of tags in the description of the plasmid. For 
         instance, "anne uv flyfos" finds all plasmids with a description that 
@@ -84,7 +84,6 @@ class FilterPlasmids(FilterForm):
         users = User.query.with_entities(User.id, User.username).order_by(User.username).all()
         self.owner_id.choices += users
 
-    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -118,28 +117,28 @@ class EditPlasmid(EditEntityForm):
         label="Insert",
         validators=[DataRequired(), Length(max=128)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Insert"},
+        render_kw=rendering.custom_field | {"placeholder": "Insert"},
     )
     vector = StringField(
         label="Vector",
         validators=[Optional(), Length(max=256)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Vector"},
+        render_kw=rendering.custom_field | {"placeholder": "Vector"},
     )
     cloning_date = DateField(
         label="Cloning date",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     description = TextAreaField(
         label="Description",
         validators=[Optional(), Length(max=1024)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Description", "rows": 4},
+        render_kw=rendering.custom_field | {"placeholder": "Description", "rows": 4},
     )
     reference = StringField(
         label="Reference",
         validators=[Optional(), Length(max=512)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Reference"},
+        render_kw=rendering.custom_field | {"placeholder": "Reference"},
     )

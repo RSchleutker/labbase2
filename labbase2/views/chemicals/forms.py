@@ -2,7 +2,7 @@ from sqlalchemy import func
 from wtforms.fields import DecimalField, IntegerField, SelectField, StringField
 from wtforms.validators import NumberRange, Optional
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import EditEntityForm, FilterForm
 from labbase2.models import Chemical, User
@@ -29,7 +29,7 @@ class FilterChemical(FilterForm):
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Label"},
+        render_kw=rendering.custom_field | {"placeholder": "Label"},
         description="The label, i.e. the name of the entity.",
     )
     owner_id = SelectField(
@@ -37,13 +37,13 @@ class FilterChemical(FilterForm):
         choices=[(0, "All")],
         default=0,
         coerce=int,
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
     )
     order_by = SelectField(
         label="Order by",
         choices=[("label", "Label"), ("id", "ID"), ("order_date", "Order date")],
         default="label",
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="The column by which the results shall be ordered.",
     )
 
@@ -59,7 +59,6 @@ class FilterChemical(FilterForm):
         )
         self.owner_id.choices += user
 
-    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -85,13 +84,13 @@ class EditChemical(EditEntityForm):
     molecular_weight = DecimalField(
         "Molecular Weight",
         validators=[Optional(), NumberRange(min=0)],
-        render_kw=render.custom_field | {"placeholder": "Molecular weight"},
+        render_kw=rendering.custom_field | {"placeholder": "Molecular weight"},
     )
     owner_id = SelectField(
         "User",
         choices=[(0, "All")],
         coerce=int,
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
     )
 
     def __init__(self, *args, **kwargs):

@@ -12,7 +12,8 @@ from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 
-from .forms import EditOligonucleotide, FilterOligonucleotide, FindOligonucleotide
+from .forms import (EditOligonucleotide, FilterOligonucleotide,
+                    FindOligonucleotide)
 from .lcsfinder import LCSFinder
 
 __all__ = ["bp"]

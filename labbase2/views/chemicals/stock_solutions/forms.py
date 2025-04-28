@@ -4,7 +4,7 @@ from wtforms.fields import (DateField, IntegerField, SelectField, StringField,
                             SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, Length, Optional
 
-from labbase2.forms import FilterForm, render
+from labbase2.forms import FilterForm, rendering
 from labbase2.forms.filters import strip_input
 from labbase2.models import Chemical, User
 
@@ -15,31 +15,31 @@ class FilterStockSolution(FilterForm):
     id = IntegerField(
         "ID",
         validators=[Optional()],
-        render_kw=render.custom_field | {"placeholder": "ID"},
+        render_kw=rendering.custom_field | {"placeholder": "ID"},
     )
     label = StringField(
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Label"},
+        render_kw=rendering.custom_field | {"placeholder": "Label"},
         description="The label, i.e. the name of the entity.",
     )
     responsible_id = SelectField(
         "Responsible",
         choices=[(0, "All")],
         coerce=int,
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
     )
     solvent = StringField(
         "Solvent",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "ddH2O"},
+        render_kw=rendering.custom_field | {"placeholder": "ddH2O"},
     )
     storage_place = StringField(
         "Storage place",
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Freezer..."},
+        render_kw=rendering.custom_field | {"placeholder": "Freezer..."},
     )
     order_by = SelectField(
         label="Order by",
@@ -50,7 +50,7 @@ class FilterStockSolution(FilterForm):
             ("solvent", "Solvent"),
         ],
         default="label",
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="The column by which the results shall be ordered.",
     )
 
@@ -66,7 +66,6 @@ class FilterStockSolution(FilterForm):
         )
         self.responsible_id.choices += user
 
-    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -85,32 +84,32 @@ class EditStockSolution(FlaskForm):
         label="Solvent",
         validators=[DataRequired(), Length(max=64)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Solvent"},
+        render_kw=rendering.custom_field | {"placeholder": "Solvent"},
     )
     concentration = StringField(
         label="Concentration",
         validators=[DataRequired(), Length(max=32)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Concentration"},
+        render_kw=rendering.custom_field | {"placeholder": "Concentration"},
     )
     storage_place = StringField(
         label="Storage Location",
         validators=[DataRequired(), Length(max=64)],
-        render_kw=render.custom_field | {"placeholder": "Storage location"},
+        render_kw=rendering.custom_field | {"placeholder": "Storage location"},
     )
     date_created = DateField(
         "Created",
         validators=[DataRequired()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     date_emptied = DateField(
         "Emptied at",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     details = TextAreaField(
         label="Concentration",
         validators=[Optional(), Length(max=2048)],
-        render_kw=render.custom_field | {"placeholder": "Further details...", "size": 8},
+        render_kw=rendering.custom_field | {"placeholder": "Further details...", "size": 8},
     )
-    submit = SubmitField(label="Submit", render_kw=render.submit_field)
+    submit = SubmitField(label="Submit", render_kw=rendering.submit_field)

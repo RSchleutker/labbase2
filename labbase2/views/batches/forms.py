@@ -3,7 +3,7 @@ from wtforms.fields import (DateField, DecimalField, IntegerField, SelectField,
                             StringField, SubmitField)
 from wtforms.validators import DataRequired, Length, NumberRange, Optional
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.filters import strip_input
 from labbase2.forms.forms import FilterForm
 from labbase2.models import Batch
@@ -15,13 +15,13 @@ class FilterBatch(FilterForm):
     id = IntegerField(
         "ID",
         validators=[Optional()],
-        render_kw=render.custom_field | {"placeholder": "Batch ID"},
+        render_kw=rendering.custom_field | {"placeholder": "Batch ID"},
     )
     label = StringField(
         label="Label",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Name of consumable."},
+        render_kw=rendering.custom_field | {"placeholder": "Name of consumable."},
         description="The label, i.e. the name of the consumable.",
     )
     consumable_type = SelectField(
@@ -32,7 +32,7 @@ class FilterBatch(FilterForm):
             ("chemical", "Chemical"),
             ("enzyme", "Enzyme"),
         ],
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="""
         Batches can be added for all kinds of consumables like antibodies, chemicals,
         or enzmyes. This field allows  to select only batches of a certain type.
@@ -41,14 +41,14 @@ class FilterBatch(FilterForm):
     supplier = SelectField(
         "Supplier",
         choices=[("", "All")],
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="The supplier from which the batch was ordered.",
     )
     lot = StringField(
         "Lot",
         validators=[Optional()],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Lot#"},
+        render_kw=rendering.custom_field | {"placeholder": "Lot#"},
         description="""
         Batches have a field for lot numbers. This is usually only necessary 
         for batches of antibodies.
@@ -62,7 +62,7 @@ class FilterBatch(FilterForm):
             ("not_empty", "Non-empty only"),
         ],
         default="all",
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="""
         Batches can be marked as empty once it was used up. However, 
         empty batches are kept in the database. This field allows to search 
@@ -73,7 +73,7 @@ class FilterBatch(FilterForm):
         "In use",
         choices=[("all", "All"), ("in_use", "In use"), ("not_in_use", "Not in use")],
         default="all",
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
     )
     order_by = SelectField(
         label="Order by",
@@ -85,7 +85,7 @@ class FilterBatch(FilterForm):
             ("ordered", "Ordered"),
         ],
         default="label",
-        render_kw=render.select_field,
+        render_kw=rendering.select_field,
         description="The column by which the results shall be ordered.",
     )
 
@@ -98,7 +98,6 @@ class FilterBatch(FilterForm):
         )
         self.supplier.choices += supplier
 
-    @property
     def fields(self) -> list:
         return [
             self.id,
@@ -146,56 +145,56 @@ class EditBatch(FlaskForm):
         "Supplier",
         validators=[DataRequired(), Length(max=64)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Supplier"},
+        render_kw=rendering.custom_field | {"placeholder": "Supplier"},
     )
     article_number = StringField(
         "Article number",
         validators=[Optional(), Length(max=32)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Article number"},
+        render_kw=rendering.custom_field | {"placeholder": "Article number"},
     )
     amount = StringField(
         "Amount",
         validators=[Optional(), Length(max=32)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Amount"},
+        render_kw=rendering.custom_field | {"placeholder": "Amount"},
     )
     date_ordered = DateField(
         "Ordered",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     date_opened = DateField(
         "Opened",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     date_expiration = DateField(
         "Expiration date",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     date_emptied = DateField(
         "Emptied at",
         validators=[Optional()],
-        render_kw=render.custom_field | {"type": "date"},
+        render_kw=rendering.custom_field | {"type": "date"},
     )
     price = DecimalField(
         "Price",
         validators=[Optional(), NumberRange(min=0)],
-        render_kw=render.custom_field
+        render_kw=rendering.custom_field
         | {"placeholder": "Price (€)", "min": 0, "type": "number", "step": 0.01},
     )
     storage_place = StringField(
         "Storage place",
         validators=[DataRequired(), Length(max=64)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Storage place"},
+        render_kw=rendering.custom_field | {"placeholder": "Storage place"},
     )
     lot = StringField(
         "Lot number",
         validators=[DataRequired(), Length(max=64)],
         filters=[strip_input],
-        render_kw=render.custom_field | {"placeholder": "Lot number"},
+        render_kw=rendering.custom_field | {"placeholder": "Lot number"},
     )
-    submit = SubmitField(label="Submit", render_kw=render.submit_field)
+    submit = SubmitField(label="Submit", render_kw=rendering.submit_field)

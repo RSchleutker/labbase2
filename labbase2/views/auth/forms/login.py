@@ -3,7 +3,7 @@ from wtforms.fields import (BooleanField, PasswordField, StringField,
                             SubmitField)
 from wtforms.validators import DataRequired
 
-from labbase2.forms import render
+from labbase2.forms import rendering
 from labbase2.forms.filters import make_lower, strip_input
 
 
@@ -26,7 +26,7 @@ class LoginForm(FlaskForm):
         "User",
         validators=[DataRequired()],
         filters=[strip_input, make_lower],
-        render_kw=render.custom_field | {"placeholder": "E-mail address"},
+        render_kw=rendering.custom_field | {"placeholder": "E-mail address"},
         description="""
         Enter your E-mail address.
         """,
@@ -34,17 +34,17 @@ class LoginForm(FlaskForm):
     password = PasswordField(
         "Password",
         validators=[DataRequired()],
-        render_kw=render.custom_field | {"placeholder": "Password"},
+        render_kw=rendering.custom_field | {"placeholder": "Password"},
         description="""
         Enter your password.
         """,
     )
     remember_me = BooleanField(
         "Remember me",
-        render_kw=render.boolean_field,
+        render_kw=rendering.boolean_field,
         description="""
         Do you want to be kept logged in until you actively log out or delete
         your browser cache?
         """,
     )
-    submit = SubmitField("Sign In", render_kw=render.submit_field)
+    submit = SubmitField("Sign In", render_kw=rendering.submit_field)
