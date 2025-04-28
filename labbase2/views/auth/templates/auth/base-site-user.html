@@ -14,7 +14,7 @@
                 <ul class="nav flex-column sticky-top my-3">
                     {{ nav.link('auth.edit_user', 'Edit profile') }}
                     {{ nav.link('auth.change_password', 'Change password') }}
-                    {% if current_user.has_permission('Manage users') %}
+                    {% if current_user.has_permission('register-user') %}
                         {{ nav.link('auth.users', 'Manage users') }}
                         {{ nav.link('auth.register', 'Register new user') }}
                     {% endif %}

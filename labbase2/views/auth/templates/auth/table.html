@@ -37,8 +37,7 @@
                            class="btn btn-sm btn-secondary">
                             Activate
                         </a>
-                    {% elif current_user.is_admin or current_user.has_permission
-                        ('Manage users') %}
+                    {% elif current_user.is_admin or current_user.has_permission('register-user') %}
                         <div class="dropdown">
                             <button class="btn btn-sm btn-primary dropdown-toggle"
                                     type="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -23,7 +23,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add glycerol stocks') %}
+                {% if current_user.has_permission('add-glycerol-stock') %}
                     <a class="text-primary ml-2 mr-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-glycerol-stock-{{ stock.id }}">
@@ -78,7 +78,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="flex-grow-1 mb-0">Bacterial stocks</h2>
             <div class="flex-shrink-0">
-                {% if current_user.has_permission('Add glycerol stocks') %}
+                {% if current_user.has_permission('add-glycerol-stock') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"

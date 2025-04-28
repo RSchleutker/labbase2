@@ -11,7 +11,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission("Add chemicals") %}
+                {% if current_user.has_permission("add-chemical") %}
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-chemical-{{ chemical.id }}">

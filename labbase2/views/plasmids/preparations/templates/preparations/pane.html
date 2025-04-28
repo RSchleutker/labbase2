@@ -23,7 +23,7 @@
 
     <div class="flex-shrink-0">
 
-        {% if current_user.has_permission('Add preparations') %}
+        {% if current_user.has_permission('add-preparation') %}
             <a class="text-primary mx-2"
                data-bs-toggle="modal"
                data-bs-target="#modal-edit-preparation-{{ preparation.id }}">
@@ -73,7 +73,7 @@
             <h2 class="flex-grow-1 mb-0">Preparations</h2>
 
             <div class="flex-shrink-0">
-                {% if current_user.has_permission('Add preparations') %}
+                {% if current_user.has_permission('add-preparation') %}
                 <button
                     type="button"
                     class="btn btn-success btn-sm"

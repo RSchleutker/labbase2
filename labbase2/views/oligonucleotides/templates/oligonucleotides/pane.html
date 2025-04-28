@@ -11,7 +11,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add oligonucleotide') %}
+                {% if current_user.has_permission('add-oligonucleotide') %}
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-primer-{{ oligonucleotide.id }}">

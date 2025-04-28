@@ -19,7 +19,7 @@
 
     <div class="flex-shrink-0">
 
-        {% if current_user.has_permission('Add stock solutions') %}
+        {% if current_user.has_permission('add-stock-solution') %}
 
             <a class="text-primary me-2"
                data-bs-toggle="modal"
@@ -70,7 +70,7 @@
             <h2 class="flex-grow-1 mb-0">Stock solutions</h2>
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add stock solutions') %}
+                {% if current_user.has_permission('add-stock-solution') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"

@@ -78,7 +78,7 @@
             <h2 class="flex-grow-1 mb-0">Comments</h2>
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Write comment') %}
+                {% if current_user.has_permission('write-comment') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"

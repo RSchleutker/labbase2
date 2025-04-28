@@ -44,7 +44,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add stock solutions') %}
+                {% if current_user.has_permission('add-stock-solution') %}
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-solution-{{ stock.id }}">

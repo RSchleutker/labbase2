@@ -13,7 +13,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add plasmid') %}
+                {% if current_user.has_permission('add-plasmid') %}
                     <a class="text-primary me-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-plasmid-{{ plasmid.id }}">

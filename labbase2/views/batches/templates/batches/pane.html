@@ -18,7 +18,7 @@
 
     <div class="flex-shrink-0">
 
-        {% if current_user.has_permission('Add consumable batches') %}
+        {% if current_user.has_permission('add-consumable-batch') %}
 
             <a class="text-primary me-2"
                data-bs-toggle="modal"
@@ -80,7 +80,7 @@
             <h2 class="flex-grow-1 mb-0">Batches</h2>
             <div class="flex-shrink-0">
 
-                {% if current_user.has_permission('Add consumable batches') %}
+                {% if current_user.has_permission('add-consumable-batch') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"

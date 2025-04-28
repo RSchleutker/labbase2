@@ -25,7 +25,7 @@
                             <i class="bi bi-info-circle"></i></a>
                     {% endif %}
 
-                    {% if current_user.has_permission('Upload files') %}
+                    {% if current_user.has_permission('upload-file') %}
                         <a class="text-info me-2"
                            href="{{ url_for('files.download', id_=file.id, download=1) }}">
                             <i class="bi bi-download"></i></a>
@@ -70,7 +70,7 @@
             <h2 class="flex-grow-1 mb-0">Files</h2>
 
             <div class="flex-shrink-0">
-                {% if current_user.has_permission('Upload files') %}
+                {% if current_user.has_permission('upload-file') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"

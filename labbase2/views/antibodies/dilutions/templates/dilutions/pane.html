@@ -14,7 +14,7 @@
 
             <div class="flex-shrink-0">
 
-                {% if dilution.user_id == current_user.id and current_user.has_permission("Add dilutions") %}
+                {% if dilution.user_id == current_user.id and current_user.has_permission("add-dilution") %}
                     <a class="text-primary mx-2"
                        data-bs-toggle="modal"
                        data-bs-target="#modal-edit-dilution-{{ dilution.id }}">
@@ -51,7 +51,7 @@
             <h2 class="flex-grow-1 mb-0">Dilutions</h2>
 
             <div class="flex-shrink-0">
-                {% if current_user.has_permission('Add dilutions') %}
+                {% if current_user.has_permission('add-dilution') %}
                     <button
                         type="button"
                         class="btn btn-success btn-sm"
