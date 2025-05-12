@@ -45,7 +45,7 @@ def index():
         entities = Antibody.filter_(order_by="label")
     else:
         entity_count = select(func.count()).select_from(entities)  # pylint: disable=not-callable
-        app.logger.debug("Found %d antibodies.", entity_count)
+        app.logger.debug("Found %d antibodies.", db.session.scalar(entity_count))
 
     return render_template(
         "antibodies/main.html",
