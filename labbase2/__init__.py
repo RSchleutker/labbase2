@@ -52,6 +52,9 @@ def create_app(
     if config_dict is not None:
         app.config |= config_dict
 
+    app.logger.debug("Config dict: %s", config_dict)
+    app.logger.debug("Instance path: %s", app.instance_path)
+
     # Initialize logging.
     logging.init_app(app)
 

@@ -1,5 +1,6 @@
 import secrets
 from datetime import datetime
+from typing import Union
 
 from flask_login import LoginManager, UserMixin
 from sqlalchemy import Column, DateTime, ForeignKey, String, func
@@ -241,7 +242,10 @@ class User(db.Model, UserMixin, Export):
 
         return check_password_hash(self.password_hash, password)
 
-    def has_permission(self, permission: "Permission") -> bool:
+    def has_permission(self, permission: Union[str, "Permission"]) -> bool:
+        if isinstance(permission, str):
+            permission = db.session.get(Permission, permission)
+
         for group in self.groups:
             if permission in group.permissions:
                 return True
