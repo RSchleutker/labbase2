@@ -1,6 +1,6 @@
 [project]
 name = "labbase2"
-version = "0.2.0"
+version = "0.2.1"
 description="A database application to manage lab resources."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["black"]
+dev = ["black", "isort", "pylint"]
 test = ["pytest>=8.3.4"]
 
 [tool.black]
