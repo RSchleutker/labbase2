@@ -1,6 +1,6 @@
 [project]
 name = "labbase2"
-version = "0.2.1"
+version = "0.2.2"
 description="A database application to manage lab resources."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -20,6 +20,7 @@ dependencies = [
     "scikit-image>0.23.0",
     "biopython>=1.78",
     "email-validator>=1.2.1",
+    "openpyxl>=3.1.5"
 ]
 
 [project.optional-dependencies]

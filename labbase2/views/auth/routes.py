@@ -194,7 +194,7 @@ def change_password(key: Optional[str] = None):
 
     if form.validate_on_submit():
 
-        if reset is not None:
+        if key and reset is not None:
             reset.user.set_password(form.new_password.data)
             reset.user.resets.clear()
             updated = True

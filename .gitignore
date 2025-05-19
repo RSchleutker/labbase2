@@ -127,6 +127,7 @@ data/
 config/
 .idea/
 app/static/files/*
+dev/
 
 # Misc files
 structure.pdf
