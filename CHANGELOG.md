@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.2.3] - 2025-06-15
+
 ### Changed
 
 - Admins can not edit plasmids, oligos, and some other entities even if they are not the owner of that resource.
