@@ -83,8 +83,8 @@ def edit(id_: int):
     if not (plasmid := db.session.get(GlycerolStock, id_)):
         return Message.ERROR(f"No glycerol stock with ID {id_}!")
 
-    if plasmid.owner_id != current_user.id:
-        return Message.ERROR("Glycerol stocks can only be edited by owner!")
+    if plasmid.owner_id != current_user.id and not current_user.is_admin:
+        return Message.ERROR("Glycerol stocks can only be edited by owner and admins!")
 
     form.populate_obj(plasmid)
 

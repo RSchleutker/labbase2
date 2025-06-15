@@ -13,8 +13,7 @@ from labbase2.utils.permission_required import permission_required
 from labbase2.views.comments.forms import EditComment
 from labbase2.views.files.forms import UploadFile
 
-from .forms import (EditOligonucleotide, FilterOligonucleotide,
-                    FindOligonucleotide)
+from .forms import EditOligonucleotide, FilterOligonucleotide, FindOligonucleotide
 from .lcsfinder import LCSFinder
 
 __all__ = ["bp"]
@@ -107,8 +106,8 @@ def edit(id_: int):
     if not (oligonucleotide := db.session.get(Oligonucleotide, id_)):
         return Message.ERROR(f"No oligonucleotide with ID {id_}!")
 
-    if oligonucleotide.owner_id != current_user.id:
-        return Message.ERROR("Oligonucleotide can only be edited by owner!")
+    if oligonucleotide.owner_id != current_user.id and not current_user.is_admin:
+        return Message.ERROR("Oligonucleotide can only be edited by owner and admins!")
 
     form.populate_obj(oligonucleotide)
 

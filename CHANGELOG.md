@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Admins can not edit plasmids, oligos, and some other entities even if they are not the owner of that resource.
+
 ### Fixed
 
 - The button to write anew comment was not shown because the respective permission name was changed in the database but not in the template.

@@ -83,8 +83,8 @@ def edit(id_: int):
     if (fly_stock := db.session.get(FlyStock, id_)) is None:
         return Message.ERROR(f"No fly stock with ID {id_}!")
 
-    if fly_stock.owner_id != current_user.id:
-        return Message.ERROR("Fly stocks can only be edited by owner!")
+    if fly_stock.owner_id != current_user.id and not current_user.is_admin:
+        return Message.ERROR("Fly stocks can only be edited by owner and admins!")
 
     form.populate_obj(fly_stock)
 

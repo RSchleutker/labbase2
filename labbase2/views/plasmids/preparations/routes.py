@@ -65,8 +65,8 @@ def edit(id_: int):
     if (preparation := db.session.get(Preparation, id_)) is None:
         return Message.ERROR(f"No preparation with ID {id_}!")
 
-    if preparation.owner_id != current_user.id:
-        return Message.ERROR("Preparations can only be edited by owner!")
+    if preparation.owner_id != current_user.id and not current_user.is_admin:
+        return Message.ERROR("Preparations can only be edited by owner and admins!")
 
     form.populate_obj(preparation)
 

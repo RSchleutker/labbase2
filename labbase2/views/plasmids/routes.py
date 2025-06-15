@@ -88,8 +88,8 @@ def edit(id_: int):
     if (plasmid := db.session.get(Plasmid, id_)) is None:
         return Message.ERROR(f"No plasmid with ID {id_}!")
 
-    if plasmid.owner_id != current_user.id:
-        return Message.ERROR("Plasmids can only be edited by owner!")
+    if plasmid.owner_id != current_user.id and not current_user.is_admin:
+        return Message.ERROR("Plasmids can only be edited by owner and admins!")
 
     form.populate_obj(plasmid)
 
