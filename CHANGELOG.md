@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The button to write anew comment was not shown because the respective permission name was changed in the database but not in the template.
+
 ## [0.2.2] - 2025-05-19
 
 ### Changed
