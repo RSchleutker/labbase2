@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Checking if a user is an admin or not is now correctly done by checking if the user belongs to the Admin group. Previously, this was done through a boolean column in the database scheme for users.
+
 
 ## [0.2.3] - 2025-06-15
 
 ### Changed
 
-- Admins can not edit plasmids, oligos, and some other entities even if they are not the owner of that resource.
+- Admins can ~~not~~ now edit plasmids, oligos, and some other entities even if they are not the owner of that resource.
 
 ### Fixed
 
-- The button to write anew comment was not shown because the respective permission name was changed in the database but not in the template.
+- The button to write a new comment was not shown because the respective permission name was changed in the database but not in the template.
 
 ## [0.2.2] - 2025-05-19
 

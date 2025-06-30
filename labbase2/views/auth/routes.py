@@ -367,8 +367,6 @@ def create_password_reset(id_: int):
 @permission_required("view-user")
 def users():
     entities = db.session.scalars(
-        select(User).order_by(
-            User.is_active.desc(), User.is_admin.desc(), User.last_name, User.first_name
-        )
+        select(User).order_by(User.is_active.desc(), User.last_name, User.first_name)
     )
     return render_template("auth/users.html", users=entities, title="Users")

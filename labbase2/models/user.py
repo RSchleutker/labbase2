@@ -128,7 +128,6 @@ class User(db.Model, UserMixin, Export):
     timestamp_last_login: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), nullable=False, default="UTC")
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
-    is_admin: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     # Set relationship for profile picture.
     picture: Mapped["BaseFile"] = relationship(
@@ -188,6 +187,12 @@ class User(db.Model, UserMixin, Export):
     @username.expression
     def username(cls):
         return cls.first_name + " " + cls.last_name
+
+    @property
+    def is_admin(self) -> bool:
+        admin_group = db.session.get(Group, "admin")
+
+        return admin_group in self.groups
 
     @property
     def form_permissions(self) -> dict:
