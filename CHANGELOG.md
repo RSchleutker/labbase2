@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Change
+
+- It is now ensured at app startup that every user is member of the "user" group.
+
 ### Fixed
 
 - Checking if a user is an admin or not is now correctly done by checking if the user belongs to the Admin group. Previously, this was done through a boolean column in the database scheme for users.

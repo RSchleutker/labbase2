@@ -119,15 +119,24 @@ def _set_up_permissions(app: Flask):
 def _set_up_groups(app: Flask):
     with app.app_context():
         if not db.session.get(Group, "admin"):
-            group = Group(name="admin")
-            group.permissions = db.session.scalars(select(Permission)).all()
-            db.session.add(group)
+            group_admin = Group(name="admin")
+            group_admin.permissions = db.session.scalars(select(Permission)).all()
+            db.session.add(group_admin)
             db.session.commit()
         if not db.session.get(Group, "user"):
-            group = Group(name="user")
-            group.permissions = [db.session.get(Permission, "add-comment")]
-            db.session.add(group)
+            group_user = Group(name="user")
+            group_user.permissions = [db.session.get(Permission, "add-comment")]
+            db.session.add(group_user)
             db.session.commit()
+        else:
+            group_user = db.session.get(Group, "user")
+
+        # Make sure, every user is in group "user".
+        for user in db.session.scalars(select(User)).all():
+            if not group_user in user.groups:
+                user.groups.append(group_user)
+
+        db.session.commit()
 
 
 def _set_up_admin(app: Flask):
