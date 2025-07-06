@@ -1,0 +1,15 @@
+{% extends 'auth/base-site-user.html' %}
+{% from 'auth/form-user-groups.html' import change_groups_form %}
+
+
+{% block content2 %}
+
+<h1 class="mt-3 mb-4">Edit Groups for user <em>{{ user.username }}</em></h1>
+
+    <div class="bg-white rounded border p-3 my-3">
+
+        {{ change_groups_form(form, 'auth.change_groups', user.id) }}
+
+    </div>
+
+{% endblock %}

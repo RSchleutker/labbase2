@@ -47,22 +47,9 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <a class="dropdown-item"
-                                       href="{{ url_for('auth.change_permissions', id_=user.id) }}">
-                                        Manage permissions
+                                       href="{{ url_for('auth.change_groups', id_=user.id) }}">
+                                        Manage groups
                                     </a>
-                                </li>
-                                <li>
-                                    {% if user.is_admin %}
-                                        <a class="dropdown-item"
-                                           href="{{ url_for('auth.change_admin_status', id_=user.id) }}">
-                                            Make normal user
-                                        </a>
-                                    {% else %}
-                                        <a class="dropdown-item"
-                                           href="{{ url_for('auth.change_admin_status', id_=user.id) }}">
-                                            Make admin
-                                        </a>
-                                    {% endif %}
                                 </li>
                                 <li>
                                     <a class="dropdown-item"
@@ -80,6 +67,46 @@
 
                         </div>
                     {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endmacro %}
+
+
+{% macro table_groups(groups) %}
+
+    <table class="table table-results">
+
+        <thead class="table-light">
+
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col"></th>
+        </tr>
+
+        </thead>
+
+        <tbody id="table-results-body">
+
+        {% for group in groups %}
+            <tr>
+                <td>{{ group.name }}</td>
+                <td>
+                    {{ group.description }}
+                    <hr>
+                    {% for permission in group.permissions %}
+                        <span class="badge rounded-pill bg-primary">{{ permission.name }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="{{ url_for('auth.edit_group', id_=group.name) }}">
+                        Edit
+                    </a>
                 </td>
             </tr>
         {% endfor %}

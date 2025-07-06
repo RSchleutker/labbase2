@@ -18,6 +18,7 @@ from labbase2.views.files.routes import upload_file
 
 from .forms.edit import EditUserForm
 from .forms.edit_permissions import EditPermissions
+from .forms.groups import AddGroupForm, ChangeGroupsForm, EditGroupForm
 from .forms.login import LoginForm
 from .forms.password import ChangePassword
 from .forms.register import RegisterForm
@@ -70,7 +71,7 @@ def login() -> str | Response:
                 formatted = last_login.astimezone(ZoneInfo(tz)).strftime("%B %d, %Y %I:%M %p")
                 flash(f"Last login was on {formatted}!", "info")
 
-            user.timestamp_last_login = func.now()
+            user.timestamp_last_login = func.now()  # pylint: disable=not-callable
             try:
                 db.session.commit()
             except Exception as error:
@@ -108,7 +109,11 @@ def register():
     if form.validate_on_submit():
         email = validate_email(form.email.data).normalized
 
-        user_count_stm = select(func.count()).select_from(User).where(User.email == email)
+        user_count_stm = (
+            select(func.count())  # pylint: disable=not-callable
+            .select_from(User)
+            .where(User.email == email)
+        )
         if db.session.scalar(user_count_stm) > 0:
             app.logger.warning("Tried to register new user with existing email address: %s", email)
             flash("Email address already exists!", "danger")
@@ -129,7 +134,7 @@ def register():
                 app.logger.info("Registered new user: %s", user.username)
                 flash("Successfully registered new user!", "success")
 
-    elif form.submit():
+    elif request.method.lower() == "post":
         app.logger.warning("Could not register new user due to invalid input: %s", form.data)
         for field, errors in form.errors.items():
             for error in errors:
@@ -181,45 +186,44 @@ def edit_user():
 @bp.route("/change-password/<string:key>", methods=["GET", "POST"])
 @login_required
 def change_password(key: Optional[str] = None):
-    if key and (reset := db.session.get(ResetPassword, key)) is not None:
+    if key is not None:
+        reset = db.session.get(ResetPassword, key)
+        if not reset:
+            flash("Invalid token!", "danger")
+            return redirect(url_for("auth.change_password"))
         if datetime.now() > reset.timeout:
             flash("Token to reset password has expired!")
             db.session.delete(reset)
-        else:
-            user = reset.user
-            logout_user()
-            login_user(user)
+            return redirect(url_for("auth.change_password"))
+        user = reset.user
+        logout_user()
+        login_user(user)
+    else:
+        reset = None
+        user = current_user
 
     form = ChangePassword()
 
-    if form.validate_on_submit():
+    if request.method == "GET":
+        return render_template("auth/change-password.html", form=form)
 
-        if key and reset is not None:
-            reset.user.set_password(form.new_password.data)
-            reset.user.resets.clear()
-            updated = True
+    if not form.validate():
+        flash(f"{form.errors}", "danger")
 
-        elif current_user.verify_password(form.old_password.data):
-            current_user.set_password(form.new_password.data)
-            updated = True
+    if not reset and not current_user.verify_password(form.old_password.data):
+        flash("Old password incorrect!", "danger")
+        render_template("auth/change-password.html", form=form)
 
-        else:
-            flash("Old password incorrect!", "danger")
-            updated = False
+    user.set_password(form.new_password.data)
+    user.resets.clear()
 
-        if updated:
-            try:
-                db.session.commit()
-            except Exception as error:
-                db.session.rollback()
-                flash(str(error), "danger")
-            else:
-                flash("Your password has been updated!", "success")
-
+    try:
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        flash(str(error), "danger")
     else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(": ".join([field, error]), "danger")
+        flash("Your password has been updated!", "success")
 
     return render_template("auth/change-password.html", form=form)
 
@@ -229,9 +233,7 @@ def change_password(key: Optional[str] = None):
 @login_required
 @permission_required("change-group")
 def change_permissions(id_: int = None):
-    users = db.session.scalars(
-        select(User).where(User.is_active).order_by(User.last_name, User.first_name)
-    )
+    users_stmt = select(User).where(User.is_active).order_by(User.last_name, User.first_name)
 
     if id_ is None:
         user = current_user
@@ -259,7 +261,7 @@ def change_permissions(id_: int = None):
         "auth/edit-permissions.html",
         form=form,
         selected_user=user,
-        users=users,
+        users=db.session.scalars(users_stmt).all(),
     )
 
 
@@ -288,11 +290,14 @@ def change_admin_status(id_: int):
         flash(f"Successfully changed admin setting for {user.username}!", "success")
 
     user_count_stm = (
-        select(func.count()).select_from(User).join(User.groups).where(Group.name == "admin")
+        select(func.count())  # pylint: disable=not-callable
+        .select_from(User)
+        .join(User.groups)
+        .where(Group.name == "admin")
     )
     if db.session.scalar(user_count_stm) == 0:
         flash("No user with admin rights! Reverting previous change!", "warning")
-        user.is_admin = True
+        user.groups.append(admin_group)
         db.session.commit()
 
     return redirect(url_for(".users"))
@@ -317,7 +322,9 @@ def change_active_status(id_: int):
         else:
             flash(f"Successfully changed active setting for {user.username}!", "success")
 
-    user_count_stm = select(func.count()).select_from(User).where(User.is_active)
+    user_count_stm = (
+        select(func.count()).select_from(User).where(User.is_active)  # pylint: disable=not-callable
+    )
     if db.session.scalar(user_count_stm) == 0:
         flash("No active user! Reverting previous change!", "warning")
         user.is_active = True
@@ -325,8 +332,8 @@ def change_active_status(id_: int):
 
     if request.referrer is None:
         return redirect(url_for(".users"))
-    else:
-        return redirect(request.referrer)
+
+    return redirect(request.referrer)
 
 
 @bp.route("/reset-password/<int:id_>", methods=["GET"])
@@ -358,8 +365,8 @@ def create_password_reset(id_: int):
 
     if request.referrer is None:
         return redirect(url_for(".users"))
-    else:
-        return redirect(request.referrer)
+
+    return redirect(request.referrer)
 
 
 @bp.route("/users", methods=["GET"])
@@ -370,3 +377,123 @@ def users():
         select(User).order_by(User.is_active.desc(), User.last_name, User.first_name)
     )
     return render_template("auth/users.html", users=entities, title="Users")
+
+
+@bp.route("/groups", methods=["GET"])
+@login_required
+@permission_required("edit-groups")
+def index_groups():
+    entities = db.session.scalars(
+        select(Group).where(Group.name.notin_(["admin", "user"])).order_by(Group.name.asc())
+    )
+
+    return render_template("auth/groups.html", groups=entities, title="Groups")
+
+
+@bp.route("/groups/add", methods=["GET", "POST"])
+@login_required
+@permission_required("edit-groups")
+def add_group():
+    form = AddGroupForm()
+
+    if request.method == "GET":
+        return render_template("auth/add-group.html", form=form)
+
+    # This is required as fields for permissions are dynamically added.
+    form.process(formdata=request.form)
+
+    if not form.validate():
+        app.logger.info("Couldn't add group due to invalid input.")
+        flash(f"{form.errors}", "warning")
+
+    group = Group()
+    group.name = form.name.data
+    group.description = form.description.data
+    group.permissions = form.selected_permissions
+
+    try:
+        db.session.add(group)
+        db.session.commit()
+    except Exception as error:
+        db.session.rollback()
+        app.logger.warning("Couldn't add group due to unknown database error: %s", error)
+        flash(str(error), "warning")
+    else:
+        flash(f"Successfully added group '{group.name}' to database.", "success")
+
+    return render_template("auth/add-group.html", form=form)
+
+
+@bp.route("/groups/<string:id_>", methods=["GET", "POST"])
+@login_required
+@permission_required("edit-groups")
+def edit_group(id_: str):
+    if not (group := db.session.get(Group, id_)):
+        flash(f"No group with name {id_}!", "warning")
+        return redirect(request.referrer)
+
+    if group.name in ["user", "admin"]:
+        flash("'user' and 'admin' groups cannot be edited!", "warning")
+        return redirect(request.referrer)
+
+    form = EditGroupForm(obj=group, group_name=id_)
+
+    if request.method == "GET":
+        return render_template("auth/edit-group.html", form=form, group=group)
+
+    # This is required as fields for permissions are dynamically added.
+    form.process(formdata=request.form)
+
+    if not form.validate():
+        flash(f"{form.errors}", "warning")
+        return render_template("auth/edit-group.html", form=form, group=group)
+
+    group.description = form.description.data
+    group.permissions = form.selected_permissions
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        flash(f"Could not edit group: {error}", "warning")
+        db.session.rollback()
+    else:
+        flash(f"Successfully edited group {group.name}!", "success")
+
+    return render_template("auth/edit-group.html", form=form, group=group)
+
+
+@bp.route("users/groups/<int:id_>", methods=["GET", "POST"])
+@login_required
+@permission_required("change-group")
+def change_groups(id_: int):
+    if not (user := db.session.get(User, id_)):
+        flash(f"No user with ID {id_}!", "warning")
+        return redirect(request.referrer)
+
+    form = ChangeGroupsForm(user_id=id_)
+
+    if request.method == "GET":
+        return render_template("auth/change-groups.html", form=form, user=user)
+
+    # Required because fields are dynamically added to the form.
+    form.process(formdata=request.form)
+
+    if not form.validate():
+        flash(f"{form.errors}", "warning")
+        return render_template("auth/change-groups.html", form=form, user=user)
+
+    protected_groups = db.session.scalars(
+        select(Group).where(Group.name.in_(["admin", "user"]), Group.users.any(User.id == id_))
+    ).all()
+
+    user.groups = form.selected_groups + protected_groups
+
+    try:
+        db.session.commit()
+    except Exception as error:
+        flash(f"Could not change groups! {error}", "warning")
+        db.session.rollback()
+    else:
+        flash("Successfully changed groups!", "success")
+
+    return render_template("auth/change-groups.html", form=form, user=user)

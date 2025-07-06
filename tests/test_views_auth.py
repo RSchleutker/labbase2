@@ -1,6 +1,8 @@
+import pytest
 from flask import url_for
 from flask_login import current_user, login_user
-from sqlalchemy import select, func
+from sqlalchemy import func, select
+
 from labbase2 import models
 from labbase2.database import db
 
@@ -137,9 +139,12 @@ def test_register_new_user(app, client):
         )
 
         user_count = db.session.scalar(select(func.count()).select_from(models.User))
+        new_user = db.session.get(models.User, 2)
+        user_group = db.session.get(models.Group, "user")
 
         assert b"Successfully registered new user!" in response.data
         assert user_count == 2
+        assert user_group in new_user.groups
 
 
 def test_get_edit_user(app, client):
@@ -316,3 +321,104 @@ def test_users_get(app, client):
         assert response.status_code == 200
         assert b"Mustermann" in response.data
         assert b"Musterfrau" in response.data
+
+
+def test_add_edit_group(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        url = url_for("auth.add_group")
+
+        admin = db.session.get(models.User, 1)
+        login_user(admin)
+
+        # Check site is accessible.
+        response = client.get(url)
+        assert response.status_code == 200
+        assert b"Add Group</h1>" in response.data
+
+        # Check group can be added.
+        response = client.post(
+            url,
+            data={"name": "students", "description": "Fake group.", "p_edit_groups": True},
+            follow_redirects=True,
+        )
+        group = db.session.get(models.Group, "students")
+        permission = db.session.get(models.Permission, "edit-groups")
+        assert response.status_code == 200
+        assert b"Successfully added group" in response.data
+        assert group is not None
+        assert group.description == "Fake group."
+        assert permission in group.permissions
+
+        # Check site is accessible.
+        url = url_for("auth.edit_group", id_="students")
+        response = client.get(url)
+        assert response.status_code == 200
+        assert b"Edit Group" in response.data
+
+        response = client.post(
+            url,
+            data={"description": "No fake group."},
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert group.description == "No fake group."
+        assert permission not in group.permissions
+
+
+def test_delete_admin_user_group(app):
+    with app.app_context():
+        admin_group = db.session.get(models.Group, "admin")
+        user_group = db.session.get(models.Group, "user")
+
+        db.session.delete(admin_group)
+
+        with pytest.raises(ValueError, match="Groups 'admin' and 'user' cannot be deleted!"):
+            db.session.commit()
+
+        db.session.rollback()
+        db.session.delete(user_group)
+
+        with pytest.raises(ValueError, match="Groups 'admin' and 'user' cannot be deleted!"):
+            db.session.commit()
+
+        db.session.rollback()
+        groups = db.session.scalars(select(models.Group.name)).all()
+
+        assert "admin" in groups
+        assert "user" in groups
+
+
+def test_remover_user_membership(app, client):
+    with app.app_context():
+        user = db.session.get(models.User, 1)
+        user_group = db.session.get(models.Group, "user")
+        admin_group = db.session.get(models.Group, "admin")
+
+        with pytest.raises(ValueError, match="Group 'user' cannot be removed from a user!"):
+            user.groups.remove(user_group)
+            db.session.commit()
+
+        db.session.rollback()
+
+        with pytest.raises(ValueError, match="Group 'user' cannot be removed from a user!"):
+            user.groups = [admin_group]
+            db.session.commit()
+
+
+def test_change_groups(app, client):
+    with app.app_context(), app.test_request_context(), client:
+        user = db.session.get(models.User, 1)
+        login_user(user)
+        new_group = models.Group(name="students")
+        db.session.add(new_group)
+        db.session.commit()
+
+        url = url_for("auth.change_groups", id_=1)
+
+        response = client.get(url)
+        assert response.status_code == 200
+        assert b"Edit Groups for user" in response.data
+
+        response = client.post(url, data={"g_students": True}, follow_redirects=True)
+        assert response.status_code == 200
+        assert new_group in user.groups

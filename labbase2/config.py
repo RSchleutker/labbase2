@@ -38,6 +38,7 @@ class DefaultConfig:
         ("reset-password", "Allow a user to reset passwords for everyone."),
         ("register-user", "Allows a user to register another user."),
         ("change-group", "Allow a user to assign groups to users"),
+        ("edit-groups", "Allow a user to create new groups and assign permissions to groups."),
         ("delete-user", "Allows a user to delete another user."),
         ("export-content", "Allows a user to export content. Suggested level: PhD Student."),
         ("add-request", "Allows a user to add requests for any ressource. Suggested level: PI."),

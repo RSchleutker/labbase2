@@ -1,5 +1,8 @@
 import pytest
+
 from labbase2 import create_app
+from labbase2.database import db
+from labbase2.models import Group, User
 
 
 @pytest.fixture

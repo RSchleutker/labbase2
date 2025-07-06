@@ -1,0 +1,14 @@
+{% extends 'auth/base-site-user.html' %}
+{% from 'auth/table.html' import table_groups with context %}
+
+
+{% block content2 %}
+
+
+    <h1 class="mt3 mb-4">{{ title }}</h1>
+
+    {{ table_groups(groups) }}
+
+
+
+{% endblock %}

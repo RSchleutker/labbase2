@@ -1,6 +1,8 @@
+from flask import url_for
+from sqlalchemy import func, select
+
 from labbase2 import models
 from labbase2.database import db
-from sqlalchemy import select, func
 
 
 def test_first_user_is_admin_and_active(app):

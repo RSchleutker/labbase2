@@ -34,6 +34,9 @@ def permission_required(*allowed) -> Callable:
         @wraps(func)
         def decorated_view(*args, **kwargs):
 
+            if current_user.is_admin:
+                return func(*args, **kwargs)
+
             for name in allowed:
                 permission = db.session.get(Permission, name)
                 if not permission:

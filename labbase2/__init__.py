@@ -120,16 +120,21 @@ def _set_up_groups(app: Flask):
     with app.app_context():
         if not db.session.get(Group, "admin"):
             group_admin = Group(name="admin")
-            group_admin.permissions = db.session.scalars(select(Permission)).all()
             db.session.add(group_admin)
-            db.session.commit()
+        else:
+            group_admin = db.session.get(Group, "admin")
+
+        group_admin.permissions = db.session.scalars(select(Permission)).all()
+        db.session.commit()
+
         if not db.session.get(Group, "user"):
             group_user = Group(name="user")
-            group_user.permissions = [db.session.get(Permission, "add-comment")]
             db.session.add(group_user)
-            db.session.commit()
         else:
             group_user = db.session.get(Group, "user")
+
+        group_user.permissions = [db.session.get(Permission, "add-comment")]
+        db.session.commit()
 
         # Make sure, every user is in group "user".
         for user in db.session.scalars(select(User)).all():
@@ -158,7 +163,7 @@ def _set_up_admin(app: Flask):
             db.session.add(admin)
             db.session.commit()
             admin.groups.append(db.session.get(Group, "admin"))
-            admin.groups.append(db.session.get(Group, "user"))
+            # admin.groups.append(db.session.get(Group, "user"))
             db.session.commit()
         elif db.session.scalar(admin_count) == 0:
             app.logger.info("No active user with admin rights; Re-activate admin.")
@@ -171,7 +176,7 @@ def _set_up_admin(app: Flask):
                 admin = User(first_name=first, last_name=last, email=email, is_admin=True)
                 admin.set_password("admin")
                 admin.groups.append(db.session.get(Group, "admin"))
-                admin.groups.append(db.session.get(Group, "user"))
+                # admin.groups.append(db.session.get(Group, "user"))
                 db.session.add(admin)
 
         try:

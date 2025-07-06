@@ -1,0 +1,15 @@
+{% extends 'auth/base-site-user.html' %}
+{% from 'auth/form-groups.html' import add_group_form %}
+
+
+{% block content2 %}
+
+<h1 class="mt-3 mb-4">Add Group</h1>
+
+    <div class="bg-white rounded border p-3 my-3">
+
+        {{ add_group_form(form, 'auth.add_group') }}
+
+    </div>
+
+{% endblock %}
