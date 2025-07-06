@@ -7,9 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.3.0] - 2025-07-06
+
+### Added
+
+- Added views to add and edit groups, group permissions, and group memberships.
+- Added additional tests for group-related views.
+- Added event function to ensure integrity of system groups `users` and `admins`.
+
 ### Change
 
-- It is now ensured at app startup that every user is member of the "user" group.
+- It is now ensured at app startup that every user is member of the `users` group.
 
 ### Fixed
 

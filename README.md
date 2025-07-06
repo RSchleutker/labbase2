@@ -1,6 +1,6 @@
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Pytest](https://img.shields.io/badge/tests-pytest%20passed-brightgreen)
-![pylint](https://img.shields.io/badge/code%20quality-8.6%2F10-green)
+![pylint](https://img.shields.io/badge/code%20quality-8.8%2F10-green)
 ![pylint](https://img.shields.io/badge/code%20style-black-black)
 ![pylint](https://img.shields.io/badge/license-MIT-brightgreen)
 
