@@ -1,9 +1,12 @@
 from datetime import datetime
+from typing import Type
 
-from sqlalchemy import DateTime, ForeignKey, func
+from sqlalchemy import DateTime, ForeignKey, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from labbase2 import models
 from labbase2.database import db
+from labbase2.models import BaseEntity
 
 __all__ = ["ImportJob", "ColumnMapping"]
 
@@ -50,8 +53,72 @@ class ImportJob(db.Model):
         backref="import_job", lazy=True, cascade="all, delete", single_parent=True
     )
 
-    def get_file(self):
-        pass
+    def get_mapping(self) -> tuple[list[str], list[str]]:
+        """Get current mapping between database and uploaded file
+
+        Returns
+        -------
+        tuple[list[str], list[str]]
+            A tuple with two lists. The first list contains the names of the fields in the database.
+            The second list containes the names of the corresponding columns in the file, from which
+            entries shall be imported.
+        """
+
+        mappings = db.session.execute(
+            select(ColumnMapping.mapped_field, ColumnMapping.input_column).where(
+                ColumnMapping.job_id.is_(self.id), ColumnMapping.input_column.isnot(None)
+            )
+        ).all()
+
+        fields, columns = zip(*mappings)
+
+        return list(fields), list(columns)
+
+    @property
+    def class_(self) -> Type[BaseEntity]:
+        """Get the model class for which entities shall be imported
+
+        Returns
+        -------
+        Type[BaseEntity]
+        """
+
+        return self.get_entity_class(self.entity_type)
+
+    @classmethod
+    def get_entity_class(cls, type_: str) -> Type[BaseEntity]:
+        """Get a model class by name
+
+        Parameters
+        ----------
+        type_: str
+            The name of class as a string. Currently supported are 'antibody', 'chemical',
+            'fly_stock', 'oligonucleotide', and 'plasmid'. This is not case-sensitive.
+
+        Returns
+        -------
+        Type[db.Model]
+            The corresponding class.
+
+        Raises
+        ------
+        ValueError
+            If `type_` is none of the supported names.
+        """
+
+        match type_.lower():
+            case "antibody":
+                return models.Antibody
+            case "chemical":
+                return models.Chemical
+            case "fly_stock":
+                return models.FlyStock
+            case "oligonucleotide":
+                return models.Oligonucleotide
+            case "plasmid":
+                return models.Plasmid
+            case _:
+                raise ValueError(f"Unknown entity type {type_}!", "danger")
 
 
 class ColumnMapping(db.Model):

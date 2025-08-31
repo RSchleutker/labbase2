@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 import pandas as pd
 from sqlalchemy import inspect, select
 from sqlalchemy.orm import Mapped
@@ -9,8 +11,8 @@ __all__ = ["Importer"]
 
 class Importer:
 
-    import_attr: tuple = (("id", "ID"),)
-    not_updatable: tuple = ("id",)
+    import_attr: ClassVar[tuple] = (("id", "ID"),)
+    not_updatable: ClassVar[tuple] = ("id",)
 
     def update(self, **kwargs) -> None:
         """Update attributes of an entity.
@@ -109,19 +111,3 @@ class Importer:
         """
 
         return {k: v for k, v in rec.items() if not pd.isnull(v)}
-
-    # @classmethod
-    # def import_form(cls, columns: list, *args, **kwargs) -> ImportEntity:
-    #     data = {'mappings': len(columns) * [[]]}
-    #
-    #     form = ImportEntity(clss=cls.__name__, data=data, *args, **kwargs)
-    #
-    #     for column, field in zip(columns, form.mappings):
-    #         field.label = column
-    #         field.choices += cls.import_attr
-    #
-    #     return form
-
-    @staticmethod
-    def process_formdata(data: dict) -> dict:
-        return {k: v for k, v in data.items() if v}

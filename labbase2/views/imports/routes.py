@@ -1,22 +1,12 @@
-from functools import partial
-
 import pandas as pd
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint
+from flask import current_app as app
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from labbase2.database import db
-from labbase2.models import (
-    Antibody,
-    BaseFile,
-    Chemical,
-    ColumnMapping,
-    FlyStock,
-    ImportJob,
-    Oligonucleotide,
-    Plasmid,
-)
+from labbase2.models import BaseFile, ColumnMapping, ImportJob
 from labbase2.utils.message import Message
 from labbase2.utils.permission_required import permission_required
 from labbase2.views.files.forms import UploadFile
@@ -34,7 +24,9 @@ bp = Blueprint("imports", __name__, url_prefix="/imports", template_folder="temp
 @login_required
 def index():
     return render_template(
-        "imports/main.html", title="Pending imports", jobs=current_user.import_jobs
+        "imports/main.html",
+        title="Pending imports",
+        jobs=current_user.import_jobs,
     )
 
 
@@ -42,40 +34,22 @@ def index():
 @login_required
 @permission_required("upload-file")
 def upload(type_: str):
-    form = UploadFile()
+    try:
+        entity_class = ImportJob.get_entity_class(type_=type_)
+    except ValueError as error:
+        flash(str(error), "danger")
+        app.logger.warning("Tried to import from file for unsupported entity type: %s", type_)
+        return redirect(request.referrer)
 
-    match type_.lower():
-        case "antibody":
-            entity_cls = Antibody
-        case "chemical":
-            entity_cls = Chemical
-        case "fly_stock":
-            entity_cls = FlyStock
-        case "oligonucleotide":
-            entity_cls = Oligonucleotide
-        case "plasmid":
-            entity_cls = Plasmid
-        case _:
-            flash(f"Unknown type {type}", "danger")
-            return redirect(request.referrer)
+    form = UploadFile()
 
     if not form.validate():
         return redirect(request.referrer)
 
-    file = upload_file(form, BaseFile)
-
-    # Try to read the file.
-    match file.path.suffix:
-        case ".csv":
-            read_fnc = pd.read_csv
-        case ".xls" | ".xlsx":
-            read_fnc = partial(pd.read_excel, engine="openpyxl")
-        case _:
-            flash("Unknown file type!", "danger")
-            return redirect(request.referrer)
+    file: BaseFile = upload_file(form, BaseFile)
 
     try:
-        read_fnc(file.path)
+        file.read_table()
     except pd.errors.ParserError:
         flash("File could not be parsed properly!", "danger")
         db.session.delete(file)
@@ -95,9 +69,8 @@ def upload(type_: str):
     # Now create the ImportJob.
     import_job = ImportJob(user_id=current_user.id, file_id=file.id, entity_type=type_)
 
-    for field in entity_cls.importable_fields():
-        column_mapping = ColumnMapping(mapped_field=field)
-        import_job.mappings.append(column_mapping)
+    for field in entity_class.importable_fields():
+        import_job.mappings.append(ColumnMapping(mapped_field=field))
 
     db.session.add(import_job)
     db.session.commit()
@@ -114,19 +87,14 @@ def edit(id_: int):
         flash(f"No import with ID {id_}!", "danger")
         return redirect(url_for(".index"))
     if import_job.user_id != current_user.id:
-        flash(f"You are not authorized to work on this import!", "danger")
+        flash("You are not authorized to work on this import!", "danger")
         return redirect(url_for(".index"))
 
-    file = import_job.file
-
-    match file.path.suffix:
-        case ".csv":
-            table = pd.read_csv(file.path)
-        case ".xls" | ".xlsx":
-            table = pd.read_excel(file.path, engine="openpyxl")
-        case _:
-            flash("Unknown file type!", "danger")
-            return redirect(url_for(".index"))
+    try:
+        table = import_job.file.read_table()
+    except ValueError as error:
+        flash(str(error), "danger")
+        return redirect(url_for(".index"))
 
     fields = [mapping.mapped_field for mapping in import_job.mappings]
     defaults = [mapping.input_column for mapping in import_job.mappings]
@@ -156,76 +124,56 @@ def execute(id_: int):
         flash(Message.ERROR("You are not authorized to execute this import."))
         return redirect(url_for(".index"))
 
-    match job.entity_type:
-        case "antibody":
-            entity_cls = Antibody
-        case "chemical":
-            entity_cls = Chemical
-        case "fly_stock":
-            entity_cls = FlyStock
-        case "oligonucleotide":
-            entity_cls = Oligonucleotide
-        case "plasmid":
-            entity_cls = Plasmid
-        case _:
-            flash(f"Unknown entity type {job.entity_type}!", "danger")
-            return redirect(request.referrer)
+    try:
+        entity_class = job.class_
+    except ValueError as error:
+        flash(str(error), "danger")
+        return redirect(url_for(".index"))
 
-    mappings = db.session.scalars(
-        select(ColumnMapping).where(
-            ColumnMapping.job_id == job.id & ColumnMapping.input_column.isnot(None)
-        )
-    )
-    fields = [mapping.mapped_field for mapping in mappings]
-    colmns = [mapping.input_column for mapping in mappings]
+    fields, columns = job.get_mapping()
 
-    file = job.file
+    try:
+        table = job.file.read_table()
+    except ValueError as error:
+        flash(str(error), "danger")
+        return redirect(request.referrer)
 
-    match file.path.suffix:
-        case ".csv":
-            read_fnc = pd.read_csv
-        case ".xls" | ".xlsx":
-            read_fnc = partial(pd.read_excel, engine="openpyxl")
-        case _:
-            flash("Unknown file type!", "danger")
-            return redirect(request.referrer)
+    table = table[columns]  # Reorder columns in the imported file.
+    table.columns = fields  # Rename the columns in the file to match the db fields.
 
-    table = read_fnc(file.path)
-
-    table = table[colmns]
-    table.columns = fields
-
-    successfull = 0
-    unsuccessfull = 0
+    imported = 0
 
     for row in table.itertuples(index=False):
-        row = row._asdict()
-
-        for key, value in row.items():
-            if pd.isnull(value):
-                row[key] = None
-            if isinstance(value, str):
-                row[key] = value.strip()
-
-        origin = f"Created from file {file.filename_exposed} by {current_user.username}."
-        entity = entity_cls(origin=origin, **row)
+        entity = entity_class.from_row(row=row)
 
         try:
             db.session.add(entity)
             db.session.commit()
-        except IntegrityError:
-            unsuccessfull += 1
+        except IntegrityError as error:
+            flash(
+                f"Couldn't import row with label {entity.label} due to integrity error.", "danger"
+            )
+            app.logger.info("Integrity error during import: %s", error)
             db.session.rollback()
             continue
         except Exception as error:
-            unsuccessfull += 1
+            flash(f"Couldn't import row with label {entity.label} due to unknown error.", "danger")
+            app.logger.info("Unknown error during import: %s", error)
             db.session.rollback()
-            return redirect(url_for(".index"))
+            continue
         else:
-            successfull += 1
+            imported += 1
 
     db.session.delete(job)
     db.session.commit()
+
+    flash(f"Successfully imported {imported} rows from file!", "success")
+    app.logger.info(
+        "Imported %d entities (%s) from file (%s).",
+        imported,
+        entity_class.__name__,
+        job.file.filename_exposed,
+    )
 
     return redirect(url_for(".index"))
 
@@ -245,5 +193,5 @@ def delete(id_: int):
     except Exception as err:
         db.session.rollback()
         return Message.ERROR(str(err))
-    else:
-        return Message.SUCCESS(f"Successfully deleted import {id_}!")
+
+    return Message.SUCCESS(f"Successfully deleted import {id_}!")

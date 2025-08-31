@@ -1,8 +1,10 @@
 import math
 import mimetypes
 from datetime import datetime
+from functools import partial
 from pathlib import Path
 
+import pandas as pd
 from flask import current_app
 from skimage import io, util
 from skimage.transform import resize
@@ -135,6 +137,17 @@ class BaseFile(db.Model):
         resized = resize(img, (height, width), anti_aliasing=True)
 
         io.imsave(self.path, util.img_as_ubyte(resized))
+
+    def read_table(self) -> pd.DataFrame:
+        match self.path.suffix:
+            case ".csv":
+                read_fnc = pd.read_csv
+            case ".xls" | ".xlsx":
+                read_fnc = partial(pd.read_excel, engine="openpyxl")
+            case _:
+                raise ValueError("File is not a supported format!")
+
+        return read_fnc(self.path)
 
 
 class EntityFile(BaseFile):

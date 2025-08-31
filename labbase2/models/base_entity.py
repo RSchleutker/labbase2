@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import pandas as pd
 from flask import current_app
 from flask_login import current_user
 from sqlalchemy import Column, DateTime, String, func
@@ -145,3 +146,16 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
             filters.append(cls.owner_id == owner_id)
 
         return super()._filters(**fields) + filters
+
+    @classmethod
+    def from_row(cls, row: tuple) -> "BaseEntity":
+        # noinspection PyProtectedMember
+        row_dict: dict = row._asdict()
+
+        for column, value in row_dict.items():
+            if pd.isnull(value):
+                row_dict[column] = None
+            if isinstance(value, str):
+                row_dict[column] = value.strip()
+
+        return cls(origin="Imported from file.", **row_dict)
