@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from flask_login import current_user
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -39,7 +40,10 @@ class Comment(db.Model, Importer, Export):
         ForeignKey("base_entity.id"), nullable=False, info={"importable": True}
     )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id"), nullable=False, info={"importable": True}
+        ForeignKey("user.id"),
+        nullable=False,
+        default=lambda: current_user.id,
+        info={"importable": True},
     )
     timestamp_created: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

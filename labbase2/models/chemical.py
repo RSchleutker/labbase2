@@ -1,5 +1,6 @@
 from datetime import date
 
+from flask_login import current_user
 from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship, subqueryload
 
@@ -15,7 +16,7 @@ class Chemical(Consumable):
 
     Currently, a Chemical has only very few attributes, i.e., two: The CAS
     number and the PubChem CID. The CID is used to retrieve further
-    informations from the web. The CAS number is sued for 'official' reference.
+    information from the web. The CAS number is sued for 'official' reference.
 
     Attributes
     ----------
@@ -28,7 +29,7 @@ class Chemical(Consumable):
         The CAS registry number, a mandatory number for all chemical compounds.
     pubchem_cid : int
         The PubChem reference number. This will be used to retrieve
-        additional informations about this compound from PubChem.
+        additional information about this compound from PubChem.
 
     Notes
     -----
@@ -73,7 +74,7 @@ class StockSolution(db.Model, Filter):
         The label, that is the token, of the stock solution. Can be something
         like 'Tris/HCl pH 9.5'.
     details : str
-        A mored detailed description of the stock solution.
+        A more detailed description of the stock solution.
 
     Notes
     -----
@@ -84,7 +85,9 @@ class StockSolution(db.Model, Filter):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     chemical_id: Mapped[int] = mapped_column(ForeignKey("chemical.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id"), nullable=False, default=lambda: current_user.id
+    )
     solvent: Mapped[str] = mapped_column(String(64), nullable=False)
     date_created: Mapped[date] = mapped_column(Date, nullable=False, default=func.today())
     date_emptied: Mapped[date] = mapped_column(Date, nullable=True)

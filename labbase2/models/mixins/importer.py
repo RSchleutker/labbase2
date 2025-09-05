@@ -10,9 +10,12 @@ __all__ = ["Importer"]
 
 
 class Importer:
+    """A mixin to add import functionality to an SQLAlchemy model"""
 
     import_attr: ClassVar[tuple] = (("id", "ID"),)
     not_updatable: ClassVar[tuple] = ("id",)
+
+    label: Mapped[str]
 
     def update(self, **kwargs) -> None:
         """Update attributes of an entity.

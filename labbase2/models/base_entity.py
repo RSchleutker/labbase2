@@ -126,6 +126,14 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
 
     @property
     def deletable(self) -> bool:
+        """Determine if an entity is allowed to be deleted
+
+        Returns
+        -------
+        bool
+            `True` if the entity was created no longer than a specified time ago
+            (DELETABLE_HOURS from config), `False` otherwise.
+        """
         hours = current_app.config["DELETABLE_HOURS"]
         return (datetime.now() - self.timestamp_created) <= timedelta(hours=hours)
 
@@ -149,6 +157,19 @@ class BaseEntity(db.Model, mixins.Filter, mixins.Export, mixins.Importer):
 
     @classmethod
     def from_row(cls, row: tuple) -> "BaseEntity":
+        """Generate a new instance from a DataFrame row.
+
+        Parameters
+        ----------
+        row: tuple
+            A row of a pd.DataFrame object as returned by iterating over the rows.
+
+        Returns
+        -------
+        BaseEntity
+            An instance of this class.
+        """
+
         # noinspection PyProtectedMember
         row_dict: dict = row._asdict()
 

@@ -8,6 +8,20 @@ __all__ = ["format_date", "format_datetime"]
 
 
 def format_date(x: Optional[date] = None) -> str:
+    """Format a date for HTML templates
+
+    Parameters
+    ----------
+    x: Optional[date]
+        A date or `None`.
+
+    Returns
+    -------
+    str
+        An empty string if `x` was empty, otherwise a date in the format
+        September 04, 2025.
+    """
+
     if not x:
         return ""
 
@@ -15,6 +29,20 @@ def format_date(x: Optional[date] = None) -> str:
 
 
 def format_datetime(x: Optional[datetime] = None) -> str:
+    """Format a datetime for HTML templates
+
+    Parameters
+    ----------
+    x: Optional[date]
+        A datetime or `None`.
+
+    Returns
+    -------
+    str
+        An empty string if `x` was empty, otherwise a datetime in the format
+        September 04, 2025 11:45 PM.
+    """
+
     if not x:
         return ""
 

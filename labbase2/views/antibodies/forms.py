@@ -11,6 +11,22 @@ __all__ = ["FilterAntibodies", "EditAntibody"]
 
 
 class FilterAntibodies(FilterForm):
+    """A form to filter antibodies
+
+    Attributes
+    ----------
+    antigen
+    clone
+    conjugate
+    host
+    label
+    order_by
+
+    Notes
+    -----
+    Additional fields are inherited by the parent class.
+    """
+
     label = StringField(
         label="Label",
         validators=[Optional()],
@@ -91,6 +107,23 @@ class FilterAntibodies(FilterForm):
 
 
 class EditAntibody(EditEntityForm):
+    """A form to add an antibody to the database or to edit an existing antibody
+
+    Attributes
+    ----------
+    antigen
+    clone
+    conjugate
+    host
+    source
+    specification
+    storage_temp
+
+    Notes
+    -----
+    Additional fields are inherited by the parent class.
+    """
+
     clone = StringField(
         label="Clone",
         validators=[Optional(), Length(max=32)],

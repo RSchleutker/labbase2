@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 from flask import current_app
+from flask_login import current_user
 from skimage import io, util
 from skimage.transform import resize
 from sqlalchemy import DateTime, ForeignKey, String, func
@@ -56,7 +57,9 @@ class BaseFile(db.Model):
     __tablename__: str = "base_file"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id"), nullable=False, default=lambda: current_user.id
+    )
     filename_internal: Mapped[str] = mapped_column(String(64), nullable=True, unique=True)
     filename_exposed: Mapped[str] = mapped_column(String(512), nullable=False)
     note: Mapped[str] = mapped_column(String(2048), nullable=True)
@@ -97,6 +100,8 @@ class BaseFile(db.Model):
 
     @property
     def type_(self):
+        """Determine the type of the file"""
+
         _, ext = self.filename_internal.rsplit(".", 1)
         match ext.lower():
             case "pdf":
@@ -113,11 +118,34 @@ class BaseFile(db.Model):
         ext = self.path.suffix.lower()
         return mimetypes.types_map.get(ext, "application/octet-stream")
 
-    def set_filename(self):
+    def set_filename(self) -> str:
+        """Determine the internal file name for the file system base on the DB ID.
+
+        Returns
+        -------
+        str
+            The internal filename of this file used for the local file system.
+        """
+
         _, ext = self.filename_exposed.split(".", 1)
-        self.filename_internal = "{0:07d}.{ext}".format(self.id, ext=ext)
+        filename = f"{self.id:07d}.{ext}"
+        self.filename_internal = filename
+
+        return filename
 
     def resize(self, longest: int):
+        """Resize the image in place if the file holds an image
+
+        Parameters
+        ----------
+        longest: int
+            The number of pixels along the long side of the image.
+
+        Returns
+        -------
+        None
+        """
+
         if not self.type_ == "image":
             return
 
@@ -139,6 +167,19 @@ class BaseFile(db.Model):
         io.imsave(self.path, util.img_as_ubyte(resized))
 
     def read_table(self) -> pd.DataFrame:
+        """Read a file and return a Pandas DataFrame is applicable
+
+        Returns
+        -------
+        pd.DataFrame
+            A Pandas DataFrame holding the data from the file.
+
+        Raises
+        ------
+        ValueError
+            If the file is not supported file format.
+        """
+
         match self.path.suffix:
             case ".csv":
                 read_fnc = pd.read_csv

@@ -26,7 +26,7 @@ def add(antibody_id: int):
         )
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    dilution = Dilution(antibody_id=antibody_id, user_id=current_user.id)
+    dilution = Dilution(antibody_id=antibody_id)
     form.populate_obj(dilution)
 
     try:

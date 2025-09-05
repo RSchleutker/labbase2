@@ -31,7 +31,6 @@ def upload_file(form, class_, **kwargs) -> Union[BaseFile, EntityFile]:
         filename = secure_filename(file.filename)
 
     db_file = class_(
-        user_id=current_user.id,
         filename_exposed=filename,
         note=form.note.data if hasattr(form, "note") else None,
         **kwargs,

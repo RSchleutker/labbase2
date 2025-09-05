@@ -121,7 +121,7 @@ class Export:
         mem.seek(0)
 
         for instance in instances:
-            pass
+            instance  # pylint: disable=pointless-statement
 
         return send_file(
             mem,

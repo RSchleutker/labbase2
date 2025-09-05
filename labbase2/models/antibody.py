@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from flask_login import current_user
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -99,7 +100,9 @@ class Dilution(db.Model, mixins.Export):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     antibody_id: Mapped[int] = mapped_column(ForeignKey("antibody.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id"), nullable=False, default=lambda: current_user.id
+    )
     application: Mapped[str] = mapped_column(String(64), nullable=False)
     dilution: Mapped[str] = mapped_column(String(32), nullable=False)
     reference: Mapped[str] = mapped_column(String(2048), nullable=False, info={"importable": True})

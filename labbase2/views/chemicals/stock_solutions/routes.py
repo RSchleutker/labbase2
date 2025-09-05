@@ -55,7 +55,7 @@ def add(chemical_id: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    solution = StockSolution(chemical_id=chemical_id, user_id=current_user.id)
+    solution = StockSolution(chemical_id=chemical_id)
     form.populate_obj(solution)
 
     try:

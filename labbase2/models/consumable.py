@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 
 from sqlalchemy import Date, ForeignKey, String, asc, desc, not_
 from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
@@ -174,7 +175,15 @@ class Consumable(BaseEntity, Export):
         return super().to_dict() | {"batches": [b.to_dict() for b in self.batches]}
 
     @property
-    def location(self):
+    def location(self) -> Optional[str]:
+        """Determine the location of this consumable.
+
+        Returns
+        -------
+        Optional[str]
+            The storage place of the first batch of this consumable, `None` otherwise.
+        """
+
         if self.batches:
             return self.batches[0].storage_place
 

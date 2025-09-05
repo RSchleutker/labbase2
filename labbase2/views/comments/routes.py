@@ -23,7 +23,7 @@ def add(entity_id: int):
     if not form.validate():
         return "<br>".join(Message.ERROR(error) for error in form.errors)
 
-    comment = Comment(entity_id=entity_id, user_id=current_user.id)
+    comment = Comment(entity_id=entity_id)
     form.populate_obj(comment)
 
     try:

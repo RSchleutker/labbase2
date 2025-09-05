@@ -9,8 +9,8 @@ from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from labbase2.models import BaseEntity
-from labbase2.models.fields import SequenceString
-from labbase2.models.mixins import Sequence
+from .fields import SequenceString
+from .mixins import Sequence
 
 __all__ = ["Oligonucleotide"]
 

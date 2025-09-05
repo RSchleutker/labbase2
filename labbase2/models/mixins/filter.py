@@ -1,4 +1,7 @@
+from typing import Any, ClassVar
+
 from sqlalchemy import asc, desc, select
+from sqlalchemy.orm import Mapped, Mapper
 from sqlalchemy.sql.selectable import Select
 
 __all__ = ["Filter"]
@@ -16,6 +19,10 @@ class Filter:
     this mixin can override one or several of these methods to customize the filter
     process.
     """
+
+    __mapper__: ClassVar[Mapper[Any]]
+
+    id: Mapped[int]
 
     @classmethod
     def filter_(cls, order_by: str, ascending: bool = True, **fields) -> Select:

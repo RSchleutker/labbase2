@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from labbase2.database import db
 from labbase2.models.mixins.importer import Importer
 
+from typing import Any
+
 __all__ = ["Request"]
 
 
@@ -51,7 +53,16 @@ class Request(db.Model, Importer):
 
     __table_args__ = {"extend_existing": True}
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
+        """Create a dict representation of the instance
+
+        Returns
+        -------
+        dict[str, Any]
+            A dict instance. Each key is the column name of the mapping and the value is
+            the database value of this instance.
+        """
+
         return {
             "id": self.id,
             "entity_id": self.entity_id,
