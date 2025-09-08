@@ -1,6 +1,6 @@
 from sqlalchemy import event, func
-from sqlalchemy.orm import Mapper, Session
 from sqlalchemy.engine import Connection
+from sqlalchemy.orm import Mapper, Session
 
 from labbase2.database import db
 from labbase2.models import ColumnMapping, Group, Oligonucleotide, User, file

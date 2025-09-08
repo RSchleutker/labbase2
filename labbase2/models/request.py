@@ -1,12 +1,11 @@
 from datetime import date
+from typing import Any
 
 from sqlalchemy import Date, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from labbase2.database import db
 from labbase2.models.mixins.importer import Importer
-
-from typing import Any
 
 __all__ = ["Request"]
 

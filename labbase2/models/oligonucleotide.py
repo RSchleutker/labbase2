@@ -9,6 +9,7 @@ from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from labbase2.models import BaseEntity
+
 from .fields import SequenceString
 from .mixins import Sequence
 
