@@ -15,8 +15,6 @@ class Importer:
     import_attr: ClassVar[tuple] = (("id", "ID"),)
     not_updatable: ClassVar[tuple] = ("id",)
 
-    label: Mapped[str]
-
     def update(self, **kwargs) -> None:
         """Update attributes of an entity.
 
@@ -76,8 +74,10 @@ class Importer:
         if update:
             if id_ := rec.pop("id", None):
                 entity = db.session.get(cls, id_)
-            elif label := rec.pop("label", None):
-                entity = db.session.scalar(select(cls).where(cls.label == label))
+            elif hasattr(cls, "label") and (label := rec.pop("label", None)):
+                entity = db.session.scalar(
+                    select(cls).where(cls.label.is_(label))  # pylint: disable=no-member
+                )
             else:
                 entity = None
 

@@ -1,5 +1,5 @@
-from .antibody import Antibody, Dilution
 from .base_entity import BaseEntity
+from .antibody import Antibody, Dilution
 from .chemical import Chemical, StockSolution
 from .comment import Comment
 from .consumable import Batch, Consumable

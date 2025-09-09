@@ -8,8 +8,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from labbase2.database import db
-from labbase2.models.mixins import Export
+from ..database import db
+from . import mixins
 
 __all__ = ["login_manager", "User", "Group", "Permission", "ResetPassword"]
 
@@ -32,7 +32,7 @@ group_permissions = db.Table(
 )
 
 
-class User(db.Model, UserMixin, Export):
+class User(db.Model, UserMixin, mixins.Export):
     """A person (user) that should have access to the database.
 
     Attributes
@@ -185,17 +185,33 @@ class User(db.Model, UserMixin, Export):
         return self.first_name + " " + self.last_name
 
     @username.expression
-    def username(cls):
+    def username(cls):  # pylint: disable=no-self-argument
         return cls.first_name + " " + cls.last_name
 
     @property
     def is_admin(self) -> bool:
+        """Is the user an admin or not
+
+        Returns
+        -------
+        bool
+            `True` if the user is an admin, `False` otherwise. By definition, a user is an admin,
+            if the user is member of the 'admin' group.
+        """
+
         admin_group = db.session.get(Group, "admin")
 
         return admin_group in self.groups
 
     @property
     def form_permissions(self) -> dict:
+        """
+
+        Returns
+        -------
+        dict
+        """
+
         out = {}
         for permission in self.permissions:
             out[permission.name.lower().replace(" ", "_")] = True
@@ -248,6 +264,20 @@ class User(db.Model, UserMixin, Export):
         return check_password_hash(self.password_hash, password)
 
     def has_permission(self, permission: Union[str, "Permission"]) -> bool:
+        """Check if the user has a certain permission by checking group memberships
+
+        Parameters
+        ----------
+        permission: str | Permission
+            Either a string describing the name of the permission (as defined by the config), i.e.,
+            the ID/name of the permission (primary key), or an instance of `Permission`.
+
+        Returns
+        -------
+        bool
+            `True` if any of the groups this user is member of confers the respective permission.
+        """
+
         if isinstance(permission, str):
             permission = db.session.get(Permission, permission)
 
@@ -259,11 +289,19 @@ class User(db.Model, UserMixin, Export):
 
     @classmethod
     def generate_password(cls) -> str:
+        """Generate a random password for a user.
+
+        Returns
+        -------
+        str
+            A random alphanumeric string of 12 characters.
+        """
+
         return secrets.token_hex(6)
 
 
-class Permission(db.Model, Export):
-    """Roles a user could possibly have.
+class Permission(db.Model, mixins.Export):
+    """Roles a user could possibly have
 
     Attributes
     ----------
@@ -284,7 +322,18 @@ class Permission(db.Model, Export):
     description: Mapped[str] = mapped_column(String(512), nullable=True)
 
 
-class Group(db.Model, Export):
+class Group(db.Model, mixins.Export):
+    """A class to represent a group, which bundles permissions for users
+
+    Attributes
+    ----------
+    name: str
+        A simple descriptive name for the group.
+    description: str
+        A more verbose description of the group stating the intended use.
+    permissions: list[Permission]
+        A list of `Permission`s. Each user will have these permissions if member of the group.
+    """
 
     __tablename__: str = "group"
 

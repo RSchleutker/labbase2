@@ -8,7 +8,7 @@ import pandas as pd
 from flask import current_app
 from flask_login import current_user
 from skimage import io, util
-from skimage.transform import resize
+from skimage.transform import resize  # pylint: disable=no-name-in-module
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -92,7 +92,7 @@ class BaseFile(db.Model):
         """The data from the file (either bytes or text)"""
 
         try:
-            with open(self.path, mode="r") as file:
+            with open(self.path, mode="r", encoding="utf-8") as file:
                 return file.read()
         except UnicodeDecodeError:
             with open(self.path, mode="rb") as file:
@@ -115,6 +115,8 @@ class BaseFile(db.Model):
 
     @property
     def mimetype(self) -> str:
+        """Return the mimetype for downloading"""
+
         ext = self.path.suffix.lower()
         return mimetypes.types_map.get(ext, "application/octet-stream")
 

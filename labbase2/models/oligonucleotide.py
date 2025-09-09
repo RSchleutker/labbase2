@@ -8,15 +8,15 @@ from Bio.SeqUtils import gc_fraction
 from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from labbase2.models import BaseEntity
+from . import BaseEntity
+from . import mixins
 
 from .fields import SequenceString
-from .mixins import Sequence
 
 __all__ = ["Oligonucleotide"]
 
 
-class Oligonucleotide(BaseEntity, Sequence):
+class Oligonucleotide(BaseEntity, mixins.Sequence):
     """A class to represent a primer.
 
     Attributes

@@ -4,9 +4,8 @@ from typing import Type
 from sqlalchemy import DateTime, ForeignKey, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from labbase2 import models
-from labbase2.database import db
-from labbase2.models import BaseEntity
+from .. import models
+from ..database import db
 
 __all__ = ["ImportJob", "ColumnMapping"]
 
@@ -75,7 +74,7 @@ class ImportJob(db.Model):
         return list(fields), list(columns)
 
     @property
-    def class_(self) -> Type[BaseEntity]:
+    def class_(self) -> Type[models.BaseEntity]:
         """Get the model class for which entities shall be imported
 
         Returns
@@ -86,7 +85,7 @@ class ImportJob(db.Model):
         return self.get_entity_class(self.entity_type)
 
     @classmethod
-    def get_entity_class(cls, type_: str) -> Type[BaseEntity]:
+    def get_entity_class(cls, type_: str) -> Type[models.BaseEntity]:
         """Get a model class by name
 
         Parameters

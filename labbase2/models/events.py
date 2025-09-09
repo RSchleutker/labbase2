@@ -46,6 +46,7 @@ def update_parent(_mapper, _connection, target) -> None:
     -------
     None
     """
+
     target.timestamp_edited = func.now()  # pylint: disable=not-callable
 
 

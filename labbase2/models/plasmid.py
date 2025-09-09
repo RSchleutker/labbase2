@@ -5,7 +5,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
-from flask import send_file
+from flask import send_file, current_app as app, Response
 from flask_login import current_user
 from sqlalchemy import Date, ForeignKey, String, asc, desc
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -92,8 +92,24 @@ class Plasmid(BaseEntity, Sequence):
 
     @property
     def storage_place(self) -> Optional[str]:
+        """The place where this plasmid is stored.
+
+        Returns
+        -------
+        Optional[str]
+            Either a string describing the storage place of this plasmid or `None` if the plasmid
+            does not have any non-empty preparation. The storage place for a plasmid is the place
+            of the first non-empty preparation.
+
+        Notes
+        -----
+        Can only be accessed by the owner of the respective preparation and admins.
+        """
+
         for preparation in self.preparations:
-            if preparation.date_emptied is not None and preparation.owner_id == current_user.id:
+            if preparation.date_emptied is not None and (
+                preparation.owner_id == current_user.id or current_user.is_admin
+            ):
                 return preparation.restricted_storage_place
 
         return None
@@ -128,14 +144,33 @@ class Plasmid(BaseEntity, Sequence):
 
         try:
             record = SeqIO.read(self.file.path, format=format_)
-        except Exception as error:
-            print(error)
+        except OSError as error:
+            app.logger.info(
+                f"OSError during opening of plasmid file for plasmid ({self.id}): {error}"
+            )
+            return None
+        except ValueError as error:
+            app.logger.info(
+                f"ValueError during parsing of plasmid file for plasmid ({self.id}): {error}"
+            )
             return None
 
         return record
 
     @classmethod
-    def to_zip(cls, entities):
+    def to_zip(cls, entities: list[db.Model]) -> Response:
+        """Consume a list of plasmids into an in-memory ZIP file
+
+        Parameters
+        ----------
+        entities: list[db.Model]
+            A list of `Plasmid` instances.
+
+        Returns
+        -------
+        Response
+            A flask Response object for downloading the ZIP file.
+        """
         mem = io.BytesIO()
 
         with ZipFile(mem, "w", ZIP_DEFLATED, False) as archive:
@@ -199,7 +234,16 @@ class Preparation(db.Model):
 
     @property
     def restricted_storage_place(self) -> str:
-        if current_user.id == self.owner_id:
+        """The storage place of this preparation
+
+        Returns
+        -------
+        str
+            A string describing the storage place of this plasmid preparation. This is only
+            accessible to the owner and admins.
+        """
+
+        if current_user.id == self.owner_id or current_user.is_admin:
             return self.storage_place
 
         return "Only accessible by owner of preparation!"
