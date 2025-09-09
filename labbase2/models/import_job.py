@@ -4,8 +4,8 @@ from typing import Type
 from sqlalchemy import DateTime, ForeignKey, func, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .. import models
-from ..database import db
+from labbase2 import models
+from labbase2.database import db
 
 __all__ = ["ImportJob", "ColumnMapping"]
 

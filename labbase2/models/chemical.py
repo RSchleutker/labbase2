@@ -5,8 +5,8 @@ from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship, subqueryload
 
 from labbase2.database import db
+from labbase2.models import mixins
 from labbase2.models.consumable import Consumable
-from labbase2.models.mixins.filter import Filter
 
 __all__ = ["Chemical", "StockSolution"]
 
@@ -63,7 +63,7 @@ class Chemical(Consumable):
         return subqueryload(cls.stocks), subqueryload(cls.batches)
 
 
-class StockSolution(db.Model, Filter):
+class StockSolution(db.Model, mixins.Filter):
     """
 
     Attributes

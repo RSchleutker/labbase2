@@ -8,8 +8,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from ..database import db
-from . import mixins
+from labbase2.database import db
+from labbase2.models import mixins
 
 __all__ = ["login_manager", "User", "Group", "Permission", "ResetPassword"]
 
@@ -96,9 +96,6 @@ class User(db.Model, UserMixin, mixins.Export):
         scheme theoretically allows to have several such resets active for one user
         but the application should make sure to delete any previous request for a new
         password once another request is started.
-    permissions : list[Permission]
-        Roles of this user. The set of roles determines hat a user can see and do in
-        the application.
 
 
     Notes
@@ -202,21 +199,6 @@ class User(db.Model, UserMixin, mixins.Export):
         admin_group = db.session.get(Group, "admin")
 
         return admin_group in self.groups
-
-    @property
-    def form_permissions(self) -> dict:
-        """
-
-        Returns
-        -------
-        dict
-        """
-
-        out = {}
-        for permission in self.permissions:
-            out[permission.name.lower().replace(" ", "_")] = True
-
-        return out
 
     def set_password(self, password: str) -> None:
         """Creates a hash that is stored in the database to validate the user's

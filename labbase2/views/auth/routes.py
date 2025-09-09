@@ -228,43 +228,6 @@ def change_password(key: Optional[str] = None):
     return render_template("auth/change-password.html", form=form)
 
 
-@bp.route("/change-permissions", methods=["GET"], defaults={"id_": None})
-@bp.route("/change-permissions/<int:id_>", methods=["GET", "POST"])
-@login_required
-@permission_required("change-group")
-def change_permissions(id_: int = None):
-    users_stmt = select(User).where(User.is_active).order_by(User.last_name, User.first_name)
-
-    if id_ is None:
-        user = current_user
-    else:
-        user = db.session.get(User, id_)
-
-    form = EditPermissions(**user.form_permissions)
-
-    if form.validate_on_submit():
-        user.permissions.clear()
-        for field in form:
-            if not field.type == "BooleanField":
-                continue
-            if not field.data:
-                continue
-
-            permission = db.session.get(Permission, field.name.replace("_", " ").capitalize())
-            user.permissions.append(permission)
-
-        db.session.commit()
-        app.logger.info("Updated permissions for user: %s", user.username)
-        flash(f"Successfully updated permissions for {user.username}!", "success")
-
-    return render_template(
-        "auth/edit-permissions.html",
-        form=form,
-        selected_user=user,
-        users=db.session.scalars(users_stmt).all(),
-    )
-
-
 @bp.route("/change-admin-status/<int:id_>", methods=["GET"])
 @login_required
 @permission_required("change-group")

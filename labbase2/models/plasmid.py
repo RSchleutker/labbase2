@@ -5,7 +5,9 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
-from flask import send_file, current_app as app, Response
+from flask import Response
+from flask import current_app as app
+from flask import send_file
 from flask_login import current_user
 from sqlalchemy import Date, ForeignKey, String, asc, desc
 from sqlalchemy.orm import Mapped, mapped_column, relationship

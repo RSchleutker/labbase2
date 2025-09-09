@@ -8,10 +8,8 @@ from Bio.SeqUtils import gc_fraction
 from sqlalchemy import Date, ForeignKey, String, asc, desc, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from . import BaseEntity
-from . import mixins
-
-from .fields import SequenceString
+from labbase2.models import BaseEntity, mixins
+from labbase2.models.fields import SequenceString
 
 __all__ = ["Oligonucleotide"]
 
