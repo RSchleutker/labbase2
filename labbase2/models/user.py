@@ -1,6 +1,6 @@
 import secrets
 from datetime import datetime
-from typing import Union
+from typing import Union, TYPE_CHECKING
 
 from flask_login import LoginManager, UserMixin
 from sqlalchemy import Column, DateTime, ForeignKey, String, func
@@ -10,6 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from labbase2.database import db
 from labbase2.models import mixins
+
 
 __all__ = ["login_manager", "User", "Group", "Permission", "ResetPassword"]
 
@@ -178,12 +179,12 @@ class User(db.Model, UserMixin, mixins.Export):
     )
 
     @hybrid_property
-    def username(self):
+    def username(self) -> str:
         return self.first_name + " " + self.last_name
 
     @username.expression
     def username(cls):  # pylint: disable=no-self-argument
-        return cls.first_name + " " + cls.last_name
+        return func.concat(cls.first_name, " ", cls.last_name)
 
     @property
     def is_admin(self) -> bool:
