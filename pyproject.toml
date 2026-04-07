@@ -1,6 +1,6 @@
 [project]
 name = "labbase2"
-version = "0.3.0"
+version = "0.3.1"
 description="A database application to manage lab resources."
 readme = "README.md"
 license = { file = "LICENSE" }
