@@ -1,9 +1,10 @@
 import io
 from datetime import date
+from typing import Union
 
 import pandas as pd
 from flask import send_file
-from sqlalchemy import inspect
+from sqlalchemy import Select, inspect
 
 from labbase2.database import db
 
@@ -27,12 +28,12 @@ class Export:
         return {c.key: getattr(self, c.key) for c in inst}
 
     @classmethod
-    def to_df(cls, instances: list[db.Model]) -> pd.DataFrame:
+    def to_df(cls, instances: Union[list[db.Model], Select]) -> pd.DataFrame:
         """Create a pandas dataframe from a list of instances
 
         Parameters
         ----------
-        instances: list[db.Model]
+        instances: Union[list[db.Model], Select]
 
         Returns
         -------
@@ -42,7 +43,8 @@ class Export:
             instance.
         """
 
-        instances = db.session.scalars(instances)
+        if not isinstance(instances, list):
+            instances = db.session.scalars(instances)
         return pd.DataFrame(i.to_dict() for i in instances)
 
     @classmethod

@@ -6,6 +6,8 @@ from Bio.Restriction import CommOnly
 from Bio.SeqRecord import SeqRecord
 from flask import Response, send_file
 
+from labbase2.database import db
+
 __all__ = ["Sequence"]
 
 
@@ -82,6 +84,7 @@ class Sequence:
         """
 
         with io.StringIO() as proxy:
+            instances = db.session.scalars(instances)
             SeqIO.write([i.seqrecord for i in instances], proxy, "fasta")
             mem = io.BytesIO(proxy.getvalue().encode("utf-8"))
 

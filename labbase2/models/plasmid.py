@@ -1,6 +1,7 @@
 import io
 from datetime import date
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from Bio import SeqIO
@@ -9,7 +10,7 @@ from flask import Response
 from flask import current_app as app
 from flask import send_file
 from flask_login import current_user
-from sqlalchemy import Date, ForeignKey, String, asc, desc
+from sqlalchemy import Date, ForeignKey, Select, String, asc, desc
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from labbase2.database import db
@@ -160,12 +161,12 @@ class Plasmid(BaseEntity, Sequence):
         return record
 
     @classmethod
-    def to_zip(cls, entities: list[db.Model]) -> Response:
+    def to_zip(cls, instances: Union[list[db.Model], Select]) -> Response:
         """Consume a list of plasmids into an in-memory ZIP file
 
         Parameters
         ----------
-        entities: list[db.Model]
+        instances: Union[list[db.Model], Select]
             A list of `Plasmid` instances.
 
         Returns
@@ -173,14 +174,24 @@ class Plasmid(BaseEntity, Sequence):
         Response
             A flask Response object for downloading the ZIP file.
         """
+
+        if not isinstance(instances, list):
+            instances = db.session.scalars(instances)
+
         mem = io.BytesIO()
 
         with ZipFile(mem, "w", ZIP_DEFLATED, False) as archive:
-            for plasmid in entities:
+            for plasmid in instances:
                 if plasmid.file_plasmid_id:
-                    archive.write(plasmid.file.path, plasmid.file.filename_exposed)
+                    archive.write(
+                        plasmid.file.path, Path(plasmid.label, plasmid.file.filename_exposed)
+                    )
                 if plasmid.file_map_id:
-                    archive.write(plasmid.map.path, plasmid.map.filename_exposed)
+                    archive.write(
+                        plasmid.map.path, Path(plasmid.label, plasmid.map.filename_exposed)
+                    )
+                for file in plasmid.files:
+                    archive.write(file.path, Path(plasmid.label, file.filename_exposed))
 
         mem.seek(0)
 
